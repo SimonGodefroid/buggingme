@@ -9,7 +9,7 @@ import {
   NavbarItem,
 } from '@nextui-org/react';
 
-import HeaderAuth from '@/app/components/header-auth';
+import HeaderAuth from '@/components/header-auth';
 
 // import SearchInput from './search-input';
 
