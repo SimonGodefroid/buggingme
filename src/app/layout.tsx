@@ -20,13 +20,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
-        <div className="container blue mx-auto px-4 max-w-6xl">
-          <Providers>
-            <Header />
-            {children}
-          </Providers>
-        </div>
+      <body className="mx-4">
+        <Providers>
+          <Header />
+          {children}
+        </Providers>
       </body>
     </html>
   );
