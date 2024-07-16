@@ -1,0 +1,7 @@
+-- AlterTable
+ALTER TABLE "Report" ALTER COLUMN "currentBehavior" DROP NOT NULL,
+ALTER COLUMN "expectedBehavior" DROP NOT NULL,
+ALTER COLUMN "snippets" DROP NOT NULL,
+ALTER COLUMN "steps" DROP NOT NULL,
+ALTER COLUMN "suggestions" DROP NOT NULL,
+ALTER COLUMN "url" DROP NOT NULL;
