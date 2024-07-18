@@ -54,7 +54,6 @@ export async function createReport(
 
 
   if (!result.success) {
-    console.log('coucou', result.error.flatten().fieldErrors)
     return {
       errors: result.error.flatten().fieldErrors,
     };
