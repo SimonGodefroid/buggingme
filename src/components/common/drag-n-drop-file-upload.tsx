@@ -1,10 +1,11 @@
 'use client';
 
 import React, { Dispatch, SetStateAction, useState } from 'react';
-import { useDropzone } from 'react-dropzone';
-import { Button } from '@nextui-org/react';
 
-export const FileUpload = ({
+import { Button } from '@nextui-org/react';
+import { useDropzone } from 'react-dropzone';
+
+export const DragNDropFileUpload = ({
   imageUrl,
   setImageUrl,
 }: {
@@ -15,9 +16,9 @@ export const FileUpload = ({
   const [uploading, setUploading] = useState(false);
 
   const { getRootProps, getInputProps } = useDropzone({
-    onDrop: acceptedFiles => {
-      setFiles(prevFiles => [...prevFiles, ...acceptedFiles]);
-    }
+    onDrop: (acceptedFiles) => {
+      setFiles((prevFiles) => [...prevFiles, ...acceptedFiles]);
+    },
   });
 
   const handleUpload = async () => {
@@ -37,7 +38,7 @@ export const FileUpload = ({
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({ filename: file.name, contentType: file.type }),
-        }
+        },
       );
 
       if (response.ok) {
@@ -70,31 +71,52 @@ export const FileUpload = ({
     }
 
     setUploading(false);
-    setFiles([]); // Clear files after upload
   };
 
   const removeFile = (fileName: string) => {
-    setFiles(prevFiles => prevFiles.filter(file => file.name !== fileName));
+    setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
   };
 
-  const fileList = files.map(file => (
+  const fileList = files.map((file) => (
     <li key={file.name}>
-      {file.name} - {file.size} bytes
-      <button onClick={() => removeFile(file.name)}>Remove</button>
+      <div className="flex gap-4 mt-4 items-center">
+        <div className='flex'>
+          {file.name} - {file.size} bytes
+        </div>
+        <div className='flex'>
+          <Button
+            type="button"
+            variant="bordered"
+            size="sm"
+            onClick={() => removeFile(file.name)}
+          >
+            {`Remove`}
+          </Button>
+        </div>
+      </div>
     </li>
   ));
 
   return (
     <section className="container rounded p-4 bg-white">
-      <h1>Upload a File to S3</h1>
+      <h1>Upload screenshots</h1>
       <div {...getRootProps({ className: 'dropzone' })}>
         <input {...getInputProps()} />
-        <p>Drop files here or click to select files</p>
+        <p>
+          Drop files <strong>here</strong> or{' '}
+          <strong style={{ cursor: 'pointer' }}>click</strong> to select files
+        </p>
       </div>
       <aside>
         <ul>{fileList}</ul>
       </aside>
-      <Button type="button" onClick={handleUpload} disabled={uploading}>
+      <Button
+        type="button"
+        onClick={handleUpload}
+        disabled={uploading}
+        color="secondary"
+        variant="light"
+      >
         Upload
       </Button>
     </section>

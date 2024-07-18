@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { createReport } from '@/actions/reports/create';
 import { faker } from '@faker-js/faker';
@@ -16,7 +16,7 @@ import {
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
-import { DropzoneClient } from '../common/drop-zone';
+import { DragNDropFileUpload } from '../common/drag-n-drop-file-upload';
 import EditorClient from '../common/editor';
 
 const FORM_ID = 'create-report';
@@ -26,16 +26,18 @@ export const CreateReportForm = () => {
   });
 
   const { onOpen, isOpen, onOpenChange, onClose } = useDisclosure();
+  const [imageUrl, setImageUrl] = useState(
+    'https://placehold.co/600x400?text=Your+screenshot+here',
+  );
 
-  console.log('formstate', formState);
   useEffect(() => {
     if (formState.success) {
       toast.success('Report created successfully !');
       onClose();
     }
     if (formState.errors._form?.length) {
-      console.log('error form');
       toast.error(formState.errors._form.join(', '));
+      setImageUrl('');
     }
   }, [formState]);
 
@@ -51,7 +53,7 @@ export const CreateReportForm = () => {
         <ModalContent>
           <div>
             <form
-              className="flex flex-col bg-slate-600 "
+              className="flex flex-col bg-slate-900"
               id={FORM_ID}
               action={action}
             >
@@ -98,7 +100,7 @@ export const CreateReportForm = () => {
                       <div className="m-4">
                         <img
                           src={
-                            faker.image.url() ||
+                            imageUrl ||
                             'https://placehold.co/600x400?text=Your+screenshot+here'
                           }
                           height="100"
@@ -107,7 +109,10 @@ export const CreateReportForm = () => {
                       </div>
                       <div className="flex flex-col gap-4 mx-4">
                         <h3 className="text-white">Files</h3>
-                        <DropzoneClient />
+                        <DragNDropFileUpload
+                          imageUrl={imageUrl}
+                          setImageUrl={setImageUrl}
+                        />
                       </div>
                     </div>
                   </div>
