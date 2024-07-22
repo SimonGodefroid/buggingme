@@ -4,6 +4,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 
 import Header from '@/components/header';
+import NavTabs from '@/components/nav-tabs';
 import Providers from '@/app/providers';
 
 const inter = Inter({ subsets: ['latin'] });
@@ -23,7 +24,8 @@ export default function RootLayout({
       <body className="mx-4">
         <Providers>
           <Header />
-          {children}
+          <NavTabs />
+          <div className="flex flex-col m-4">{children}</div>
         </Providers>
       </body>
     </html>

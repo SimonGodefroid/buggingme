@@ -2,7 +2,6 @@
 
 import { Divider } from '@nextui-org/react';
 
-import { CreateReportForm } from '@/components/reports/create-report-form';
 
 export default async function Home() {
   // const reports = await prisma.report.findMany({});
@@ -14,7 +13,7 @@ export default async function Home() {
         {/* <PostList fetchData={fetchTopPosts} /> */}
       </div>
       <div className="border shadow py-3 px-2">
-        <CreateReportForm />
+        
         <Divider className="my-2" />
         <h3 className="text-lg">Leaderboard</h3>
         <div>Leaderboard WIP</div>
