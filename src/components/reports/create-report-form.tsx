@@ -20,12 +20,22 @@ import { DragNDropFileUpload } from '../common/drag-n-drop-file-upload';
 import EditorClient from '../common/editor';
 
 const FORM_ID = 'create-report';
-export const CreateReportForm = () => {
+
+export const CreateReportForm = ({
+  onOpen,
+  isOpen,
+  onOpenChange,
+  onClose,
+}: {
+  onOpen: () => void;
+  isOpen: boolean;
+  onOpenChange: () => void;
+  onClose: () => void;
+}) => {
   const [formState, action] = useFormState(createReport, {
     errors: {},
   });
 
-  const { onOpen, isOpen, onOpenChange, onClose } = useDisclosure();
   const [imageUrl, setImageUrl] = useState(
     'https://placehold.co/600x400?text=Your+screenshot+here',
   );
@@ -43,7 +53,6 @@ export const CreateReportForm = () => {
 
   return (
     <>
-      <Button onPress={onOpen}>Create report</Button>
       <Modal
         isOpen={isOpen}
         onOpenChange={onOpenChange}
