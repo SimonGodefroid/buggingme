@@ -6,11 +6,9 @@ import { Button } from '@nextui-org/react';
 import { useDropzone } from 'react-dropzone';
 
 export const DragNDropFileUpload = ({
-  imageUrl,
-  setImageUrl,
+  setImages,
 }: {
-  imageUrl: string;
-  setImageUrl: Dispatch<SetStateAction<string>>;
+  setImages: Dispatch<SetStateAction<{ id: number; url: string }[]>>;
 }) => {
   const [files, setFiles] = useState<File[]>([]);
   const [uploading, setUploading] = useState(false);
@@ -59,7 +57,16 @@ export const DragNDropFileUpload = ({
 
         if (uploadResponse.ok) {
           const bucketImageUrl = uploadResponse.headers.get('Location') || '';
-          setImageUrl(bucketImageUrl);
+          // setImageUrl(bucketImageUrl);
+          console.log('bucketImageUrl', bucketImageUrl);
+          setImages((prevImages) => {
+            console.log('prevImages', prevImages);
+            const images = [
+              ...prevImages,
+              { id: prevImages.length + 1, url: bucketImageUrl },
+            ];
+            return images;
+          });
           alert('Upload successful!');
         } else {
           console.error('S3 Upload Error:', uploadResponse);
@@ -80,10 +87,10 @@ export const DragNDropFileUpload = ({
   const fileList = files.map((file) => (
     <li key={file.name}>
       <div className="flex gap-4 mt-4 items-center">
-        <div className='flex'>
+        <div className="flex">
           {file.name} - {file.size} bytes
         </div>
-        <div className='flex'>
+        <div className="flex">
           <Button
             type="button"
             variant="bordered"

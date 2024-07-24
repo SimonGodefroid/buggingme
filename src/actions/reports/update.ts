@@ -2,12 +2,11 @@
 
 import type { Report } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { z } from 'zod';
 import { auth } from '@/auth';
 import db from '@/db';
 
-const createReportSchema = z.object({
+const updateReportSchema = z.object({
   title: z.string().min(10),
   company: z.string().min(10),
   url: z.string().refine(value => /^([\da-z.-]+)\.([a-z.]{2,6})(\/[\w.-]*)*\/?$/.test(value), {
@@ -21,7 +20,7 @@ const createReportSchema = z.object({
   language: z.string().optional().nullable(),
 });
 
-interface CreateReportFormState {
+interface UpdateReportFormState {
   errors: {
     title?: string[],
     company?: string[],
@@ -37,12 +36,16 @@ interface CreateReportFormState {
   success?: boolean
 }
 
-export async function createReport(
-  formState: CreateReportFormState,
+export async function updateReport(
+  { id }: { id: string },
+  formState: UpdateReportFormState,
   formData: FormData
-): Promise<CreateReportFormState> {
+): Promise<UpdateReportFormState> {
 
-  const result = createReportSchema.safeParse({
+
+
+
+  const result = updateReportSchema.safeParse({
     title: formData.get('title'),
     company: formData.get('company'),
     url: formData.get('url'),
@@ -71,8 +74,10 @@ export async function createReport(
   }
 
   let report: Report;
+
   try {
-    report = await db.report.create({
+    report = await db.report.update({
+      where: { id },
       data: {
         title: result.data.title,
         company: result.data.company,
@@ -84,7 +89,7 @@ export async function createReport(
         userId: session.user.id!,
         snippets: result.data.snippets,
         language: result.data.language
-      },
+      }
     });
   } catch (err: unknown) {
     console.error('>'.repeat(200), err)
@@ -103,10 +108,13 @@ export async function createReport(
       };
     }
   } finally {
-    revalidatePath('/reports');
+    revalidatePath(`/reports/${id}`); // Update cached reports
+    revalidatePath(`/reports`); // Update cached reports
     return {
       errors: {},
       success: true,
     };
   }
 }
+
+

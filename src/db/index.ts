@@ -1,3 +1,5 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@prisma/client'
 
-export const db = new PrismaClient();
+let db = new PrismaClient()
+
+export default db;
