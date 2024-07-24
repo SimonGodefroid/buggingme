@@ -1,12 +1,27 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
 import { usePathname } from 'next/navigation';
 
-import { Button, Chip, Tab, Tabs, useDisclosure } from '@nextui-org/react';
+import { createReport } from '@/actions/reports/create';
+import { faker } from '@faker-js/faker';
+import {
+  Button,
+  Chip,
+  Modal,
+  modal,
+  ModalContent,
+  Tab,
+  Tabs,
+  useDisclosure,
+} from '@nextui-org/react';
+import { useFormState } from 'react-dom';
+import { toast } from 'react-toastify';
 
-import { CreateReportForm } from './reports/create-report-form';
+import { EditReportForm, FormMode } from './reports/edit-report-form';
+
+const DEFAULT_IMAGE = 'https://placehold.co/600x400?text=Your+screenshot+here';
 
 export default function NavTabs() {
   const [selected, setSelected] = React.useState<string | number>('reports');
@@ -75,8 +90,23 @@ export default function NavTabs() {
         </Tabs>
       </div>
       <div>
-        <Button onPress={modalProps.onOpen}>Report bug</Button>
-        <CreateReportForm {...modalProps} />
+        <Button
+          onPress={modalProps.onOpen}
+          color="success"
+          className="text-white"
+        >
+          Report bug
+        </Button>
+        <Modal
+          isOpen={modalProps.isOpen}
+          onOpenChange={modalProps.onOpenChange}
+          size="4xl"
+          placement="auto"
+        >
+          <ModalContent>
+            <EditReportForm mode={'create'} handleCancel={modalProps.onClose} />
+          </ModalContent>
+        </Modal>
       </div>
     </div>
   );

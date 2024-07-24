@@ -8,9 +8,11 @@ import { Autocomplete, AutocompleteItem } from '@nextui-org/react';
 export const LanguagePicker = ({
   setLanguage,
   language,
+  readOnly = false,
 }: {
   setLanguage: Function;
   language: string;
+  readOnly?: boolean;
 }) => {
   const monaco = useMonaco();
   const LANGUAGES = useMemo(() => {
@@ -21,8 +23,12 @@ export const LanguagePicker = ({
 
   return (
     <Autocomplete
-      label="Select a language"
-      className="max-w-fit"
+      label={readOnly ? 'Language' : 'Select a language'}
+      size="sm"
+      isDisabled={readOnly}
+      labelPlacement="outside-left"
+      color="success"
+      className="max-w-fit text-green-300"
       selectedKey={language}
       onSelectionChange={(value) => {
         setLanguage(value);

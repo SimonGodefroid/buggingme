@@ -2,11 +2,14 @@
 
 import React from 'react';
 
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 
 import {
+  Button,
   Chip,
   ChipProps,
+  Code,
+  Link,
   Table,
   TableBody,
   TableCell,
@@ -16,8 +19,9 @@ import {
   Tooltip,
 } from '@nextui-org/react';
 import { Report } from '@prisma/client';
+import { toast } from 'react-toastify';
 
-import { columns } from './data';
+import { columns } from './columns';
 
 const statusColorMap: Record<string, ChipProps['color']> = {
   active: 'success',
@@ -28,6 +32,7 @@ const statusColorMap: Record<string, ChipProps['color']> = {
 export default function ReportsTable({ reports }: { reports: Report[] }) {
   const router = useRouter();
 
+  const deleteReport = (id: string) => {};
   const renderCell = React.useCallback(
     (report: Report, columnKey: React.Key) => {
       const cellValue = report?.[columnKey as keyof Report];
@@ -48,10 +53,16 @@ export default function ReportsTable({ reports }: { reports: Report[] }) {
                 {cellValue?.toString()}
               </p>
               <a
-                className="text-bold text-sm  text-default-400 border-dotted border-2 border-sky-300 max-w-max"
-                href={report.url?.toString()}
+                className="text-bold text-sm  text-default-400 border-dotted border-2 border-sky-300 max-w-max text-ellipsis"
+                // href={`${report.url?.toString()}`}
+                href={`https://${report.url}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(evt) => {
+                  evt.stopPropagation();
+                }}
               >
-                {report.url?.toString()}
+                🔗 {report.url?.toString()}
               </a>
             </div>
           );
@@ -78,44 +89,66 @@ export default function ReportsTable({ reports }: { reports: Report[] }) {
           return (
             <div className="relative flex items-center gap-2">
               <Tooltip content="Edit report">
-                <button
+                <a
                   className="text-lg text-default-400 cursor-pointer active:opacity-50 p-1"
+                  href={`/reports/${report.id}/edit`}
                   onClick={(evt) => {
                     evt.stopPropagation();
-                    alert('Edit report');
                   }}
                 >
                   ✏️
-                </button>
+                </a>
               </Tooltip>
               <Tooltip color="danger" content="Delete report">
                 <button
                   className="text-lg text-danger cursor-pointer active:opacity-50 p-1"
                   onClick={(evt) => {
                     evt.stopPropagation();
-                    alert('Delete report');
+                    if (
+                      confirm('Are you sure you want to delete this report?')
+                    ) {
+                      deleteReport(report.id);
+                    }
                   }}
                 >
                   🗑️
                 </button>
               </Tooltip>
-              <Tooltip color="primary" content="Information">
-                <button
+              <Tooltip
+                color="foreground"
+                radius="sm"
+                onClick={(evt) => evt.stopPropagation()}
+                content={
+                  <div className="flex flex-col my-2">
+                    <dl className="flex flex-col gap-2">
+                      <dt>created at:</dt>
+                      <dd>
+                        <Code>{report.createdAt.toISOString()}</Code>
+                      </dd>
+                      <dt>updated at:</dt>
+                      <dd>
+                        <Code>{report.updatedAt.toISOString()}</Code>
+                      </dd>
+                    </dl>
+                  </div>
+                }
+                placement="bottom"
+              >
+                <span
                   className="text-lg text-primary cursor-pointer active:opacity-50 p-1"
                   onClick={(evt) => {
                     evt.stopPropagation();
-                    alert('Information');
                   }}
                 >
-                  ⓘ
-                </button>
+                  🕔
+                </span>
               </Tooltip>
-              <Tooltip color="primary" content="Upvote">
+              <Tooltip color="success" content="Upvote">
                 <button
                   className="text-lg text-primary cursor-pointer active:opacity-50 p-1"
                   onClick={(evt) => {
                     evt.stopPropagation();
-                    alert('Upvoted');
+                    toast.success('Upvoted');
                   }}
                 >
                   <div className="text-medium bg-purple-100 w-8 h-8 flex justify-center items-center rounded-full mx-auto">
@@ -123,12 +156,12 @@ export default function ReportsTable({ reports }: { reports: Report[] }) {
                   </div>
                 </button>
               </Tooltip>
-              <Tooltip color="primary" content="Downvote">
+              <Tooltip color="danger" content="Downvote">
                 <button
                   className="text-lg text-primary cursor-pointer active:opacity-50 p-1"
                   onClick={(evt) => {
                     evt.stopPropagation();
-                    alert('Downvoted');
+                    toast.success('Downvoted');
                   }}
                 >
                   <div className="text-medium bg-purple-100 w-8 h-8 flex justify-center items-center rounded-full mx-auto">
@@ -136,7 +169,7 @@ export default function ReportsTable({ reports }: { reports: Report[] }) {
                   </div>
                 </button>
               </Tooltip>
-              <Tooltip color="primary" content="Follow">
+              <Tooltip color="warning" content="Follow">
                 <button
                   className="cursor-pointer hover:opacity-70 p-2 "
                   onClick={(evt) => {
@@ -179,7 +212,17 @@ export default function ReportsTable({ reports }: { reports: Report[] }) {
         )}
       </TableHeader>
 
-      <TableBody items={reports} isLoading>
+      <TableBody
+        items={reports}
+        emptyContent={
+          <div className="flex flex-col items-center gap-4">
+            No reports to display...{' '}
+            <Button as={Link} href="/reports" color="primary" variant="ghost">
+              Try refreshing the page
+            </Button>
+          </div>
+        }
+      >
         {(item) => (
           <TableRow
             className="cursor-pointer m-4"
