@@ -105,8 +105,7 @@ export const DragNDropFileUpload = ({
   ));
 
   return (
-    <section className="container rounded p-4 bg-white">
-      <h1>Upload screenshots</h1>
+    <section className="container flex flex-col gap-2 rounded p-4 bg-white">
       <div {...getRootProps({ className: 'dropzone' })}>
         <input {...getInputProps()} />
         <p>

@@ -59,22 +59,84 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+model Tag {
+  id      String   @id @default(cuid())
+  name    String   @unique
+  reports Report[] @relation("ReportTags")
+}
+
+// Define the enum type
+enum ReportStatus {
+  Open
+  UnderReview
+  InProgress
+  Resolved
+  Closed
+  Deferred
+  Cancelled
+  Rejected
+  Deleted
+}
+
+enum Severity {
+  Critical
+  High
+  Medium
+  Low
+}
+
+enum Impact {
+  SingleUser
+  AllUsers
+  SpecificBrowsersDevices
+  SiteWide
+}
+
+model StatusHistory {
+  id        String       @id @default(cuid())
+  reportId  String
+  oldStatus ReportStatus
+  newStatus ReportStatus
+  changedAt DateTime     @default(now())
+  changedBy String // You might want to relate this to a User or include userId
+  report    Report       @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+model UpdateHistory {
+  id        String   @id @default(cuid())
+  reportId  String
+  fieldName String
+  oldValue  String?
+  newValue  String?
+  updatedAt DateTime @default(now())
+  updatedBy String // You might want to relate this to a User or include userId
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+}
+
+// Modify the Report model
 model Report {
-  id      String @id @default(cuid())
-  title   String
-  company String
-  url     String?
-  steps   String?
-	currentBehavior String?
-	expectedBehavior String?
-	suggestions String?
-	snippets String?
-  language String?
-  userId    String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  comments  Comment[]
+  id               String          @id @default(cuid())
+  title            String
+  company          String
+  url              String?
+  steps            String?
+  currentBehavior  String?
+  expectedBehavior String?
+  suggestions      String?
+  snippets         String?
+  language         String?
+  userId           String
+  createdAt        DateTime        @default(now())
+  updatedAt        DateTime        @updatedAt
+  user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments         Comment[]
+  // New status field
+  status           ReportStatus    @default(Open)
+  StatusHistory    StatusHistory[]
+  UpdateHistory    UpdateHistory[]
+  tags             Tag[]           @relation("ReportTags")
+  severity         Severity        @default(Medium)
+  impact           Impact          @default(SingleUser)
 }
 
 model Comment {

@@ -2,7 +2,7 @@
 
 import React from 'react';
 
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 
 import {
   Button,
@@ -18,16 +18,11 @@ import {
   TableRow,
   Tooltip,
 } from '@nextui-org/react';
-import { Report } from '@prisma/client';
+import { Report, ReportStatus } from '@prisma/client';
 import { toast } from 'react-toastify';
 
+import { Status } from '../common/status';
 import { columns } from './columns';
-
-const statusColorMap: Record<string, ChipProps['color']> = {
-  active: 'success',
-  paused: 'danger',
-  vacation: 'warning',
-};
 
 export default function ReportsTable({ reports }: { reports: Report[] }) {
   const router = useRouter();
@@ -75,16 +70,7 @@ export default function ReportsTable({ reports }: { reports: Report[] }) {
             </div>
           );
         case 'status':
-          return (
-            <Chip
-              className="capitalize"
-              // color={statusColorMap[report?.status || '']}
-              size="sm"
-              variant="flat"
-            >
-              {/* {cellValue} */}
-            </Chip>
-          );
+          return <Status status={cellValue?.toString() as ReportStatus} />;
         case 'actions':
           return (
             <div className="relative flex items-center gap-2">

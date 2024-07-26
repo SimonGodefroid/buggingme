@@ -15,7 +15,7 @@ import Providers from '@/app/providers';
 // const inter = Inter({ subsets: ['latin'] });
 
 // export const metadata: Metadata = {
-//   title: 'Bugging me - Find glitches get money',
+//   title: 'Bug busters - Find glitches get money',
 //   description: 'Submit bugs, get noticed, get paid',
 // };
 
@@ -26,7 +26,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="border-4 border-pink-300 mx-4">
+      <body className="">
         <Providers>
           <Header />
           <NavTabs />
