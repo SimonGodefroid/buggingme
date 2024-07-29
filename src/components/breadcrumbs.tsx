@@ -9,8 +9,8 @@ export const BreadCrumbsClient = ({ crumbs }: { crumbs: Crumbs }) => {
   return (
     <div className="mt-4">
       <Breadcrumbs>
-        {[HOME_CRUMB, ...crumbs].map((crumb) => (
-          <BreadcrumbItem href={crumb.href}>{crumb.text}</BreadcrumbItem>
+        {[HOME_CRUMB, ...crumbs].map((crumb,index) => (
+          <BreadcrumbItem key={crumb.href + index + crumb.text} href={crumb.href}>{crumb.text}</BreadcrumbItem>
         ))}
       </Breadcrumbs>
     </div>

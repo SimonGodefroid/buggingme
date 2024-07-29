@@ -5,10 +5,7 @@ import { Button, Link } from '@nextui-org/react';
 import type { Report } from '@prisma/client';
 
 import { BreadCrumbsClient } from '@/components/breadcrumbs';
-import {
-  EditReportForm,
-  FormMode,
-} from '@/components/reports/edit-report-form';
+import { ReportForm } from '@/components/reports/report-form';
 
 export default async function EditReport({
   params,
@@ -43,10 +40,7 @@ export default async function EditReport({
           Back
         </Button>
       </div>
-      <EditReportForm
-        mode={'edit'}
-        report={report}
-      />
+      <ReportForm mode={'edit'} report={report} />
     </div>
   );
 }
