@@ -57,10 +57,7 @@ export const DragNDropFileUpload = ({
 
         if (uploadResponse.ok) {
           const bucketImageUrl = uploadResponse.headers.get('Location') || '';
-          // setImageUrl(bucketImageUrl);
-          console.log('bucketImageUrl', bucketImageUrl);
           setImages((prevImages) => {
-            console.log('prevImages', prevImages);
             const images = [
               ...prevImages,
               { id: prevImages.length + 1, url: bucketImageUrl },
@@ -105,7 +102,7 @@ export const DragNDropFileUpload = ({
   ));
 
   return (
-    <section className="container flex flex-col gap-2 rounded p-4 bg-white">
+    <section className="container flex flex-col gap-2 rounded p-4 border-2 bg-blue-500">
       <div {...getRootProps({ className: 'dropzone' })}>
         <input {...getInputProps()} />
         <p>
@@ -121,7 +118,7 @@ export const DragNDropFileUpload = ({
         onClick={handleUpload}
         disabled={uploading}
         color="secondary"
-        variant="light"
+        variant="ghost"
       >
         Upload
       </Button>

@@ -21,7 +21,7 @@ import {
 import { Report, ReportStatus } from '@prisma/client';
 import { toast } from 'react-toastify';
 
-import { Status } from '../common/status';
+import { Status } from './status';
 import { columns } from './columns';
 
 export default function ReportsTable({ reports }: { reports: Report[] }) {
@@ -184,7 +184,7 @@ export default function ReportsTable({ reports }: { reports: Report[] }) {
       aria-label="Example table with custom cells"
       isHeaderSticky
       className="overflow-auto max-h-[70vh]"
-      classNames={{ tr: ['hover:bg-sky-200'] }}
+      classNames={{ tr: ['hover:bg-red-400 '] }}
       isCompact
     >
       <TableHeader columns={columns}>
