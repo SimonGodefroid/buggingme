@@ -1,6 +1,6 @@
 'use server';
 
-import { Impact, Severity, type Report } from '@prisma/client';
+import { Impact, Severity, Tag, type Report } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { auth } from '@/auth';
@@ -18,8 +18,9 @@ const updateReportSchema = z.object({
   suggestions: z.string().optional().nullable(),
   snippets: z.string().optional().nullable(),
   language: z.string().optional().nullable(),
-  impact: z.nativeEnum(Impact).optional(),
-  severity: z.nativeEnum(Severity).optional(),
+  impact: z.nativeEnum(Impact).default(Impact.SiteWide),
+  severity: z.nativeEnum(Severity).default(Severity.Medium),
+  tags: z.string().array()
 });
 
 interface UpdateReportFormState {
@@ -33,6 +34,8 @@ interface UpdateReportFormState {
     suggestions?: string[],
     snippets?: string[],
     language?: string[],
+    impact?: string[],
+    severity?: string[]
     _form?: string[],
   };
   success?: boolean
@@ -59,6 +62,7 @@ export async function updateReport(
     language: formData.get('language'),
     impact: formData.get('impact'),
     severity: formData.get('severity'),
+    tags: formData.getAll('tags')
   });
 
   if (!result.success) {
@@ -79,6 +83,7 @@ export async function updateReport(
   }
 
   let report: Report;
+  const tagIds = result.data.tags.map(tagId => ({ id: tagId }));
 
   try {
     report = await db.report.update({
@@ -91,11 +96,13 @@ export async function updateReport(
         currentBehavior: result.data.currentBehavior,
         expectedBehavior: result.data.expectedBehavior,
         suggestions: result.data.suggestions,
-        userId: session.user.id!,
         snippets: result.data.snippets,
         language: result.data.language,
         impact: result.data.impact,
-        severity: result.data.severity
+        severity: result.data.severity,
+        tags: {
+          set: tagIds,
+        }
       }
     });
   } catch (err: unknown) {

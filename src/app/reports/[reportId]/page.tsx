@@ -1,11 +1,15 @@
 import { notFound } from 'next/navigation';
 
 import db from '@/db';
-import { BreadcrumbItem, Breadcrumbs, Button, Link } from '@nextui-org/react';
-import type { Report } from '@prisma/client';
+import { Button, Link } from '@nextui-org/react';
+import type { Prisma } from '@prisma/client';
 
 import { BreadCrumbsClient } from '@/components/breadcrumbs';
 import { ReportForm } from '@/components/reports/report-form';
+
+export type ReportWithTags = Prisma.ReportGetPayload<{
+  include: { tags: true; user: true; StatusHistory: true };
+}>;
 
 export default async function EditReport({
   params,
@@ -14,9 +18,10 @@ export default async function EditReport({
 }) {
   const { reportId } = params;
 
-  const report = (await db.report.findFirst({
+  const report = (await db.report.findUnique({
     where: { id: params.reportId },
-  })) as Report;
+    include: { StatusHistory: true, tags: true, user: true },
+  })) as ReportWithTags;
   if (!report) {
     notFound();
   }

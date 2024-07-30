@@ -7,6 +7,8 @@ import type { Report } from '@prisma/client';
 import { BreadCrumbsClient } from '@/components/breadcrumbs';
 import { ReportForm } from '@/components/reports/report-form';
 
+import { ReportWithTags } from '../page';
+
 export default async function EditReport({
   params,
 }: {
@@ -16,7 +18,8 @@ export default async function EditReport({
 
   const report = (await db.report.findFirst({
     where: { id: params.reportId },
-  })) as Report;
+    include: { user: true, StatusHistory: true, tags: true },
+  })) as ReportWithTags;
 
   if (!report?.id) {
     return notFound();
