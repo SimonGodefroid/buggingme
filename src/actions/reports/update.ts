@@ -1,6 +1,6 @@
 'use server';
 
-import type { Report } from '@prisma/client';
+import { Impact, Severity, type Report } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { auth } from '@/auth';
@@ -18,6 +18,8 @@ const updateReportSchema = z.object({
   suggestions: z.string().optional().nullable(),
   snippets: z.string().optional().nullable(),
   language: z.string().optional().nullable(),
+  impact: z.nativeEnum(Impact).optional(),
+  severity: z.nativeEnum(Severity).optional(),
 });
 
 interface UpdateReportFormState {
@@ -55,12 +57,15 @@ export async function updateReport(
     suggestions: formData.get('suggestions'),
     snippets: formData.get('snippets'),
     language: formData.get('language'),
+    impact: formData.get('impact'),
+    severity: formData.get('severity'),
   });
 
-
   if (!result.success) {
+    const errors = result.error.flatten().fieldErrors;
+    console.error('result' + '>'.repeat(200), errors)
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors,
     };
   }
 
@@ -88,7 +93,9 @@ export async function updateReport(
         suggestions: result.data.suggestions,
         userId: session.user.id!,
         snippets: result.data.snippets,
-        language: result.data.language
+        language: result.data.language,
+        impact: result.data.impact,
+        severity: result.data.severity
       }
     });
   } catch (err: unknown) {
@@ -100,7 +107,7 @@ export async function updateReport(
         },
       };
     } else {
-      console.error('lol'.repeat(200))
+      console.error('>'.repeat(200))
       return {
         errors: {
           _form: ['Something went wrong'],

@@ -39,6 +39,8 @@ import { toast } from 'react-toastify';
 import { DragNDropFileUpload } from '@/components/common/drag-n-drop-file-upload';
 import { EditorClient } from '@/components/common/editor';
 
+import { ImpactChip } from './impact';
+import { SeverityChip } from './severity';
 import { Status } from './status';
 
 const DEFAULT_IMAGE = 'https://placehold.co/600x400?text=Your+screenshot+here';
@@ -235,22 +237,36 @@ export const ReportForm = ({
                 <div className="grid grid-cols-2 gap-4">
                   <Select
                     label="Impact"
+                    name="impact"
                     isDisabled={mode === 'view'}
-                    placeholder="Select a impact level"
-                    defaultSelectedKeys={['SiteWide']}
-                  >
-                    {Object.values(Impact).map((level) => (
-                      <SelectItem key={level}>{level}</SelectItem>
+                    placeholder="Select an impact level"
+                    defaultSelectedKeys={[report.impact]}
+                    classNames={{ value: ['mt-1'] }}
+                    renderValue={(selected) => (
+                      <ImpactChip impact={selected[0].key as Impact} />
+                    )}
+                    >
+                    {Object.values(Impact).map((impact) => (
+                      <SelectItem key={impact}>
+                        <ImpactChip impact={impact} />
+                      </SelectItem>
                     ))}
                   </Select>
                   <Select
                     label="Severity"
-                    defaultSelectedKeys={['Medium']}
+                    name="severity"
+                    defaultSelectedKeys={[report.severity]}
                     isDisabled={mode === 'view'}
-                    placeholder="Select an severity degree"
+                    placeholder="Select a severity degree"
+                    classNames={{ value: ['mt-1'] }}
+                    renderValue={(selected) => (
+                      <SeverityChip severity={selected[0].key as Severity} />
+                    )}
                   >
                     {Object.values(Severity).map((degree) => (
-                      <SelectItem key={degree}>{degree}</SelectItem>
+                      <SelectItem key={degree}>
+                        <SeverityChip severity={degree} />
+                      </SelectItem>
                     ))}
                   </Select>
                   <Select
@@ -302,7 +318,7 @@ export const ReportForm = ({
               <div className="flex m-4">
                 <div className="flex flex-col gap-4 w-full">
                   {!disabled && <DragNDropFileUpload setImages={setImages} />}
-                  <div className="flex gap-4">
+                  <div className="flex gap-4 justify-end">
                     {(images || []).map((image) => (
                       <Tooltip
                         placement="left"
