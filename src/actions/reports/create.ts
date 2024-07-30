@@ -19,8 +19,8 @@ const createReportSchema = z.object({
   suggestions: z.string().optional().nullable(),
   snippets: z.string().optional().nullable(),
   language: z.string().optional().nullable(),
-  impact: z.nativeEnum(Impact).optional(),
-  severity: z.nativeEnum(Severity).optional(),
+  impact: z.nativeEnum(Impact).optional().nullable(),
+  severity: z.nativeEnum(Severity).optional().nullable(),
 });
 
 interface CreateReportFormState {
@@ -60,8 +60,10 @@ export async function createReport(
 
 
   if (!result.success) {
+    const errors = result.error.flatten().fieldErrors;
+    console.error('errrors', errors)
     return {
-      errors: result.error.flatten().fieldErrors,
+      errors
     };
   }
 
@@ -88,8 +90,8 @@ export async function createReport(
         userId: session.user.id!,
         snippets: result.data.snippets,
         language: result.data.language,
-        impact: result.data.impact,
-        severity: result.data.severity
+        impact: result.data.impact!,
+        severity: result.data.severity!
       },
     });
   } catch (err: unknown) {

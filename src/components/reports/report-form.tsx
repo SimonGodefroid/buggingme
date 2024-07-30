@@ -2,10 +2,10 @@
 
 import React, {
   FormEvent,
-  Key,
   useEffect,
   useState,
   useTransition,
+  type Key,
 } from 'react';
 
 import Image from 'next/image';
@@ -13,6 +13,7 @@ import { redirect, useRouter } from 'next/navigation';
 
 import { createReport } from '@/actions/reports/create';
 import { REPORT_STATUS_STATE_MACHINE } from '@/actions/reports/helpers/reportStatus';
+import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
 import { updateReport } from '@/actions/reports/update';
 import { updateReportStatus } from '@/actions/reports/updateStatus';
 import { faker } from '@faker-js/faker';
@@ -32,12 +33,19 @@ import {
   Textarea,
   Tooltip,
 } from '@nextui-org/react';
-import { Impact, ReportStatus, Severity, type Report } from '@prisma/client';
+import {
+  Impact,
+  ReportStatus,
+  Severity,
+  Tag,
+  type Report,
+} from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
 import { DragNDropFileUpload } from '@/components/common/drag-n-drop-file-upload';
 import { EditorClient } from '@/components/common/editor';
+import { ReportWithTags } from '@/app/reports/[reportId]/page';
 
 import { ImpactChip } from './impact';
 import { SeverityChip } from './severity';
@@ -65,6 +73,18 @@ const MOCK_REPORT = {
   status: ReportStatus.Open,
   impact: Impact.SiteWide,
   severity: Severity.Medium,
+  tags: [
+    { id: 'clz2kud4w0004ei9ftba708s0', name: 'Security Vulnerability' },
+    { id: 'clz2kud4x0005ei9f6sd82o72', name: 'Functional Bug' },
+  ],
+  user: {
+    id: '4b380ad5-c697-4779-88d8-982b15a55ff4',
+    name: 'SimonGodefroid',
+    email: 'simon.godefroid@gmail.com',
+    emailVerified: null,
+    image: 'https://avatars.githubusercontent.com/u/17337190?v=4',
+  },
+  StatusHistory: [],
 };
 
 export const ReportForm = ({
@@ -73,19 +93,19 @@ export const ReportForm = ({
   mode,
   handleCancel,
 }: {
-  report?: Report;
+  report?: ReportWithTags;
   disabled?: boolean;
   mode: 'edit' | 'create' | 'view';
   handleCancel?: () => void;
 }) => {
   const [pending, startTransition] = useTransition();
-
   const [hovered, setHovered] = React.useState<ReportStatus | undefined>(
     undefined,
   );
+  const [tags, setTags] = useState<Tag[] | []>([]);
   const FORM_ID = `${mode}-report`;
-  const [selectedTags, setSelectedTags] = React.useState<Selection>(
-    new Set([]),
+  const [selectedTags, setSelectedTags] = useState<Selection>(
+    new Set((report?.tags || []).map((tag) => tag.id)),
   );
   const router = useRouter();
   const [formState, action] = useFormState(
@@ -100,6 +120,22 @@ export const ReportForm = ({
   const [images, setImages] = React.useState<{ id: number; url: string }[]>(
     Array.from({ length: 1 }, (v, k) => ({ id: k, url: DEFAULT_IMAGE })),
   );
+
+  useEffect(() => {
+    const loadTags = async () => {
+      try {
+        const allTags = await fetchAllTags();
+        setTags(allTags);
+      } catch (error: unknown) {
+        let message = 'Failed to load tags';
+        if (error instanceof Error) {
+          message += ` ${error.message}`;
+        }
+        toast.error(message);
+      }
+    };
+    loadTags();
+  }, []);
 
   useEffect(() => {
     if (formState.success) {
@@ -238,6 +274,7 @@ export const ReportForm = ({
                   <Select
                     label="Impact"
                     name="impact"
+                    isRequired={mode !== 'view'}
                     isDisabled={mode === 'view'}
                     placeholder="Select an impact level"
                     defaultSelectedKeys={[report.impact]}
@@ -245,7 +282,7 @@ export const ReportForm = ({
                     renderValue={(selected) => (
                       <ImpactChip impact={selected[0].key as Impact} />
                     )}
-                    >
+                  >
                     {Object.values(Impact).map((impact) => (
                       <SelectItem key={impact}>
                         <ImpactChip impact={impact} />
@@ -255,6 +292,7 @@ export const ReportForm = ({
                   <Select
                     label="Severity"
                     name="severity"
+                    isRequired={mode !== 'view'}
                     defaultSelectedKeys={[report.severity]}
                     isDisabled={mode === 'view'}
                     placeholder="Select a severity degree"
@@ -269,14 +307,20 @@ export const ReportForm = ({
                       </SelectItem>
                     ))}
                   </Select>
+                </div>
+                <div className="gap-4">
                   <Select
                     label={<div className="mb-4">Tags</div>}
+                    name="tags"
+                    isLoading={!Boolean(tags.length > 0)}
                     isDisabled={mode === 'view'}
                     selectionMode="multiple"
                     endContent={
+                      mode !== 'view' &&
+                      !Boolean(tags.length === 0) &&
                       new Set(selectedTags).size > 0 ? (
                         <span
-                          className="border-1 border-black rounded-full px-2"
+                          className="text-sm border-1 border-black rounded-full px-2"
                           onClick={() => setSelectedTags(new Set([]))}
                         >
                           Clear
@@ -293,8 +337,10 @@ export const ReportForm = ({
                           onClose={() => {
                             // Remove the item from the selectedTags set
                             const newSelectedTags = new Set(selectedTags);
-                            newSelectedTags.delete(value?.textValue!);
-                            setSelectedTags(newSelectedTags);
+                            if (value.key) {
+                              newSelectedTags.delete(value?.key as string);
+                              setSelectedTags(newSelectedTags);
+                            }
                           }}
                           key={value.key}
                           className="m-1"
@@ -306,8 +352,8 @@ export const ReportForm = ({
                     isMultiline
                     placeholder="Select tags"
                   >
-                    {Object.values(ReportStatus).map((tag) => (
-                      <SelectItem key={tag}>{tag}</SelectItem>
+                    {(tags || []).map((tag: Tag) => (
+                      <SelectItem key={tag.id}>{tag.name}</SelectItem>
                     ))}
                   </Select>
                 </div>
