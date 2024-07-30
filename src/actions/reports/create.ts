@@ -1,6 +1,6 @@
 'use server';
 
-import type { Report } from '@prisma/client';
+import { Impact, Severity, type Report } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -19,6 +19,8 @@ const createReportSchema = z.object({
   suggestions: z.string().optional().nullable(),
   snippets: z.string().optional().nullable(),
   language: z.string().optional().nullable(),
+  impact: z.nativeEnum(Impact).optional(),
+  severity: z.nativeEnum(Severity).optional(),
 });
 
 interface CreateReportFormState {
@@ -52,6 +54,8 @@ export async function createReport(
     suggestions: formData.get('suggestions'),
     snippets: formData.get('snippets'),
     language: formData.get('language'),
+    impact: formData.get('impact'),
+    severity: formData.get('severity'),
   });
 
 
@@ -83,7 +87,9 @@ export async function createReport(
         suggestions: result.data.suggestions,
         userId: session.user.id!,
         snippets: result.data.snippets,
-        language: result.data.language
+        language: result.data.language,
+        impact: result.data.impact,
+        severity: result.data.severity
       },
     });
   } catch (err: unknown) {
