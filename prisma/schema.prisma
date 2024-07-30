@@ -71,9 +71,9 @@ enum ReportStatus {
   UnderReview
   InProgress
   Resolved
-  Closed
-  Deferred
-  Cancelled
+  Closed // Closed ?
+  Deferred // rm
+  Cancelled // Closed ?
   Rejected
   Deleted
 }

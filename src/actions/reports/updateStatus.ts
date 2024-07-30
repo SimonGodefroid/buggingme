@@ -5,37 +5,43 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { auth } from '@/auth';
 import db from '@/db';
+import { assertStateTransition, RoleType } from './helpers/reportStatus';
 
 const updateReportStatusSchema = z.object({
-  status: z.nativeEnum(ReportStatus),
+  id: z.string(),
+  oldStatus: z.nativeEnum(ReportStatus),
+  newStatus: z.nativeEnum(ReportStatus),
 });
 
 interface UpdateReportStatusFormState {
   errors: {
-    status?: string[],
+    oldStatus?: string[],
+    newStatus?: string[]
     _form?: string[],
   };
   success?: boolean
 }
 
-export async function updateReport(
-  { id }: { id: string },
-  formState: UpdateReportStatusFormState,
-  formData: FormData
+export async function updateReportStatus(
+  { id, oldStatus, newStatus }: { id: string, oldStatus: ReportStatus, newStatus: ReportStatus },
+  formState: UpdateReportStatusFormState = { errors: {} },
 ): Promise<UpdateReportStatusFormState> {
 
-
-
-
   const result = updateReportStatusSchema.safeParse({
-    status: formData.get('status'),
+    id,
+    oldStatus,
+    newStatus
   });
 
-
   if (!result.success) {
-    return {
-      errors: result.error.flatten().fieldErrors,
-    };
+    const errors = Object.entries(result.error.flatten().fieldErrors).map(([k, v]) => `${k}: ${v}`).join(', ');
+    throw new Error(
+      errors
+    )
+  }
+
+  if (!assertStateTransition(oldStatus, newStatus, RoleType.Engineer)) {
+    throw new Error('You are trying to perform a forbidden status change');
   }
 
   const session = await auth();
@@ -50,12 +56,23 @@ export async function updateReport(
   let report: Report;
 
   try {
-    report = await db.report.update({
-      where: { id },
-      data: {
-        status: result.data.status,
-      }
-    });
+    const [report, statusHistory] = await db.$transaction([
+      db.report.update({
+        where: { id },
+        data: {
+          status: result.data.newStatus,
+        },
+      }),
+      db.statusHistory.create({
+        data: {
+          reportId: id,
+          oldStatus: result.data.oldStatus,
+          newStatus: result.data.newStatus,
+          changedAt: new Date(),
+          changedBy: session?.user?.id!
+        },
+      }),
+    ]);
   } catch (err: unknown) {
     console.error('>'.repeat(200), err)
     if (err instanceof Error) {
