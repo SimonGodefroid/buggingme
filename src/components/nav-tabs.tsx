@@ -16,7 +16,6 @@ import {
 
 import { ReportForm } from './reports/report-form';
 
-
 export default function NavTabs() {
   const [selected, setSelected] = React.useState<string | number>('reports');
   const modalProps = useDisclosure();
@@ -94,7 +93,7 @@ export default function NavTabs() {
         <Modal
           isOpen={modalProps.isOpen}
           onOpenChange={modalProps.onOpenChange}
-          size='5xl'
+          size="5xl"
           // size='full'
           // className='max-w-screen-xl overflow-auto max-h-[95vh]'
           placement="auto"
