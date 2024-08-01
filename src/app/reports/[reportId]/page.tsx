@@ -8,7 +8,7 @@ import { BreadCrumbsClient } from '@/components/breadcrumbs';
 import { ReportForm } from '@/components/reports/report-form';
 
 export type ReportWithTags = Prisma.ReportGetPayload<{
-  include: { tags: true; user: true; StatusHistory: true };
+  include: { tags: true; user: true; StatusHistory: true; company: true };
 }>;
 
 export default async function EditReport({
@@ -20,7 +20,7 @@ export default async function EditReport({
 
   const report = (await db.report.findUnique({
     where: { id: params.reportId },
-    include: { StatusHistory: true, tags: true, user: true },
+    include: { StatusHistory: true, tags: true, user: true, company: true },
   })) as ReportWithTags;
   if (!report) {
     notFound();

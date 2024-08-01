@@ -1,16 +1,11 @@
 'use client';
 
-import React, {
-  FormEvent,
-  useEffect,
-  useState,
-  useTransition,
-  type Key,
-} from 'react';
+import React, { useEffect, useState, useTransition, type Key } from 'react';
 
 import Image from 'next/image';
 import { redirect, useRouter } from 'next/navigation';
 
+import { fetchAllCompanies } from '@/actions/companies/fetchAllCompanies';
 import { createReport } from '@/actions/reports/create';
 import { REPORT_STATUS_STATE_MACHINE } from '@/actions/reports/helpers/reportStatus';
 import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
@@ -18,7 +13,6 @@ import { updateReport } from '@/actions/reports/update';
 import { updateReportStatus } from '@/actions/reports/updateStatus';
 import { faker } from '@faker-js/faker';
 import {
-  Autocomplete,
   Button,
   Chip,
   Dropdown,
@@ -33,13 +27,8 @@ import {
   Textarea,
   Tooltip,
 } from '@nextui-org/react';
-import {
-  Impact,
-  ReportStatus,
-  Severity,
-  Tag,
-  type Report,
-} from '@prisma/client';
+import { Impact, ReportStatus, Severity, Tag } from '@prisma/client';
+import debounce from 'lodash.debounce';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
@@ -47,6 +36,7 @@ import { DragNDropFileUpload } from '@/components/common/drag-n-drop-file-upload
 import { EditorClient } from '@/components/common/editor';
 import { ReportWithTags } from '@/app/reports/[reportId]/page';
 
+import CompanySelector from '../companies/company-selector';
 import { ImpactChip } from './impact';
 import { SeverityChip } from './severity';
 import { Status } from './status';
@@ -60,7 +50,7 @@ const MOCK_REPORT = {
   id: `${faker.database.mongodbObjectId}`,
   title: `${faker.hacker.noun()} ${faker.hacker.ingverb()}`,
   url: `${faker.internet.url().replace('https://', '')}`,
-  company: `${faker.company.name()}`,
+  companyId: `${faker.company.name()}`,
   steps: `1. ${faker.hacker.verb()} ${faker.hacker.noun()}\n2. ${faker.hacker.verb()} ${faker.hacker.noun()}`,
   currentBehavior: `It is currently ${faker.hacker.ingverb()} the ${faker.hacker.noun()}`,
   expectedBehavior: `It should ${faker.hacker.verb()} the ${faker.hacker.noun()}`,
@@ -85,6 +75,7 @@ const MOCK_REPORT = {
     image: 'https://avatars.githubusercontent.com/u/17337190?v=4',
   },
   StatusHistory: [],
+  company: { id: '', name: '', logo: '', domain: '' },
 };
 
 export const ReportForm = ({
@@ -98,15 +89,21 @@ export const ReportForm = ({
   mode: 'edit' | 'create' | 'view';
   handleCancel?: () => void;
 }) => {
+  const FORM_ID = `${mode}-report`;
+
   const [pending, startTransition] = useTransition();
+
   const [hovered, setHovered] = React.useState<ReportStatus | undefined>(
     undefined,
   );
+
   const [tags, setTags] = useState<Tag[] | []>([]);
-  const FORM_ID = `${mode}-report`;
   const [selectedTags, setSelectedTags] = useState<Selection>(
     new Set((report?.tags || []).map((tag) => tag.id)),
   );
+
+  const [companies, setCompanies] = useState<any[] | []>([]);
+
   const router = useRouter();
   const [formState, action] = useFormState(
     mode === 'edit'
@@ -138,6 +135,22 @@ export const ReportForm = ({
   }, []);
 
   useEffect(() => {
+    const loadCompanies = async () => {
+      try {
+        const allCompanies = await fetchAllCompanies();
+        setCompanies(allCompanies);
+      } catch (error: unknown) {
+        let message = 'Failed to load companies';
+        if (error instanceof Error) {
+          message += ` ${error.message}`;
+        }
+        toast.error(message);
+      }
+    };
+    loadCompanies();
+  }, []);
+
+  useEffect(() => {
     if (formState.success) {
       toast.success('Report edited successfully !');
       redirect(`/reports/${mode === 'create' ? '' : report?.id}`);
@@ -158,7 +171,7 @@ export const ReportForm = ({
   // }
   return (
     <div>
-      <form className="bg-blue-200 py-2 my-2" id={FORM_ID} action={action}>
+      <form className="bg-blue-200 " id={FORM_ID} action={action}>
         <div className="flex flex-col m-4">
           {/* Upper */}
           <div className="grid grid-cols-12 ">
@@ -241,8 +254,13 @@ export const ReportForm = ({
                     </DropdownMenu>
                   </Dropdown>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <Input
+                <div className="gap-4">
+                  <CompanySelector
+                    {...viewModeProps}
+                    companies={companies}
+                    report={report}
+                  />
+                  {/* <Input
                     {...viewModeProps}
                     label="Company"
                     defaultValue={report?.company}
@@ -252,7 +270,112 @@ export const ReportForm = ({
                     placeholder="Example Inc."
                     isInvalid={!!formState?.errors.company}
                     errorMessage={formState?.errors.company?.join(', ')}
-                  />
+                  /> */}
+                  {/*<Autocomplete
+                    allowsCustomValue
+                    classNames={{
+                      listboxWrapper: 'max-h-[320px]',
+                      selectorButton: 'text-default-500',
+                    }}
+                    // onClear={() => setCompaniesSuggestions([])}
+                    onInputChange={(value) => {
+                      debouncedFetchCompanies(value);
+                    }}
+                    inputProps={{
+                      classNames: {
+                        input: 'ml-1',
+                        inputWrapper: 'h-[60px] bg-background',
+                        label: 'mb-2',
+                      },
+                      autoFocus: true,
+                    }}
+                    isRequired
+                    listboxProps={{
+                      hideSelectedIcon: true,
+                      itemClasses: {
+                        base: [
+                          'rounded-medium',
+                          'text-default-500',
+                          'transition-opacity',
+                          'data-[hover=true]:text-foreground',
+                          'dark:data-[hover=true]:bg-default-50',
+                          'data-[pressed=true]:opacity-70',
+                          'data-[hover=true]:bg-default-200',
+                          'data-[selectable=true]:focus:bg-default-100',
+                          'data-[focus-visible=true]:ring-default-500',
+                        ],
+                      },
+                    }}
+                    aria-label="Select a company"
+                    label="Company"
+                    placeholder="Search company name"
+                    popoverProps={{
+                      offset: 10,
+                      classNames: {
+                        base: 'rounded-large',
+                        content:
+                          'p-1 border-small border-default-100 bg-background',
+                      },
+                    }}
+                    startContent={'🔍'}
+                    variant="bordered"
+                  >
+                    <AutocompleteSection title="Existing Companies">
+                      {dbCompanies.map((company: CompanySuggestion) => (
+                        <AutocompleteItem
+                          key={company.id}
+                          value={company.id}
+                          textValue={company.name}
+                        >
+                          {renderOption(company)}
+                        </AutocompleteItem>
+                      ))}
+                    </AutocompleteSection>
+                    <AutocompleteSection title="New Companies">
+                      {companiesSuggestions.map(
+                        (company: CompanySuggestion) => (
+                          <AutocompleteItem
+                            key={company.id}
+                            value={company.id}
+                            textValue={company.name}
+                          >
+                            {renderOption(company)}
+                          </AutocompleteItem>
+                        ),
+                      )}
+                    </AutocompleteSection>
+                    {/* {(item) => (
+                      <AutocompleteItem key={item.domain} textValue={item.name}>
+                        <div className="flex justify-between items-center">
+                          <div className="flex gap-2 items-center">
+                            <Avatar
+                              alt={item.name}
+                              className="flex-shrink-0"
+                              size="sm"
+                              src={item.logo}
+                            />
+                            <div className="flex flex-col">
+                              <span className="text-small">{item.name}</span>
+                              <span className="text-tiny text-default-400">
+                                {item.domain}
+                              </span>
+                            </div>
+                          </div>
+                          <Button
+                            className="border-small mr-0.5 font-medium shadow-small"
+                            radius="full"
+                            size="sm"
+                            variant="bordered"
+                            // onPress={() => createCompany(item)}
+                          >
+                            Create
+                          </Button>
+                        </div>
+                      </AutocompleteItem>
+                    )} 
+                  </Autocomplete>*/}
+                </div>
+                <div className="gap-4">
                   <Input
                     {...viewModeProps}
                     label="url"
