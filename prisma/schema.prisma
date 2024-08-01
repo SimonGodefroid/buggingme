@@ -117,7 +117,7 @@ model UpdateHistory {
 model Report {
   id               String          @id @default(cuid())
   title            String
-  company          String
+  companyId        String
   url              String?
   steps            String?
   currentBehavior  String?
@@ -137,6 +137,7 @@ model Report {
   tags             Tag[]           @relation("ReportTags")
   severity         Severity        @default(Medium)
   impact           Impact          @default(SingleUser)
+  company          Company?        @relation(fields: [companyId], references: [id])
 }
 
 model Comment {
@@ -151,4 +152,12 @@ model Comment {
   report    Report    @relation(fields: [reportId], references: [id], onDelete: Cascade)
   user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   children  Comment[] @relation("Comments")
+}
+
+model Company {
+  id      String   @id @default(cuid())
+  name    String   @unique
+  domain  String?
+  logo    String?
+  reports Report[]
 }

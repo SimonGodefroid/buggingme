@@ -8,7 +8,6 @@ import db from '@/db';
 
 const updateReportSchema = z.object({
   title: z.string().min(10),
-  company: z.string().min(10),
   url: z.string().refine(value => /^([\da-z.-]+)\.([a-z.]{2,6})(\/[\w.-]*)*\/?$/.test(value), {
     message: "Please provide a valid URL without the protocol",
   }),
@@ -26,7 +25,6 @@ const updateReportSchema = z.object({
 interface UpdateReportFormState {
   errors: {
     title?: string[],
-    company?: string[],
     url?: string[],
     steps?: string[],
     currentBehavior?: string[],
@@ -52,7 +50,6 @@ export async function updateReport(
 
   const result = updateReportSchema.safeParse({
     title: formData.get('title'),
-    company: formData.get('company'),
     url: formData.get('url'),
     steps: formData.get('steps'),
     currentBehavior: formData.get('currentBehavior'),
@@ -90,7 +87,6 @@ export async function updateReport(
       where: { id },
       data: {
         title: result.data.title,
-        company: result.data.company,
         url: result.data.url,
         steps: result.data.steps,
         currentBehavior: result.data.currentBehavior,
