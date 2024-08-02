@@ -114,8 +114,11 @@ export const ReportForm = ({
     },
   );
 
-  const [images, setImages] = React.useState<{ id: number; url: string }[]>(
-    Array.from({ length: 1 }, (v, k) => ({ id: k, url: DEFAULT_IMAGE })),
+  const [images, setImages] = React.useState<
+    { id: number; url: string }[] | []
+  >(
+    [],
+    // Array.from({ length: 1 }, (v, k) => ({ id: k, url: DEFAULT_IMAGE })),
   );
 
   useEffect(() => {
@@ -171,12 +174,12 @@ export const ReportForm = ({
   // }
   return (
     <div>
-      <form className="bg-blue-200 " id={FORM_ID} action={action}>
+      <form className="" id={FORM_ID} action={action}>
         <div className="flex flex-col m-4">
           {/* Upper */}
           <div className="grid grid-cols-12 ">
             {/* Left */}
-            <div className="col-span-6 ">
+            <div className="col-span-6">
               <div className="flex flex-col gap-4 m-4">
                 <div className="flex gap-4 items-center">
                   <Input

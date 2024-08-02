@@ -53,7 +53,7 @@ export default function CompanySelector({
   const [loading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<CompanySuggestion[] | []>([]);
   const [inputValue, setInputValue] = useState<string>('');
-
+  console.log('data', companyData);
   const handleSelectionChange = (selectedKey: Key | null) => {
     if (!selectedKey) {
       setCompanyData({ name: inputValue, domain: '', logo: '' });
@@ -66,6 +66,12 @@ export default function CompanySelector({
         const selectedSuggestion = suggestions.find(
           (suggestion) => suggestion.name === selectedKey,
         );
+        if (selectedSuggestion)
+          setCompanyData({
+            name: selectedSuggestion.name,
+            logo: selectedSuggestion.logo,
+            domain: selectedSuggestion.domain,
+          });
       }
     }
   };

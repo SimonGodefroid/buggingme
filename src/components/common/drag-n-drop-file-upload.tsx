@@ -102,7 +102,7 @@ export const DragNDropFileUpload = ({
   ));
 
   return (
-    <section className="container flex flex-col gap-2 rounded p-4 border-2 bg-blue-500">
+    <section className="container flex flex-col gap-2 rounded-xl p-4 border-2 h-full">
       <div {...getRootProps({ className: 'dropzone' })}>
         <input {...getInputProps()} />
         <p>
@@ -113,15 +113,17 @@ export const DragNDropFileUpload = ({
       <aside>
         <ul>{fileList}</ul>
       </aside>
-      <Button
-        type="button"
-        onClick={handleUpload}
-        disabled={uploading}
-        color="secondary"
-        variant="ghost"
-      >
-        Upload
-      </Button>
+      {Boolean(files.length > 0) && (
+        <Button
+          type="button"
+          onClick={handleUpload}
+          disabled={uploading}
+          color="secondary"
+          variant="ghost"
+        >
+          Upload
+        </Button>
+      )}
     </section>
   );
 };

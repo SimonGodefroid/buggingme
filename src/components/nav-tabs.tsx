@@ -95,7 +95,9 @@ export default function NavTabs() {
           onOpenChange={modalProps.onOpenChange}
           size="5xl"
           // size='full'
-          // className='max-w-screen-xl overflow-auto max-h-[95vh]'
+          style={{ margin: 0 }}
+          className="max-w-screen-xl overflow-auto max-h-[95vh]"
+          classNames={{ closeButton: 'text-foreground-50 top-3' }}
           placement="auto"
         >
           <ModalContent>

@@ -32,14 +32,15 @@ export default function RootLayout({
 }) {
   const [theme, setTheme] = useState<Theme>(Theme.dark);
   return (
-    <html lang="en">
-      <body
-        className={`${theme === Theme.dark ? 'dark text-foreground bg-background' : ''}`}
-      >
+    <html
+      lang="en"
+      className={`${theme === Theme.dark ? 'dark text-foreground bg-background' : ''} h-[100vh]`}
+    >
+      <body>
         <Providers>
           <Header theme={theme} setTheme={setTheme} />
           <NavTabs />
-          <main className="flex flex-col my-4">{children}</main>
+          <main className="my-4">{children}</main>
         </Providers>
       </body>
     </html>
