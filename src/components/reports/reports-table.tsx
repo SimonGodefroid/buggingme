@@ -2,14 +2,18 @@
 
 import React from 'react';
 
-import { useRouter } from 'next/navigation';
-
 import {
   Button,
   Chip,
   ChipProps,
-  Code,
-  Link,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+  Pagination,
+  Selection,
+  SortDescriptor,
   Table,
   TableBody,
   TableCell,
@@ -17,242 +21,342 @@ import {
   TableHeader,
   TableRow,
   Tooltip,
+  User,
 } from '@nextui-org/react';
-import { Report, ReportStatus } from '@prisma/client';
-import { toast } from 'react-toastify';
+import { Key } from '@react-types/shared';
 
-import { Status } from './status';
-import { columns } from './columns';
+import { columns, statusOptions } from '../companies/data';
+import { ReportWithTags } from '@/app/reports/[reportId]/page';
 
-export default function ReportsTable({ reports }: { reports: Report[] }) {
-  const router = useRouter();
+const statusColorMap: Record<string, ChipProps['color']> = {
+  active: 'success',
+  paused: 'danger',
+  vacation: 'warning',
+};
 
-  const deleteReport = (id: string) => {};
+const INITIAL_VISIBLE_COLUMNS = ['title', 'company', 'status', 'actions'];
+
+export default function ReportsTable({ reports }: { reports: ReportWithTags[] }) {
+  const [filterValue, setFilterValue] = React.useState('');
+  const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
+    new Set([]),
+  );
+  const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
+    new Set(INITIAL_VISIBLE_COLUMNS),
+  );
+  const [statusFilter, setStatusFilter] = React.useState<Selection>('all');
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
+    column: 'age',
+    direction: 'ascending',
+  });
+
+  const [page, setPage] = React.useState(1);
+
+  const hasSearchFilter = Boolean(filterValue);
+
+  const headerColumns = React.useMemo(() => {
+    if (visibleColumns === 'all') return columns;
+
+    return columns.filter((column: { uid: Key }) =>
+      Array.from(visibleColumns).includes(column.uid),
+    );
+  }, [visibleColumns]);
+
+  const filteredItems = React.useMemo(() => {
+    let filteredReports = [...reports];
+
+    if (hasSearchFilter) {
+      filteredReports = filteredReports.filter((report) =>
+        report.company?.name.toLowerCase().includes(filterValue.toLowerCase()),
+      );
+    }
+    if (
+      statusFilter !== 'all' &&
+      Array.from(statusFilter).length !== statusOptions.length
+    ) {
+      filteredReports = filteredReports.filter((report) =>
+        Array.from(statusFilter).includes(report.status),
+      );
+    }
+
+    return filteredReports;
+  }, [reports, filterValue, statusFilter]);
+
+  const pages = Math.ceil(filteredItems.length / rowsPerPage);
+
+  const items = React.useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return filteredItems.slice(start, end);
+  }, [page, filteredItems, rowsPerPage]);
+
+  const sortedItems = React.useMemo(() => {
+    return [...items].sort((a: Report, b: Report) => {
+      const first = a[sortDescriptor.column as keyof Report] as number;
+      const second = b[sortDescriptor.column as keyof Report] as number;
+      const cmp = first < second ? -1 : first > second ? 1 : 0;
+
+      return sortDescriptor.direction === 'descending' ? -cmp : cmp;
+    });
+  }, [sortDescriptor, items]);
+
   const renderCell = React.useCallback(
     (report: Report, columnKey: React.Key) => {
-      const cellValue = report?.[columnKey as keyof Report];
+      const cellValue = report[columnKey as keyof Report];
 
       switch (columnKey) {
-        case 'title':
-          return (
-            <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">
-                {cellValue?.toString()}
-              </p>
-            </div>
-          );
         case 'company':
           return (
-            <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">
-                {cellValue?.toString()}
-              </p>
-              <a
-                className="text-bold text-sm  text-default-400 border-dotted border-2 border-sky-300 max-w-max text-ellipsis"
-                // href={`${report.url?.toString()}`}
-                href={`https://${report.url}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(evt) => {
-                  evt.stopPropagation();
-                }}
-              >
-                🔗 {report.url?.toString()}
-              </a>
-            </div>
+            <User
+              avatarProps={{ radius: 'lg', src: report.company?.logo }}
+              description={report.company?.name}
+              name={cellValue?.company?.name}
+            >
+              {report.company.name}
+            </User>
           );
-        case 'steps':
+        case 'title':
           return (
-            <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">
-                {cellValue?.toString()}
-              </p>
-            </div>
+            <Tooltip
+              content={
+                <img src="https://placehold.co/600x400?text=Your+screenshot+here" />
+              }
+            >
+              <div className="flex flex-col">
+                <p className="text-bold text-small capitalize">{cellValue}</p>
+              </div>
+            </Tooltip>
           );
         case 'status':
-          return <Status status={cellValue?.toString() as ReportStatus} />;
+          return (
+            <Chip
+              className="capitalize"
+              color={statusColorMap[report.status]}
+              size="sm"
+              variant="flat"
+            >
+              {cellValue}
+            </Chip>
+          );
         case 'actions':
           return (
-            <div className="relative flex items-center gap-2">
-              <Tooltip content="Edit report">
-                <a
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50 p-1"
-                  href={`/reports/${report.id}/edit`}
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                  }}
-                >
-                  ✏️
-                </a>
-              </Tooltip>
-              <Tooltip color="danger" content="Delete report">
-                <button
-                  className="text-lg text-danger cursor-pointer active:opacity-50 p-1"
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                    if (
-                      confirm('Are you sure you want to delete this report?')
-                    ) {
-                      deleteReport(report.id);
-                    }
-                  }}
-                >
-                  🗑️
-                </button>
-              </Tooltip>
-              <Tooltip
-                color="foreground"
-                radius="sm"
-                onClick={(evt) => evt.stopPropagation()}
-                content={
-                  <div className="flex flex-col my-2">
-                    <dl className="flex flex-col gap-2">
-                      <dt>created at:</dt>
-                      <dd>
-                        <Code>{report.createdAt.toISOString()}</Code>
-                      </dd>
-                      <dt>updated at:</dt>
-                      <dd>
-                        <Code>{report.updatedAt.toISOString()}</Code>
-                      </dd>
-                    </dl>
-                  </div>
-                }
-                placement="bottom"
-              >
-                <span
-                  className="text-lg text-primary cursor-pointer active:opacity-50 p-1"
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                  }}
-                >
-                  🕔
-                </span>
-              </Tooltip>
-              <Tooltip color="success" content="Upvote">
-                <button
-                  className="text-lg text-primary cursor-pointer active:opacity-50 p-1"
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                    toast.success('Upvoted');
-                  }}
-                >
-                  <div className="text-medium bg-purple-100 w-8 h-8 flex justify-center items-center rounded-full mx-auto">
-                    ↑
-                  </div>
-                </button>
-              </Tooltip>
-              <Tooltip color="danger" content="Downvote">
-                <button
-                  className="text-lg text-primary cursor-pointer active:opacity-50 p-1"
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                    toast.success('Downvoted');
-                  }}
-                >
-                  <div className="text-medium bg-purple-100 w-8 h-8 flex justify-center items-center rounded-full mx-auto">
-                    ↓
-                  </div>
-                </button>
-              </Tooltip>
-              <Tooltip color="warning" content="Follow">
-                <button
-                  className="cursor-pointer hover:opacity-70 p-2 "
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                    alert('Followed');
-                  }}
-                >
-                  <div className="text-medium bg-purple-100 w-8 h-8 flex justify-center items-center rounded-full mx-auto">
-                    ⭐
-                  </div>
-                </button>
-              </Tooltip>
+            <div className="relative flex justify-end items-center gap-2">
+              <Dropdown>
+                <DropdownTrigger>
+                  <Button isIconOnly size="sm" variant="light">
+                    ...
+                  </Button>
+                </DropdownTrigger>
+                <DropdownMenu>
+                  <DropdownItem>View</DropdownItem>
+                  <DropdownItem>Edit</DropdownItem>
+                  <DropdownItem>Delete</DropdownItem>
+                </DropdownMenu>
+              </Dropdown>
             </div>
           );
-
         default:
-          return cellValue || <></>;
+          return cellValue;
       }
     },
     [],
   );
 
+  const onNextPage = React.useCallback(() => {
+    if (page < pages) {
+      setPage(page + 1);
+    }
+  }, [page, pages]);
+
+  const onPreviousPage = React.useCallback(() => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  }, [page]);
+
+  const onRowsPerPageChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setRowsPerPage(Number(e.target.value));
+      setPage(1);
+    },
+    [],
+  );
+
+  const onSearchChange = React.useCallback((value?: string) => {
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue('');
+    }
+  }, []);
+
+  const onClear = React.useCallback(() => {
+    setFilterValue('');
+    setPage(1);
+  }, []);
+
+  const topContent = React.useMemo(() => {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between gap-3 items-end">
+          <Input
+            isClearable
+            className="w-full sm:max-w-[44%]"
+            placeholder="Search by keywords..."
+            startContent={'🔍'}
+            value={filterValue}
+            onClear={() => onClear()}
+            onValueChange={onSearchChange}
+          />
+          <div className="flex gap-3">
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button endContent={'>'} variant="flat">
+                  Status
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={statusFilter}
+                selectionMode="multiple"
+                onSelectionChange={setStatusFilter}
+              >
+                {statusOptions.map(
+                  (status: { uid: string | number | undefined; name: any }) => (
+                    <DropdownItem key={status.uid} className="capitalize">
+                      {status.name}
+                    </DropdownItem>
+                  ),
+                )}
+              </DropdownMenu>
+            </Dropdown>
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button endContent={'>'} variant="flat">
+                  Columns
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={visibleColumns}
+                selectionMode="multiple"
+                onSelectionChange={setVisibleColumns}
+              >
+                {columns.map(
+                  (column: { uid: string | number | undefined; name: any }) => (
+                    <DropdownItem key={column.uid} className="capitalize">
+                      {column.name}
+                    </DropdownItem>
+                  ),
+                )}
+              </DropdownMenu>
+            </Dropdown>
+            <Button color="primary" endContent={'+'}>
+              Add New
+            </Button>
+          </div>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-default-400 text-small">
+            Total {reports.length} reports
+          </span>
+          <label className="flex items-center text-default-400 text-small">
+            Rows per page:
+            <select
+              className="bg-transparent outline-none text-default-400 text-small"
+              onChange={onRowsPerPageChange}
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    );
+  }, [
+    filterValue,
+    statusFilter,
+    visibleColumns,
+    onSearchChange,
+    onRowsPerPageChange,
+    reports.length,
+    hasSearchFilter,
+  ]);
+
+  const bottomContent = React.useMemo(() => {
+    return (
+      <div className="py-2 px-2 flex justify-between items-center">
+        <span className="w-[30%] text-small text-default-400" />
+        <Pagination
+          isCompact
+          showControls
+          showShadow
+          color="primary"
+          page={page}
+          total={pages}
+          onChange={setPage}
+        />
+        <div className="hidden sm:flex w-[30%] justify-end gap-2">
+          <Button
+            isDisabled={pages === 1}
+            size="sm"
+            variant="flat"
+            onPress={onPreviousPage}
+          >
+            Previous
+          </Button>
+          <Button
+            isDisabled={pages === 1}
+            size="sm"
+            variant="flat"
+            onPress={onNextPage}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+
   return (
     <Table
-      removeWrapper
-      aria-label="Example table with custom cells"
+      aria-label="Reports table"
       isHeaderSticky
-      className="overflow-auto max-h-[70vh]"
-      classNames={{ tr: ['hover:bg-red-400 '] }}
-      isCompact
+      bottomContent={bottomContent}
+      bottomContentPlacement="outside"
+      classNames={{
+        wrapper: 'max-h-[382px]',
+      }}
+      sortDescriptor={sortDescriptor}
+      topContent={topContent}
+      topContentPlacement="outside"
+      onSelectionChange={setSelectedKeys}
+      onSortChange={setSortDescriptor}
     >
-      <TableHeader columns={columns}>
-        {(column) => (
+      <TableHeader columns={headerColumns}>
+        {(column: any) => (
           <TableColumn
             key={column.uid}
             align={column.uid === 'actions' ? 'center' : 'start'}
+            allowsSorting={column.sortable}
           >
             {column.name}
           </TableColumn>
         )}
       </TableHeader>
-
-      <TableBody
-        items={reports}
-        emptyContent={
-          <div className="flex flex-col items-center gap-4">
-            No reports to display...{' '}
-            <Button as={Link} href="/reports" color="primary" variant="ghost">
-              Try refreshing the page
-            </Button>
-          </div>
-        }
-      >
+      <TableBody emptyContent={'No reports found'} items={sortedItems}>
         {(item) => (
-          <TableRow
-            className="cursor-pointer m-4"
-            key={item.id}
-            onClick={(evt) => {
-              router.push(`/reports/${item.id}`);
-            }}
-          >
+          <TableRow key={item.id}>
             {(columnKey) => (
-              <TableCell>
-                {columnKey === 'steps' ? (
-                  <Tooltip
-                    showArrow
-                    content={
-                      <div className="flex gap-4">
-                        <img
-                          src={
-                            'https://placehold.co/600x400?text=Your+screenshot+here'
-                          }
-                          alt="Popover image"
-                          width={200}
-                          height={200}
-                        />
-                        <img
-                          src={
-                            'https://placehold.co/600x400?text=Your+screenshot+here'
-                          }
-                          alt="Popover image"
-                          width={200}
-                          height={200}
-                        />
-                      </div>
-                    }
-                  >
-                    <div>
-                      <>{renderCell(item, columnKey)}</>
-                    </div>
-                  </Tooltip>
-                ) : (
-                  <div>
-                    <>{renderCell(item, columnKey)}</>
-                  </div>
-                )}
-              </TableCell>
+              <TableCell>{renderCell(item, columnKey)}</TableCell>
             )}
           </TableRow>
         )}
