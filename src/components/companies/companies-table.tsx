@@ -20,6 +20,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  Tooltip,
   User,
 } from '@nextui-org/react';
 import { Key } from '@react-types/shared';
@@ -118,12 +119,18 @@ export default function CompaniesTable() {
         );
       case 'role':
         return (
-          <div className="flex flex-col">
-            <p className="text-bold text-small capitalize">{cellValue}</p>
-            <p className="text-bold text-tiny capitalize text-default-400">
-              {user.team}
-            </p>
-          </div>
+          <Tooltip
+            content={
+              <img src="https://placehold.co/600x400?text=Your+screenshot+here" />
+            }
+          >
+            <div className="flex flex-col">
+              <p className="text-bold text-small capitalize">{cellValue}</p>
+              <p className="text-bold text-tiny capitalize text-default-400">
+                {user.team}
+              </p>
+            </div>
+          </Tooltip>
         );
       case 'status':
         return (
