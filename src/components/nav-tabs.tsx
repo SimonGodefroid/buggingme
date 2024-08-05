@@ -16,7 +16,14 @@ import {
 
 import { ReportForm } from './reports/report-form';
 
-export default function NavTabs() {
+export type Count = {
+  companies: number;
+  campaigns: number;
+  contributors: number;
+  reports: number;
+};
+
+export default function NavTabs({ count }: { count: Count }) {
   const [selected, setSelected] = React.useState<string | number>('reports');
   const modalProps = useDisclosure();
 
@@ -50,7 +57,7 @@ export default function NavTabs() {
               <div className="flex items-center space-x-2">
                 <span>🐛&nbsp; Reports</span>
                 <Chip size="sm" variant="faded">
-                  9
+                  {count.reports}
                 </Chip>
               </div>
             }
@@ -60,9 +67,9 @@ export default function NavTabs() {
             key="/contributors"
             title={
               <div className="flex items-center space-x-2">
-                <span>👷👷‍♀️ &nbsp;Contributors</span>
+                <span>👷👷‍♀️&nbsp;Contributors</span>
                 <Chip size="sm" variant="faded">
-                  9
+                  {count.contributors}
                 </Chip>
               </div>
             }
@@ -72,13 +79,37 @@ export default function NavTabs() {
             key="/companies"
             title={
               <div className="flex items-center space-x-2">
-                <span>🏢 &nbsp;Companies</span>
+                <span>🏢&nbsp;Companies</span>
                 <Chip size="sm" variant="faded">
-                  9
+                  {count.companies}
                 </Chip>
               </div>
             }
             href="/companies"
+          />
+          <Tab
+            key="/campaigns"
+            title={
+              <div className="flex items-center space-x-2">
+                <span>📢&nbsp;Campaigns</span>
+                <Chip size="sm" variant="faded">
+                  {count.campaigns}
+                </Chip>
+              </div>
+            }
+            href="/campaigns"
+          />
+          <Tab
+            key="/leaderboard"
+            title={
+              <div className="flex items-center space-x-2">
+                <span>🏆&nbsp;Leaderboard</span>
+                <Chip size="sm" color="danger">
+                  New
+                </Chip>
+              </div>
+            }
+            href="/leaderboard"
           />
         </Tabs>
       </div>
@@ -95,7 +126,9 @@ export default function NavTabs() {
           onOpenChange={modalProps.onOpenChange}
           size="5xl"
           // size='full'
-          // className='max-w-screen-xl overflow-auto max-h-[95vh]'
+          style={{ margin: 0 }}
+          className="max-w-screen-xl overflow-auto max-h-[95vh]"
+          classNames={{ closeButton: 'text-foreground-50 top-3' }}
           placement="auto"
         >
           <ModalContent>

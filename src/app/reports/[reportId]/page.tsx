@@ -11,7 +11,7 @@ export type ReportWithTags = Prisma.ReportGetPayload<{
   include: { tags: true; user: true; StatusHistory: true; company: true };
 }>;
 
-export default async function EditReport({
+export default async function ViewReport({
   params,
 }: {
   params: { reportId: string };
@@ -19,15 +19,16 @@ export default async function EditReport({
   const { reportId } = params;
 
   const report = (await db.report.findUnique({
-    where: { id: params.reportId },
+    where: { id: reportId },
     include: { StatusHistory: true, tags: true, user: true, company: true },
   })) as ReportWithTags;
+
   if (!report) {
     notFound();
   }
 
   return (
-    <div className="flex flex-col ">
+    <div className="flex flex-col">
       <div className="flex items-center justify-between">
         <BreadCrumbsClient
           crumbs={[
@@ -36,7 +37,6 @@ export default async function EditReport({
             { href: `/reports/${report.id}`, text: `View` },
           ]}
         />
-        {/* <h1>{`View report ${reportId}`}</h1> */}
         <div className="flex flex-col flex-wrap gap-4"></div>
         <div className="flex items-center gap-4">
           <Button href={`/reports`} as={Link} color="primary" variant="ghost">

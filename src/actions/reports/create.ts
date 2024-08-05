@@ -117,7 +117,6 @@ export async function createReport(
       },
     };
   }
-  console.log('tacul')
   let report: Report;
   const tagIds = result.data.tags.map(tagId => ({ id: tagId }));
   try {

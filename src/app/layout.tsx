@@ -1,5 +1,3 @@
-'use client';
-
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 
@@ -7,9 +5,14 @@ import './globals.css';
 
 import { useState } from 'react';
 
-import { BreadcrumbItem, Breadcrumbs } from '@nextui-org/react';
+import db from '@/db';
+import {
+  countCampaigns,
+  countCompanies,
+  countContributors,
+  countReports,
+} from '@/queries';
 
-import { BreadCrumbsClient } from '@/components/breadcrumbs';
 import Header from '@/components/header';
 import NavTabs from '@/components/nav-tabs';
 import Providers from '@/app/providers';
@@ -20,26 +23,37 @@ import Providers from '@/app/providers';
 //   title: 'Bug busters - Find glitches get money',
 //   description: 'Submit bugs, get noticed, get paid',
 
-export enum Theme {
-  dark = 'dark',
-  light = 'light',
+async function fetchCounts() {
+  try {
+    const [companies, reports, campaigns, contributors] = await Promise.all([
+      countCompanies(),
+      countReports(),
+      countCampaigns(),
+      countContributors(),
+    ]);
+
+    return { companies, reports, campaigns, contributors };
+  } catch (error) {
+    console.error('Failed to load counts:', error);
+    return { companies: 0, reports: 0, campaigns: 0, contributors: 0 };
+  }
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const [theme, setTheme] = useState<Theme>(Theme.dark);
+  const counts = await fetchCounts();
+
   return (
     <html lang="en">
-      <body
-        className={`${theme === Theme.dark ? 'dark text-foreground bg-background' : ''}`}
-      >
+      <body>
         <Providers>
-          <Header theme={theme} setTheme={setTheme} />
-          <NavTabs />
-          <main className="flex flex-col my-4">{children}</main>
+          {/* Wrap main content with ThemeProvider */}
+          <Header />
+          <NavTabs count={counts} />
+          <main className="my-4">{children}</main>
         </Providers>
       </body>
     </html>

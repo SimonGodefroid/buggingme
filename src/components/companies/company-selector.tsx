@@ -7,7 +7,7 @@ import {
   Avatar,
   InputProps,
 } from '@nextui-org/react';
-import { Company, Report } from '@prisma/client';
+import { Company } from '@prisma/client';
 import debounce from 'lodash.debounce';
 import differenceby from 'lodash.differenceby';
 import { toast } from 'react-toastify';
@@ -35,15 +35,11 @@ type CompanySuggestion = {
 };
 
 export default function CompanySelector({
-  isRequired,
-  isReadOnly,
-  color,
+  mode,
   companies,
   report,
 }: {
-  isRequired: boolean;
-  isReadOnly?: boolean;
-  color: InputProps['color'];
+  mode: 'create' | 'edit' | 'view';
   companies: Company[];
   report?: ReportWithTags;
 }) {
@@ -53,7 +49,6 @@ export default function CompanySelector({
   const [loading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<CompanySuggestion[] | []>([]);
   const [inputValue, setInputValue] = useState<string>('');
-
   const handleSelectionChange = (selectedKey: Key | null) => {
     if (!selectedKey) {
       setCompanyData({ name: inputValue, domain: '', logo: '' });
@@ -66,6 +61,12 @@ export default function CompanySelector({
         const selectedSuggestion = suggestions.find(
           (suggestion) => suggestion.name === selectedKey,
         );
+        if (selectedSuggestion)
+          setCompanyData({
+            name: selectedSuggestion.name,
+            logo: selectedSuggestion.logo,
+            domain: selectedSuggestion.domain,
+          });
       }
     }
   };
@@ -114,7 +115,7 @@ export default function CompanySelector({
 
   const debouncedFetchSuggestions = debounce(fetchSuggestions, 200);
 
-  if (isReadOnly && report) {
+  if (report && mode !== 'create') {
     return (
       <div className="flex border-2 bg-foreground-100 rounded-xl p-4">
         <a
@@ -132,8 +133,7 @@ export default function CompanySelector({
     <>
       <Autocomplete
         name="company"
-        isRequired={isRequired}
-        isReadOnly={isReadOnly}
+        isRequired
         isLoading={loading}
         classNames={{
           listboxWrapper: 'max-h-[320px]',
@@ -150,7 +150,7 @@ export default function CompanySelector({
         variant="bordered"
         allowsCustomValue
         onSelectionChange={handleSelectionChange}
-        items={isReadOnly ? [] : suggestions}
+        items={suggestions}
         label="Pick a company"
         placeholder="Select a company"
         onInputChange={handleInputChange}

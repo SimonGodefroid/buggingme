@@ -4,12 +4,18 @@ import React from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { pascalToSentenceCase } from '@/helpers/strings/pascalToSentenceCase';
 import {
   Button,
   Chip,
-  ChipProps,
-  Code,
-  Link,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+  Input,
+  Pagination,
+  Selection,
+  SortDescriptor,
   Table,
   TableBody,
   TableCell,
@@ -17,242 +23,378 @@ import {
   TableHeader,
   TableRow,
   Tooltip,
+  User,
 } from '@nextui-org/react';
-import { Report, ReportStatus } from '@prisma/client';
-import { toast } from 'react-toastify';
+import { ReportStatus } from '@prisma/client';
+import { Key } from '@react-types/shared';
 
+import { ReportWithTags } from '@/app/reports/[reportId]/page';
+
+import { columns } from '../reports/data';
+import { ImpactChip } from './impact';
+import { SeverityChip } from './severity';
 import { Status } from './status';
-import { columns } from './columns';
+import { TagChip } from './tag';
 
-export default function ReportsTable({ reports }: { reports: Report[] }) {
+const INITIAL_VISIBLE_COLUMNS = [
+  'title',
+  'company',
+  'status',
+  'user',
+  'tags',
+  'severity',
+  'impact',
+  'createdAt',
+  'actions',
+];
+
+export default function ReportsTable({
+  reports,
+}: {
+  reports: ReportWithTags[];
+}) {
   const router = useRouter();
+  const [filterValue, setFilterValue] = React.useState('');
+  const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
+    new Set([]),
+  );
+  const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
+    new Set(INITIAL_VISIBLE_COLUMNS),
+  );
+  const [statusFilter, setStatusFilter] = React.useState<
+    Selection | ReportStatus
+  >('all');
+  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
+    column: 'createdAt',
+    direction: 'descending',
+  });
 
-  const deleteReport = (id: string) => {};
+  const [page, setPage] = React.useState(1);
+
+  const hasSearchFilter = Boolean(filterValue);
+
+  const headerColumns = React.useMemo(() => {
+    if (visibleColumns === 'all') return columns;
+
+    return columns.filter((column: (typeof columns)[number]) =>
+      Array.from(visibleColumns).includes(column.uid as Key),
+    );
+  }, [visibleColumns]);
+
+  const filteredItems = React.useMemo(() => {
+    let filteredReports = [...reports];
+
+    if (hasSearchFilter) {
+      filteredReports = filteredReports.filter((report) =>
+        report.title.toLowerCase().includes(filterValue.toLowerCase()),
+      );
+    }
+    if (
+      statusFilter !== 'all' &&
+      Array.from(statusFilter).length !== Object.keys(ReportStatus).length
+    ) {
+      filteredReports = filteredReports.filter((report) =>
+        Array.from(statusFilter).includes(report.status),
+      );
+    }
+
+    return filteredReports;
+  }, [reports, filterValue, statusFilter]);
+
+  const pages = Math.ceil(filteredItems.length / rowsPerPage);
+
+  const items = React.useMemo(() => {
+    const start = (page - 1) * rowsPerPage;
+    const end = start + rowsPerPage;
+
+    return filteredItems.slice(start, end);
+  }, [page, filteredItems, rowsPerPage]);
+
+  const sortedItems = React.useMemo(() => {
+    return [...items].sort((a: ReportWithTags, b: ReportWithTags) => {
+      const first = a?.[sortDescriptor?.column as keyof ReportWithTags];
+      const second = b?.[sortDescriptor?.column as keyof ReportWithTags];
+      const cmp = first! < second! ? -1 : first! > second! ? 1 : 0;
+
+      return sortDescriptor.direction === 'descending' ? -cmp : cmp;
+    });
+  }, [sortDescriptor, items]);
+
   const renderCell = React.useCallback(
-    (report: Report, columnKey: React.Key) => {
-      const cellValue = report?.[columnKey as keyof Report];
-
+    (report: ReportWithTags, columnKey: React.Key) => {
+      const cellValue = report[columnKey as keyof ReportWithTags];
       switch (columnKey) {
-        case 'title':
-          return (
-            <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">
-                {cellValue?.toString()}
-              </p>
-            </div>
-          );
         case 'company':
           return (
-            <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">
-                {cellValue?.toString()}
-              </p>
-              <a
-                className="text-bold text-sm  text-default-400 border-dotted border-2 border-sky-300 max-w-max text-ellipsis"
-                // href={`${report.url?.toString()}`}
-                href={`https://${report.url}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(evt) => {
-                  evt.stopPropagation();
-                }}
-              >
-                🔗 {report.url?.toString()}
-              </a>
-            </div>
+            <User
+              avatarProps={{
+                radius: 'lg',
+                src: `${report?.company?.logo}` || '',
+              }}
+              description={report.company?.domain}
+              name={report?.company?.name}
+            >
+              {report?.company?.name}
+            </User>
+          );
+        case 'title':
+          return (
+            <Tooltip content={<pre></pre>}>
+              <div className="flex flex-col">
+                <p className="text-bold text-small capitalize">
+                  {report.title}
+                </p>
+              </div>
+            </Tooltip>
+          );
+        case 'url':
+          return (
+            <a href={`https://${report.url}`} target="_blank" rel="noreferrer">
+              {report.url}
+            </a>
+          );
+        case 'createdAt':
+          return (
+            <Chip color="default" size="sm">
+              {new Date(report.createdAt).toISOString()}
+            </Chip>
           );
         case 'steps':
           return (
-            <div className="flex flex-col">
-              <p className="text-bold text-sm capitalize">
-                {cellValue?.toString()}
-              </p>
+            <div>
+              <p>{report.steps}</p>
+            </div>
+          );
+        case 'severity':
+          return <SeverityChip severity={report.severity} />;
+        case 'impact':
+          return (
+            <div>
+              <ImpactChip impact={report.impact} />
+            </div>
+          );
+        case 'tags':
+          return (
+            <div className="flex flex-col gap-4">
+              {report.tags.map((tag) => (
+                <TagChip key={tag.id} tag={tag} />
+              ))}
             </div>
           );
         case 'status':
-          return <Status status={cellValue?.toString() as ReportStatus} />;
+          return <Status status={report.status} />;
         case 'actions':
           return (
-            <div className="relative flex items-center gap-2">
-              <Tooltip content="Edit report">
-                <a
-                  className="text-lg text-default-400 cursor-pointer active:opacity-50 p-1"
-                  href={`/reports/${report.id}/edit`}
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                  }}
-                >
-                  ✏️
-                </a>
-              </Tooltip>
-              <Tooltip color="danger" content="Delete report">
-                <button
-                  className="text-lg text-danger cursor-pointer active:opacity-50 p-1"
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                    if (
-                      confirm('Are you sure you want to delete this report?')
-                    ) {
-                      deleteReport(report.id);
-                    }
-                  }}
-                >
-                  🗑️
-                </button>
-              </Tooltip>
-              <Tooltip
-                color="foreground"
-                radius="sm"
-                onClick={(evt) => evt.stopPropagation()}
-                content={
-                  <div className="flex flex-col my-2">
-                    <dl className="flex flex-col gap-2">
-                      <dt>created at:</dt>
-                      <dd>
-                        <Code>{report.createdAt.toISOString()}</Code>
-                      </dd>
-                      <dt>updated at:</dt>
-                      <dd>
-                        <Code>{report.updatedAt.toISOString()}</Code>
-                      </dd>
-                    </dl>
-                  </div>
-                }
-                placement="bottom"
-              >
-                <span
-                  className="text-lg text-primary cursor-pointer active:opacity-50 p-1"
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                  }}
-                >
-                  🕔
-                </span>
-              </Tooltip>
-              <Tooltip color="success" content="Upvote">
-                <button
-                  className="text-lg text-primary cursor-pointer active:opacity-50 p-1"
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                    toast.success('Upvoted');
-                  }}
-                >
-                  <div className="text-medium bg-purple-100 w-8 h-8 flex justify-center items-center rounded-full mx-auto">
-                    ↑
-                  </div>
-                </button>
-              </Tooltip>
-              <Tooltip color="danger" content="Downvote">
-                <button
-                  className="text-lg text-primary cursor-pointer active:opacity-50 p-1"
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                    toast.success('Downvoted');
-                  }}
-                >
-                  <div className="text-medium bg-purple-100 w-8 h-8 flex justify-center items-center rounded-full mx-auto">
-                    ↓
-                  </div>
-                </button>
-              </Tooltip>
-              <Tooltip color="warning" content="Follow">
-                <button
-                  className="cursor-pointer hover:opacity-70 p-2 "
-                  onClick={(evt) => {
-                    evt.stopPropagation();
-                    alert('Followed');
-                  }}
-                >
-                  <div className="text-medium bg-purple-100 w-8 h-8 flex justify-center items-center rounded-full mx-auto">
-                    ⭐
-                  </div>
-                </button>
-              </Tooltip>
+            <div className="relative flex justify-end items-center gap-2">
+              <Button>View</Button>
+              <Button>Edit</Button>
+              <Button>Delete</Button>
             </div>
           );
-
-        default:
-          return cellValue || <></>;
+        // default:
+        //   return <>{cellValue}</>;
       }
     },
     [],
   );
 
+  const onNextPage = React.useCallback(() => {
+    if (page < pages) {
+      setPage(page + 1);
+    }
+  }, [page, pages]);
+
+  const onPreviousPage = React.useCallback(() => {
+    if (page > 1) {
+      setPage(page - 1);
+    }
+  }, [page]);
+
+  const onRowsPerPageChange = React.useCallback(
+    (e: React.ChangeEvent<HTMLSelectElement>) => {
+      setRowsPerPage(Number(e.target.value));
+      setPage(1);
+    },
+    [],
+  );
+
+  const onSearchChange = React.useCallback((value?: string) => {
+    if (value) {
+      setFilterValue(value);
+      setPage(1);
+    } else {
+      setFilterValue('');
+    }
+  }, []);
+
+  const onClear = React.useCallback(() => {
+    setFilterValue('');
+    setPage(1);
+  }, []);
+
+  const topContent = React.useMemo(() => {
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex justify-between gap-3 items-end">
+          <Input
+            isClearable
+            className="w-full sm:max-w-[44%]"
+            placeholder="Search by keywords..."
+            startContent={'🔍'}
+            value={filterValue}
+            onClear={() => onClear()}
+            onValueChange={onSearchChange}
+          />
+          <div className="flex gap-3">
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button endContent={'>'} variant="flat">
+                  Status
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={statusFilter}
+                selectionMode="multiple"
+                onSelectionChange={setStatusFilter}
+              >
+                {Object.keys(ReportStatus).map((status: string) => (
+                  <DropdownItem key={status} className="capitalize">
+                    {pascalToSentenceCase(status)}
+                  </DropdownItem>
+                ))}
+              </DropdownMenu>
+            </Dropdown>
+            <Dropdown>
+              <DropdownTrigger className="hidden sm:flex">
+                <Button endContent={'>'} variant="flat">
+                  Columns
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu
+                disallowEmptySelection
+                aria-label="Table Columns"
+                closeOnSelect={false}
+                selectedKeys={visibleColumns}
+                selectionMode="multiple"
+                onSelectionChange={setVisibleColumns}
+              >
+                {columns.map((column: (typeof columns)[number]) => {
+                  return (
+                    <DropdownItem key={column.uid} className="capitalize">
+                      {column.name}
+                    </DropdownItem>
+                  );
+                })}
+              </DropdownMenu>
+            </Dropdown>
+            {/* <Button color="primary" endContent={'+'}>
+              Add New
+            </Button> */}
+          </div>
+        </div>
+        <div className="flex justify-between items-center">
+          <span className="text-default-400 text-small">
+            Total {reports.length} reports
+          </span>
+          <label className="flex items-center text-default-400 text-small">
+            Rows per page:
+            <select
+              className="bg-transparent outline-none text-default-400 text-small"
+              onChange={onRowsPerPageChange}
+            >
+              <option value="5">5</option>
+              <option value="10">10</option>
+              <option value="15">15</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    );
+  }, [
+    filterValue,
+    statusFilter,
+    visibleColumns,
+    onSearchChange,
+    onRowsPerPageChange,
+    reports.length,
+    hasSearchFilter,
+  ]);
+
+  const bottomContent = React.useMemo(() => {
+    return (
+      <div className="py-2 px-2 flex justify-between items-center">
+        <span className="w-[30%] text-small text-default-400" />
+        <Pagination
+          isCompact
+          showControls
+          showShadow
+          color="primary"
+          page={page}
+          total={pages}
+          onChange={setPage}
+        />
+        <div className="hidden sm:flex w-[30%] justify-end gap-2">
+          <Button
+            isDisabled={pages === 1}
+            size="sm"
+            variant="flat"
+            onPress={onPreviousPage}
+          >
+            Previous
+          </Button>
+          <Button
+            isDisabled={pages === 1}
+            size="sm"
+            variant="flat"
+            onPress={onNextPage}
+          >
+            Next
+          </Button>
+        </div>
+      </div>
+    );
+  }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+
   return (
     <Table
-      removeWrapper
-      aria-label="Example table with custom cells"
+      aria-label="Reports table"
       isHeaderSticky
-      className="overflow-auto max-h-[70vh]"
-      classNames={{ tr: ['hover:bg-red-400 '] }}
-      isCompact
+      isStriped
+      bottomContent={bottomContent}
+      bottomContentPlacement="outside"
+      classNames={{
+        wrapper: 'max-h-[382px]',
+      }}
+      sortDescriptor={sortDescriptor}
+      topContent={topContent}
+      topContentPlacement="outside"
+      onSelectionChange={setSelectedKeys}
+      onSortChange={setSortDescriptor}
     >
-      <TableHeader columns={columns}>
-        {(column) => (
+      <TableHeader columns={headerColumns}>
+        {(column: any) => (
           <TableColumn
             key={column.uid}
             align={column.uid === 'actions' ? 'center' : 'start'}
+            allowsSorting={column.sortable}
           >
             {column.name}
           </TableColumn>
         )}
       </TableHeader>
-
-      <TableBody
-        items={reports}
-        emptyContent={
-          <div className="flex flex-col items-center gap-4">
-            No reports to display...{' '}
-            <Button as={Link} href="/reports" color="primary" variant="ghost">
-              Try refreshing the page
-            </Button>
-          </div>
-        }
-      >
+      <TableBody emptyContent={'No reports found'} items={sortedItems}>
         {(item) => (
           <TableRow
-            className="cursor-pointer m-4"
             key={item.id}
-            onClick={(evt) => {
-              router.push(`/reports/${item.id}`);
-            }}
+            className="cursor-pointer"
+            onClick={() => router.push(`/reports/${item.id}`)}
           >
             {(columnKey) => (
-              <TableCell>
-                {columnKey === 'steps' ? (
-                  <Tooltip
-                    showArrow
-                    content={
-                      <div className="flex gap-4">
-                        <img
-                          src={
-                            'https://placehold.co/600x400?text=Your+screenshot+here'
-                          }
-                          alt="Popover image"
-                          width={200}
-                          height={200}
-                        />
-                        <img
-                          src={
-                            'https://placehold.co/600x400?text=Your+screenshot+here'
-                          }
-                          alt="Popover image"
-                          width={200}
-                          height={200}
-                        />
-                      </div>
-                    }
-                  >
-                    <div>
-                      <>{renderCell(item, columnKey)}</>
-                    </div>
-                  </Tooltip>
-                ) : (
-                  <div>
-                    <>{renderCell(item, columnKey)}</>
-                  </div>
-                )}
-              </TableCell>
+              <TableCell>{renderCell(item, columnKey)}</TableCell>
             )}
           </TableRow>
         )}

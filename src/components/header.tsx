@@ -1,7 +1,6 @@
+'use client';
+
 // import { Suspense } from 'react';
-
-import type { Dispatch, SetStateAction } from 'react';
-
 import Link from 'next/link';
 
 import {
@@ -10,21 +9,15 @@ import {
   NavbarBrand,
   NavbarContent,
   NavbarItem,
-  Tooltip,
 } from '@nextui-org/react';
 
 import HeaderAuth from '@/components/header-auth';
-import { Theme } from '@/app/layout';
+
+import ThemeSwitch from './common/theme-switch';
 
 // import SearchInput from './search-input';
 
-export default function Header({
-  theme,
-  setTheme,
-}: {
-  theme: Theme;
-  setTheme: Dispatch<SetStateAction<Theme>>;
-}) {
+export default function Header() {
   return (
     <Navbar className="shadow mb-6">
       <NavbarBrand>
@@ -35,22 +28,9 @@ export default function Header({
       <NavbarContent justify="center">
         <NavbarItem>{/* <Suspense><SearchInput /></Suspense> */}</NavbarItem>
       </NavbarContent>
-      <NavbarContent justify="end">
-        <Tooltip
-          content={`Switch to ${theme === Theme.light ? Theme.dark : Theme.light} theme`}
-        >
-          <Button
-          variant='light'
-            onClick={() => {
-              setTheme((prevTheme: Theme) =>
-                prevTheme === Theme.light ? Theme.dark : Theme.light,
-              );
-            }}
-          >
-            {theme === Theme.light ? '🌙' : '🌞'}
-          </Button>
-        </Tooltip>
+      <NavbarContent justify="end" >
         <HeaderAuth />
+        <ThemeSwitch />
       </NavbarContent>
     </Navbar>
   );

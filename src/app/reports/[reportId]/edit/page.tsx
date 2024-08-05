@@ -2,7 +2,6 @@ import { notFound, redirect } from 'next/navigation';
 
 import db from '@/db';
 import { Button, Link } from '@nextui-org/react';
-import type { Report } from '@prisma/client';
 
 import { BreadCrumbsClient } from '@/components/breadcrumbs';
 import { ReportForm } from '@/components/reports/report-form';
@@ -18,10 +17,10 @@ export default async function EditReport({
 
   const report = (await db.report.findFirst({
     where: { id: params.reportId },
-    include: { user: true, StatusHistory: true, tags: true },
+    include: { user: true, StatusHistory: true, tags: true, company: true },
   })) as ReportWithTags;
 
-  if (!report?.id) {
+  if (!report?.id || !report) {
     return notFound();
   }
   return (
