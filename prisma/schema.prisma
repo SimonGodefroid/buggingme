@@ -49,6 +49,8 @@ model User {
   sessions      Session[]
   Report        Report[]
   Comment       Comment[]
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime? @updatedAt
 }
 
 model VerificationToken {
@@ -71,11 +73,22 @@ enum ReportStatus {
   UnderReview
   InProgress
   Resolved
-  Closed // Closed ?
-  Deferred // rm
-  Cancelled // Closed ?
+  Closed
+  Deferred
+  Cancelled
   Rejected
   Deleted
+}
+
+enum ReportCategory {
+  New
+  Valid
+  PendingCampaign
+  Duplicate
+  NotApplicable
+  Informative
+  Spam
+  InformationNeeded
 }
 
 enum Severity {
@@ -126,6 +139,7 @@ model Report {
   snippets         String?
   language         String?
   userId           String
+  category         ReportCategory  @default(New)
   createdAt        DateTime        @default(now())
   updatedAt        DateTime        @updatedAt
   user             User            @relation(fields: [userId], references: [id], onDelete: Cascade)

@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useTransition, type Key } from 'react';
 
 import Image from 'next/image';
-import { redirect, useRouter } from 'next/navigation';
+import { notFound, redirect, useRouter } from 'next/navigation';
 
 import { fetchAllCompanies } from '@/actions/companies/fetchAllCompanies';
 import { createReport } from '@/actions/reports/create';
@@ -11,7 +11,6 @@ import { REPORT_STATUS_STATE_MACHINE } from '@/actions/reports/helpers/reportSta
 import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
 import { updateReport } from '@/actions/reports/update';
 import { updateReportStatus } from '@/actions/reports/updateStatus';
-import { faker } from '@faker-js/faker';
 import {
   Button,
   Chip,
@@ -28,12 +27,12 @@ import {
   Tooltip,
 } from '@nextui-org/react';
 import { Impact, ReportStatus, Severity, Tag } from '@prisma/client';
-import debounce from 'lodash.debounce';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
 import { DragNDropFileUpload } from '@/components/common/drag-n-drop-file-upload';
 import { EditorClient } from '@/components/common/editor';
+import ReportNotFound from '@/app/reports/[reportId]/not-found';
 import { ReportWithTags } from '@/app/reports/[reportId]/page';
 
 import CompanySelector from '../companies/company-selector';
@@ -41,45 +40,12 @@ import { ImpactChip } from './impact';
 import { SeverityChip } from './severity';
 import { Status } from './status';
 
-const DEFAULT_IMAGE = 'https://placehold.co/600x400?text=Your+screenshot+here';
 const imageLoader = ({ width, height }: { width: number; height: number }) => {
   return `https://placehold.co/${width}x${height}?text=Your+screenshot+here`;
 };
 
-const MOCK_REPORT = {
-  id: `${faker.database.mongodbObjectId}`,
-  title: `${faker.hacker.noun()} ${faker.hacker.ingverb()}`,
-  url: `${faker.internet.url().replace('https://', '')}`,
-  companyId: `${faker.company.name()}`,
-  steps: `1. ${faker.hacker.verb()} ${faker.hacker.noun()}\n2. ${faker.hacker.verb()} ${faker.hacker.noun()}`,
-  currentBehavior: `It is currently ${faker.hacker.ingverb()} the ${faker.hacker.noun()}`,
-  expectedBehavior: `It should ${faker.hacker.verb()} the ${faker.hacker.noun()}`,
-  suggestions: `Try to ${faker.hacker.verb()} the ${faker.hacker.noun()}`,
-  snippets: `// coucou c'est pour du js`,
-  language: `javascript`,
-  userId: faker.database.mongodbObjectId(),
-  createdAt: faker.date.past(),
-  updatedAt: faker.date.anytime(),
-  status: ReportStatus.Open,
-  impact: Impact.SiteWide,
-  severity: Severity.Medium,
-  tags: [
-    { id: 'clz2kud4w0004ei9ftba708s0', name: 'Security Vulnerability' },
-    { id: 'clz2kud4x0005ei9f6sd82o72', name: 'Functional Bug' },
-  ],
-  user: {
-    id: '4b380ad5-c697-4779-88d8-982b15a55ff4',
-    name: 'SimonGodefroid',
-    email: 'simon.godefroid@gmail.com',
-    emailVerified: null,
-    image: 'https://avatars.githubusercontent.com/u/17337190?v=4',
-  },
-  StatusHistory: [],
-  company: { id: '', name: '', logo: '', domain: '' },
-};
-
 export const ReportForm = ({
-  report = MOCK_REPORT,
+  report,
   disabled,
   mode,
   handleCancel,
@@ -106,7 +72,7 @@ export const ReportForm = ({
 
   const router = useRouter();
   const [formState, action] = useFormState(
-    mode === 'edit'
+    mode === 'edit' && report && report.id
       ? updateReport.bind(null, { id: report?.id })
       : createReport,
     {
@@ -114,9 +80,9 @@ export const ReportForm = ({
     },
   );
 
-  const [images, setImages] = React.useState<{ id: number; url: string }[]>(
-    Array.from({ length: 1 }, (v, k) => ({ id: k, url: DEFAULT_IMAGE })),
-  );
+  const [images, setImages] = React.useState<
+    { id: number; url: string }[] | []
+  >([]);
 
   useEffect(() => {
     const loadTags = async () => {
@@ -166,17 +132,17 @@ export const ReportForm = ({
     color: disabled ? ('primary' as InputProps['color']) : undefined,
   };
 
-  // if (!report) {
-  //   notFound();
-  // }
+  if ((mode === 'view' || mode === 'edit') && !report) {
+    return <ReportNotFound />;
+  }
   return (
     <div>
-      <form className="bg-blue-200 " id={FORM_ID} action={action}>
+      <form className="" id={FORM_ID} action={action}>
         <div className="flex flex-col m-4">
           {/* Upper */}
           <div className="grid grid-cols-12 ">
             {/* Left */}
-            <div className="col-span-6 ">
+            <div className="col-span-6">
               <div className="flex flex-col gap-4 m-4">
                 <div className="flex gap-4 items-center">
                   <Input
@@ -189,74 +155,84 @@ export const ReportForm = ({
                     placeholder="Wrong user information in profile"
                     // endContent={}
                   />
-                  <Dropdown>
-                    <DropdownTrigger>
-                      <Button
-                        // size="lg"
-                        variant="light"
-                        isDisabled={mode !== 'edit'}
-                        className={
-                          mode !== 'edit'
-                            ? 'justify-end'
-                            : 'min-w-[200px] justify-between p-6'
-                        }
-                      >
-                        {mode === 'edit' && <span>Status: </span>}
-                        <Status status={report?.status as ReportStatus} />
-                      </Button>
-                    </DropdownTrigger>
-                    <DropdownMenu
-                      classNames={{ list: 'w-60' }}
-                      onAction={(newStatus: Key) => {
-                        if (
-                          confirm(
-                            `Please confirm your status update from ${report.status} to ${newStatus}`,
-                          )
-                        ) {
-                          startTransition(async () => {
-                            try {
-                              await updateReportStatus({
-                                id: report.id,
-                                oldStatus: report.status as ReportStatus,
-                                newStatus: newStatus as ReportStatus,
-                              });
-                            } catch (err: unknown) {
-                              if (err instanceof Error) {
-                                toast.error(err.message);
-                              }
-                            }
-                          });
-                        }
-                      }}
-                    >
-                      {REPORT_STATUS_STATE_MACHINE['Engineer'][
-                        report.status
-                      ].map((status) => (
-                        <DropdownItem
-                          key={status!}
-                          onMouseEnter={() => {
-                            setHovered(status as ReportStatus);
-                          }}
-                          onMouseLeave={() => setHovered(undefined)}
+                  {report && report.id && mode === 'edit' ? (
+                    <Dropdown>
+                      <DropdownTrigger>
+                        <Button
+                          // size="lg"
+                          variant="light"
+                          isDisabled={mode !== 'edit'}
+                          className={
+                            mode !== 'edit'
+                              ? 'justify-end'
+                              : 'min-w-[200px] justify-between p-6'
+                          }
                         >
-                          <div className="flex gap-4 justify-between">
-                            <Button type="submit" size="sm" variant="light">
-                              <Status status={status as ReportStatus} />
-                            </Button>
-                            {hovered === status && (
-                              <div className="flex flex-col bordered rounded border-1 border-black items-center justify-center gap-4 p-1">
-                                update
-                              </div>
-                            )}
-                          </div>
-                        </DropdownItem>
-                      ))}
-                    </DropdownMenu>
-                  </Dropdown>
+                          {mode === 'edit' && <span>Status: </span>}
+                          <Status status={report?.status as ReportStatus} />
+                        </Button>
+                      </DropdownTrigger>
+                      <DropdownMenu
+                        classNames={{ list: 'w-60' }}
+                        onAction={(newStatus: Key) => {
+                          if (
+                            confirm(
+                              `Please confirm your status update from ${report.status} to ${newStatus}`,
+                            )
+                          ) {
+                            startTransition(async () => {
+                              try {
+                                await updateReportStatus({
+                                  id: report.id,
+                                  oldStatus: report.status as ReportStatus,
+                                  newStatus: newStatus as ReportStatus,
+                                });
+                              } catch (err: unknown) {
+                                if (err instanceof Error) {
+                                  toast.error(err.message);
+                                }
+                              }
+                            });
+                          }
+                        }}
+                      >
+                        {REPORT_STATUS_STATE_MACHINE['Engineer'][
+                          report.status
+                        ].map((status) => (
+                          <DropdownItem
+                            key={status!}
+                            onMouseEnter={() => {
+                              setHovered(status as ReportStatus);
+                            }}
+                            onMouseLeave={() => setHovered(undefined)}
+                          >
+                            <div className="flex gap-4 justify-between">
+                              <Button type="submit" size="sm" variant="light">
+                                <Status status={status as ReportStatus} />
+                              </Button>
+                              {hovered === status && (
+                                <div className="flex flex-col bordered rounded border-1 border-black items-center justify-center gap-4 p-1">
+                                  update
+                                </div>
+                              )}
+                            </div>
+                          </DropdownItem>
+                        ))}
+                      </DropdownMenu>
+                    </Dropdown>
+                  ) : (
+                    <Status
+                      status={
+                        mode === 'create'
+                          ? ReportStatus.Open
+                          : (report?.status as ReportStatus)
+                      }
+                    />
+                  )}
                 </div>
                 <div className="gap-4">
                   <CompanySelector
-                    {...viewModeProps}
+                    mode={mode}
                     companies={companies}
                     report={report}
                   />
@@ -400,7 +376,7 @@ export const ReportForm = ({
                     isRequired={mode !== 'view'}
                     isDisabled={mode === 'view'}
                     placeholder="Select an impact level"
-                    defaultSelectedKeys={[report.impact]}
+                    defaultSelectedKeys={[report?.impact || Impact.SingleUser]}
                     classNames={{ value: ['mt-1'] }}
                     renderValue={(selected) => (
                       <ImpactChip impact={selected[0].key as Impact} />
@@ -416,7 +392,7 @@ export const ReportForm = ({
                     label="Severity"
                     name="severity"
                     isRequired={mode !== 'view'}
-                    defaultSelectedKeys={[report.severity]}
+                    defaultSelectedKeys={[report?.severity || Severity.Medium]}
                     isDisabled={mode === 'view'}
                     placeholder="Select a severity degree"
                     classNames={{ value: ['mt-1'] }}
