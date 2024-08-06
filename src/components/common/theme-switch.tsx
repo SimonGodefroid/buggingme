@@ -1,3 +1,5 @@
+'use client';
+
 import { Button, Tooltip } from '@nextui-org/react';
 import { useTheme } from 'next-themes';
 

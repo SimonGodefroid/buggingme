@@ -1,8 +1,7 @@
-'use client';
-
 // import { Suspense } from 'react';
 import Link from 'next/link';
 
+import { auth } from '@/auth';
 import {
   Button,
   Navbar,
@@ -10,14 +9,15 @@ import {
   NavbarContent,
   NavbarItem,
 } from '@nextui-org/react';
+import { User } from '@prisma/client';
 
 import HeaderAuth from '@/components/header-auth';
 
 import ThemeSwitch from './common/theme-switch';
 
 // import SearchInput from './search-input';
-
-export default function Header() {
+export default async function Header() {
+  const session = await auth();
   return (
     <Navbar className="shadow mb-6">
       <NavbarBrand>
@@ -25,11 +25,9 @@ export default function Header() {
           Bug busters
         </Link>
       </NavbarBrand>
-      <NavbarContent justify="center">
-        <NavbarItem>{/* <Suspense><SearchInput /></Suspense> */}</NavbarItem>
-      </NavbarContent>
-      <NavbarContent justify="end" >
-        <HeaderAuth />
+      <NavbarContent justify="center"></NavbarContent>
+      <NavbarContent justify="end">
+        <HeaderAuth user={session?.user} />
         <ThemeSwitch />
       </NavbarContent>
     </Navbar>

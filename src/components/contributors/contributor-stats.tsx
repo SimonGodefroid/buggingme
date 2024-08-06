@@ -16,7 +16,7 @@
 // }
 import { Card, CardBody, CardFooter, Image } from '@nextui-org/react';
 
-import { ContributorWithReports } from '@/app/contributors/page';
+import { ContributorWithReports } from '@/app/@engineer/contributors/page';
 
 export default function ContributorStats({
   contributor,
