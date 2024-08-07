@@ -28,7 +28,7 @@ import {
 import { ReportStatus } from '@prisma/client';
 import { Key } from '@react-types/shared';
 
-import { ReportWithTags } from '@/app/reports/[reportId]/page';
+import { ReportWithTags } from '@/app/@engineer/reports/[reportId]/page';
 
 import { columns } from '../reports/data';
 import { ImpactChip } from './impact';

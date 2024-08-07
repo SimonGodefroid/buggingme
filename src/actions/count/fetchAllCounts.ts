@@ -4,15 +4,17 @@ import { countCampaigns, countCompanies, countContributors, countReports } from 
 
 
 export async function fetchAllCounts() {
-  const contributors = await countContributors();
-  const companies = await countCompanies();
-  const reports = await countReports();
-  const campaigns = await countCampaigns();
+  try {
+    const [companies, reports, campaigns, contributors] = await Promise.all([
+      countCompanies(),
+      countReports(),
+      countCampaigns(),
+      countContributors(),
+    ]);
 
-  return {
-    contributors,
-    companies,
-    reports,
-    campaigns,
-  };
+    return { companies, reports, campaigns, contributors };
+  } catch (error) {
+    console.error('Failed to load counts:', error);
+    return { companies: 0, reports: 0, campaigns: 0, contributors: 0 };
+  }
 }

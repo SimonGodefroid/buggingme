@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { use, useState } from 'react';
 
 import { usePathname } from 'next/navigation';
 
@@ -11,8 +11,12 @@ import {
   ModalContent,
   Tab,
   Tabs,
+  Tooltip,
   useDisclosure,
 } from '@nextui-org/react';
+import { User, UserType } from '@prisma/client';
+import { Session } from 'next-auth';
+import { useSession } from 'next-auth/react';
 
 import { ReportForm } from './reports/report-form';
 
@@ -23,9 +27,13 @@ export type Count = {
   reports: number;
 };
 
-export default function NavTabs({ count }: { count: Count }) {
+export default function NavTabs({ count, user }: { count: Count; user: User }) {
   const [selected, setSelected] = React.useState<string | number>('reports');
+  const [isOpen, setIsOpen] = React.useState(false);
   const modalProps = useDisclosure();
+  const isEngineer = user.userTypes.includes(UserType.ENGINEER);
+
+  console.log('isEngineer', isEngineer);
 
   const handleSelectionChange = (selected: any) => {
     setSelected(selected);
@@ -114,13 +122,21 @@ export default function NavTabs({ count }: { count: Count }) {
         </Tabs>
       </div>
       <div>
-        <Button
-          onPress={modalProps.onOpen}
-          color="success"
-          className="text-white"
+        <Tooltip
+          isDisabled={isEngineer}
+          content={'Only engineers can report bugs :D'}
         >
-          Report bug
-        </Button>
+          <div>
+            <Button
+              isDisabled={!isEngineer}
+              onPress={modalProps.onOpen}
+              color="success"
+              className="text-white"
+            >
+              Report bug
+            </Button>
+          </div>
+        </Tooltip>
         <Modal
           isOpen={modalProps.isOpen}
           onOpenChange={modalProps.onOpenChange}

@@ -24,7 +24,7 @@ import {
 } from '@nextui-org/react';
 import { Key } from '@react-types/shared';
 
-import { ContributorWithReports } from '@/app/contributors/page';
+import { ContributorWithReports } from '@/app/@engineer/contributors/page';
 
 import { columns } from '../contributors/data';
 

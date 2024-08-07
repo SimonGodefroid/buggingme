@@ -5,14 +5,13 @@ import {
   AutocompleteItem,
   AutocompleteSection,
   Avatar,
-  InputProps,
 } from '@nextui-org/react';
 import { Company } from '@prisma/client';
 import debounce from 'lodash.debounce';
 import differenceby from 'lodash.differenceby';
 import { toast } from 'react-toastify';
 
-import { ReportWithTags } from '@/app/reports/[reportId]/page';
+import { ReportWithTags } from '@/app/@engineer/reports/[reportId]/page';
 
 const noop = () => {};
 

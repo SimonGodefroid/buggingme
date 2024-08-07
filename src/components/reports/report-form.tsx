@@ -32,8 +32,8 @@ import { toast } from 'react-toastify';
 
 import { DragNDropFileUpload } from '@/components/common/drag-n-drop-file-upload';
 import { EditorClient } from '@/components/common/editor';
-import ReportNotFound from '@/app/reports/[reportId]/not-found';
-import { ReportWithTags } from '@/app/reports/[reportId]/page';
+import ReportNotFound from '@/app/@engineer/reports/[reportId]/not-found';
+import { ReportWithTags } from '@/app/@engineer/reports/[reportId]/page';
 
 import CompanySelector from '../companies/company-selector';
 import { ImpactChip } from './impact';

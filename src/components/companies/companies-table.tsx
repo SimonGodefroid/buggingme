@@ -24,7 +24,7 @@ import {
 } from '@nextui-org/react';
 import { Key } from '@react-types/shared';
 
-import { CompanyWithReports } from '@/app/companies/page';
+import { CompanyWithReports } from '@/app/@engineer/companies/page';
 
 import { columns } from './data';
 
