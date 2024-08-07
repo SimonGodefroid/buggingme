@@ -93,12 +93,12 @@ export async function createReport(
     tags: formData.getAll('tags')
   });
 
-  console.log('result', {
-    companyId: formData.get('companyId'),
-    companyName: formData.get('companyName'),
-    companyLogo: formData.get('companyLogo'),
-    companyDomain: formData.get('companyDomain'),
-  })
+  // console.log('result', {
+  //   companyId: formData.get('companyId'),
+  //   companyName: formData.get('companyName'),
+  //   companyLogo: formData.get('companyLogo'),
+  //   companyDomain: formData.get('companyDomain'),
+  // })
 
 
   if (!result.success) {
