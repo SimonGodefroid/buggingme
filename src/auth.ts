@@ -38,7 +38,6 @@ export const {
       if (session && user) {
         session.user.id = user.id;
       }
-      console.log('session'.repeat(300), session)
       return session;
     },
     async jwt({ token, account, user }) {

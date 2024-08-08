@@ -42,11 +42,15 @@ export default async function RootLayout({
         <Providers>
           {/* Wrap main content with ThemeProvider */}
           <Header />
-          {user ? <NavTabs count={counts} user={user} /> : null}
-          <main className="my-4">
+          <NavTabs count={counts} user={user} />
+          <main className="my-4 ">
+            {/* <main className="my-4 flex"> */}
+            {/* <aside className='border-3 border-white'>
+              <ListboxTabs />
+            </aside> */}
+            {user?.userTypes.includes(UserType.GOD) ? admin : null}
             {user?.userTypes.includes(UserType.ENGINEER) ? engineer : null}
             {user?.userTypes.includes(UserType.COMPANY) ? company : null}
-            {user?.userTypes.includes(UserType.GOD) ? admin : null}
             {!user ? children : null}
           </main>
         </Providers>

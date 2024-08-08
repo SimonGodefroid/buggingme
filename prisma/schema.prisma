@@ -58,6 +58,7 @@ model User {
   Comment       Comment[]
   createdAt     DateTime   @default(now())
   updatedAt     DateTime?  @updatedAt
+  companies     Company[]  @relation("UserCompanies")
 }
 
 model VerificationToken {
@@ -181,4 +182,7 @@ model Company {
   domain  String?
   logo    String?
   reports Report[]
+  users   User[]   @relation("UserCompanies")
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }

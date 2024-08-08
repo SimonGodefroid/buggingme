@@ -10,8 +10,12 @@ import {
   Popover,
   PopoverContent,
   PopoverTrigger,
+  Tooltip,
 } from '@nextui-org/react';
 import { Session } from 'next-auth';
+
+import SignInAuth0Button from './common/sign-in-auth0-button';
+import SignInGitHubButton from './common/sign-in-github-button';
 
 // import { useSession } from 'next-auth/react';
 
@@ -45,20 +49,11 @@ export default function HeaderAuth({ user }: { user: Session['user'] }) {
     authContent = (
       <>
         <NavbarItem>
-          {/* <form action={actions.signIn}> */}
-          <form action={actions.signInAuth0}>
-            <Button type="submit" color="secondary" variant="bordered">
-              Sign In with Auth0
-            </Button>
-          </form>
+          <SignInAuth0Button />
         </NavbarItem>
 
         <NavbarItem>
-          <form action={actions.signIn}>
-            <Button type="submit" color="primary" variant="flat">
-              Sign In with Github
-            </Button>
-          </form>
+          <SignInGitHubButton />
         </NavbarItem>
       </>
     );

@@ -15,8 +15,9 @@ import {
   useDisclosure,
 } from '@nextui-org/react';
 import { User, UserType } from '@prisma/client';
-import { Session } from 'next-auth';
-import { useSession } from 'next-auth/react';
+
+// import { Session } from 'next-auth';
+// import { useSession } from 'next-auth/react';
 
 import { ReportForm } from './reports/report-form';
 
@@ -27,13 +28,18 @@ export type Count = {
   reports: number;
 };
 
-export default function NavTabs({ count, user }: { count: Count; user: User }) {
+export default function NavTabs({
+  count,
+  user,
+}: {
+  count: Count;
+  user: User | null;
+}) {
   const [selected, setSelected] = React.useState<string | number>('reports');
-  const [isOpen, setIsOpen] = React.useState(false);
   const modalProps = useDisclosure();
-  const isEngineer = user.userTypes.includes(UserType.ENGINEER);
-
-  console.log('isEngineer', isEngineer);
+  const isEngineer =
+    user?.userTypes.includes(UserType.ENGINEER) ||
+    user?.userTypes.includes(UserType.GOD);
 
   const handleSelectionChange = (selected: any) => {
     setSelected(selected);
@@ -43,6 +49,7 @@ export default function NavTabs({ count, user }: { count: Count; user: User }) {
     <div className="flex w-full justify-between flex-wrap gap-4">
       <div className="flex flex-col gap-4">
         <Tabs
+          classNames={{ tabContent: 'items-start' }}
           aria-label="Options"
           selectedKey={path}
           className="flex-wrap"
@@ -119,6 +126,17 @@ export default function NavTabs({ count, user }: { count: Count; user: User }) {
             }
             href="/leaderboard"
           />
+          {user?.userTypes.includes(UserType.GOD) && (
+            <Tab
+              key="/admin"
+              title={
+                <div className="flex items-center space-x-2">
+                  <span>🔑&nbsp;Admin</span>
+                </div>
+              }
+              href="/admin"
+            />
+          )}
         </Tabs>
       </div>
       <div>
