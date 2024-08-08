@@ -4,10 +4,9 @@ import db from '@/db';
 import { Button, Link } from '@nextui-org/react';
 import type { Prisma } from '@prisma/client';
 
+import { ContributorWithReports } from '@/types/users';
 import { BreadCrumbsClient } from '@/components/breadcrumbs';
 import ContributorStats from '@/components/contributors/contributor-stats';
-
-import { ContributorWithReports } from '../page';
 
 export default async function ViewContributor({
   params,

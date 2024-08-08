@@ -13,6 +13,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Input,
+  Link,
   Pagination,
   Selection,
   SortDescriptor,
@@ -28,7 +29,7 @@ import {
 import { ReportStatus } from '@prisma/client';
 import { Key } from '@react-types/shared';
 
-import { ReportWithTags } from '@/app/@engineer/reports/[reportId]/page';
+import { ReportWithTags } from '@/types/reports';
 
 import { columns } from '../reports/data';
 import { ImpactChip } from './impact';
@@ -187,13 +188,14 @@ export default function ReportsTable({
         case 'actions':
           return (
             <div className="relative flex justify-end items-center gap-2">
-              <Button>View</Button>
-              <Button>Edit</Button>
+              <Button as={Link} href={`/reports/${report.id}/edit`}>
+                Edit
+              </Button>
               <Button>Delete</Button>
             </div>
           );
-        // default:
-        //   return <>{cellValue}</>;
+        default:
+          return <>{cellValue}</>;
       }
     },
     [],

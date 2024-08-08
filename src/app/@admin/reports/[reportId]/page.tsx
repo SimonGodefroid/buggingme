@@ -3,7 +3,8 @@ import { notFound } from 'next/navigation';
 import { fetchUser } from '@/actions';
 import { auth } from '@/auth';
 import db from '@/db';
-import { Button, Link } from '@nextui-org/react';
+import { Button, Link, Tooltip } from '@nextui-org/react';
+import type { Prisma } from '@prisma/client';
 
 import { ReportWithTags } from '@/types/reports';
 import { BreadCrumbsClient } from '@/components/breadcrumbs';
@@ -33,7 +34,10 @@ export default async function ViewReport({
         <BreadCrumbsClient
           crumbs={[
             { href: '/reports', text: 'Reports' },
-            { href: `/reports/${report.id}`, text: `${report.title}` },
+            {
+              href: `/reports/${report?.id}`,
+              text: report?.title,
+            },
             { href: `/reports/${report.id}`, text: `View` },
           ]}
         />

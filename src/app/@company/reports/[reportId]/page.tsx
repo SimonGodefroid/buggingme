@@ -14,9 +14,11 @@ export default async function ViewReport({
 }: {
   params: { reportId: string };
 }) {
+  const authenticatedUser = await auth();
+  const user = authenticatedUser?.user?.id
+    ? await fetchUser(authenticatedUser?.user.id)
+    : null;
   const { reportId } = params;
-
-  const user = await fetchUser();
 
   const report = (await db.report.findUnique({
     where: { id: reportId },

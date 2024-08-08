@@ -1,7 +1,5 @@
 import { notFound, redirect } from 'next/navigation';
 
-import { fetchUser } from '@/actions';
-import { auth } from '@/auth';
 import db from '@/db';
 import { Button, Link } from '@nextui-org/react';
 
@@ -15,10 +13,6 @@ export default async function EditReport({
   params: { reportId: string };
 }) {
   const { reportId } = params;
-  const authenticatedUser = await auth();
-  const user = authenticatedUser?.user?.id
-    ? await fetchUser(authenticatedUser?.user.id)
-    : null;
 
   const report = (await db.report.findFirst({
     where: { id: params.reportId },
@@ -34,7 +28,7 @@ export default async function EditReport({
         <BreadCrumbsClient
           crumbs={[
             { href: '/reports', text: 'Reports' },
-            { href: `/reports/${report.id}`, text: `${report.title}` },
+            { href: `/reports/${report?.id}`, text: `${report?.title}` },
             { href: `/reports/${report?.id}`, text: `Edit` },
           ]}
         />
@@ -47,7 +41,7 @@ export default async function EditReport({
           Back
         </Button>
       </div>
-      <ReportForm user={user} mode={'edit'} report={report} />
+      <ReportForm mode={'edit'} report={report} />
     </div>
   );
 }

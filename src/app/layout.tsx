@@ -3,11 +3,14 @@ import { Inter } from 'next/font/google';
 
 import './globals.css';
 
+import { ReactNode } from 'react';
+
 import { fetchAllCounts } from '@/actions/count/fetchAllCounts';
 import { fetchUser } from '@/actions/users/fetchUser';
 import { auth } from '@/auth';
 import { User, UserType } from '@prisma/client';
 
+import { UserWithCompanies } from '@/types/users';
 import Header from '@/components/header';
 import NavTabs from '@/components/nav-tabs';
 import Providers from '@/app/providers';
@@ -18,6 +21,15 @@ export const metadata: Metadata = {
   title: 'Bug busters - Find glitches get money',
   description: 'Submit bugs, get noticed, get paid',
 };
+
+function withUser<P extends { user: User | null }>(
+  WrappedComponent: React.ComponentType<P>,
+  user: User | null,
+) {
+  return (props: Omit<P, 'user'>) => {
+    return <WrappedComponent {...(props as P)} user={user} />;
+  };
+}
 
 export default async function RootLayout({
   children,
@@ -31,10 +43,7 @@ export default async function RootLayout({
   engineer: React.ReactNode;
 }) {
   const counts = await fetchAllCounts();
-  const authenticatedUser = await auth();
-  const user: User | null = authenticatedUser?.user?.id
-    ? await fetchUser(authenticatedUser?.user?.id as string)
-    : null;
+  const user = await fetchUser();
 
   return (
     <html lang="en">

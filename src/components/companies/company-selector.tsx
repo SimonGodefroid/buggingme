@@ -11,7 +11,7 @@ import debounce from 'lodash.debounce';
 import differenceby from 'lodash.differenceby';
 import { toast } from 'react-toastify';
 
-import { ReportWithTags } from '@/app/@engineer/reports/[reportId]/page';
+import { ReportWithTags } from '@/types/reports';
 
 const noop = () => {};
 
@@ -116,9 +116,9 @@ export default function CompanySelector({
 
   if (report && mode !== 'create') {
     return (
-      <div className="flex border-2 bg-foreground-100 rounded-xl p-4">
+      <div className="flex border-2 bg-foreground-100 rounded-xl p-4 w-full">
         <a
-          href={`https://${report?.company?.domain}`}
+          href={`https://${report?.company?.domain || `example.com`}`}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -129,7 +129,7 @@ export default function CompanySelector({
   }
 
   return (
-    <>
+    <div className="">
       <Autocomplete
         name="company"
         isRequired
@@ -201,6 +201,6 @@ export default function CompanySelector({
           />
         </>
       )}
-    </>
+    </div>
   );
 }

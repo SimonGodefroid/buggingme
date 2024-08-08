@@ -2,10 +2,9 @@ import { fetchAllCompanies, fetchAllUsers } from '@/actions';
 import { Prisma } from '@prisma/client';
 
 import { LinkUserForm } from '@/components/users/link-user-form';
+import { UserWithCompanies } from '@/types/users';
 
-export type UserWithCompanies = Prisma.UserGetPayload<{
-  include: { companies: true };
-}>;
+
 
 export default async function Admin() {
   const users = (await fetchAllUsers()) as UserWithCompanies[];

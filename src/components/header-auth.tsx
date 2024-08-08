@@ -1,16 +1,18 @@
 'use client';
 
-import { redirect } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 
 import * as actions from '@/actions';
 import {
   Avatar,
   Button,
+  Link,
   NavbarItem,
   Popover,
   PopoverContent,
   PopoverTrigger,
   Tooltip,
+  User,
 } from '@nextui-org/react';
 import { Session } from 'next-auth';
 
@@ -20,6 +22,7 @@ import SignInGitHubButton from './common/sign-in-github-button';
 // import { useSession } from 'next-auth/react';
 
 export default function HeaderAuth({ user }: { user: Session['user'] }) {
+  const router = useRouter();
   // const session = useSession();
   let authContent: React.ReactNode;
   if (user) {
@@ -29,18 +32,29 @@ export default function HeaderAuth({ user }: { user: Session['user'] }) {
     authContent = (
       <Popover placement="left">
         <PopoverTrigger>
-          <Avatar src={user?.image || ''} />
+          <User
+            className="cursor-pointer"
+            avatarProps={{ radius: 'lg', src: `${user?.image}` }}
+            description={<span className="">{user.email}</span>}
+            name={user?.name}
+          >
+            {user?.name}
+          </User>
         </PopoverTrigger>
         <PopoverContent>
-          <div className="p-4">
+          <div className="flex flex-col gap-4 p-4">
             <form
-              action={() => {
-                actions.signOut();
-                redirect('/');
+              action={async () => {
+                await actions.signOut().then(() => {
+                  router.push('/');
+                });
               }}
             >
               <Button type="submit">Sign Out</Button>
             </form>
+            <Button as={Link} href={`/profile/${user.id}`}>
+              Profile
+            </Button>
           </div>
         </PopoverContent>
       </Popover>

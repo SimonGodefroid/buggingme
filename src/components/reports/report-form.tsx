@@ -3,7 +3,7 @@
 import React, { useEffect, useState, useTransition, type Key } from 'react';
 
 import Image from 'next/image';
-import { notFound, redirect, useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 
 import { fetchAllCompanies } from '@/actions/companies/fetchAllCompanies';
 import { createReport } from '@/actions/reports/create';
@@ -30,11 +30,15 @@ import { Impact, ReportStatus, Severity, Tag } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
+import { ReportWithTags } from '@/types/reports';
 import { DragNDropFileUpload } from '@/components/common/drag-n-drop-file-upload';
 import { EditorClient } from '@/components/common/editor';
-import ReportNotFound from '@/app/@engineer/reports/[reportId]/not-found';
-import { ReportWithTags } from '@/app/@engineer/reports/[reportId]/page';
+import { UserWithCompanies } from '@/app/@admin/admin/page';
+import NotFound from '@/app/not-found';
 
+import { Category } from '../common/category';
+import CategorySelector from '../common/category-selector';
+import StatusSelector from '../common/status-selector';
 import CompanySelector from '../companies/company-selector';
 import { ImpactChip } from './impact';
 import { SeverityChip } from './severity';
@@ -45,11 +49,13 @@ const imageLoader = ({ width, height }: { width: number; height: number }) => {
 };
 
 export const ReportForm = ({
+  user,
   report,
   disabled,
   mode,
   handleCancel,
 }: {
+  user?: UserWithCompanies | null;
   report?: ReportWithTags;
   disabled?: boolean;
   mode: 'edit' | 'create' | 'view';
@@ -133,8 +139,9 @@ export const ReportForm = ({
   };
 
   if ((mode === 'view' || mode === 'edit') && !report) {
-    return <ReportNotFound />;
+    return <NotFound />;
   }
+
   return (
     <div>
       <form className="" id={FORM_ID} action={action}>
@@ -153,89 +160,30 @@ export const ReportForm = ({
                     name="title"
                     label="Title"
                     placeholder="Wrong user information in profile"
-                    // endContent={}
                   />
                   {report && report.id && mode === 'edit' ? (
-                    <Dropdown>
-                      <DropdownTrigger>
-                        <Button
-                          // size="lg"
-                          variant="light"
-                          isDisabled={mode !== 'edit'}
-                          className={
-                            mode !== 'edit'
-                              ? 'justify-end'
-                              : 'min-w-[200px] justify-between p-6'
-                          }
-                        >
-                          {mode === 'edit' && <span>Status: </span>}
-                          <Status status={report?.status as ReportStatus} />
-                        </Button>
-                      </DropdownTrigger>
-                      <DropdownMenu
-                        classNames={{ list: 'w-60' }}
-                        onAction={(newStatus: Key) => {
-                          if (
-                            confirm(
-                              `Please confirm your status update from ${report.status} to ${newStatus}`,
-                            )
-                          ) {
-                            startTransition(async () => {
-                              try {
-                                await updateReportStatus({
-                                  id: report.id,
-                                  oldStatus: report.status as ReportStatus,
-                                  newStatus: newStatus as ReportStatus,
-                                });
-                              } catch (err: unknown) {
-                                if (err instanceof Error) {
-                                  toast.error(err.message);
-                                }
-                              }
-                            });
-                          }
-                        }}
-                      >
-                        {REPORT_STATUS_STATE_MACHINE['Engineer'][
-                          report.status
-                        ].map((status) => (
-                          <DropdownItem
-                            key={status!}
-                            onMouseEnter={() => {
-                              setHovered(status as ReportStatus);
-                            }}
-                            onMouseLeave={() => setHovered(undefined)}
-                          >
-                            <div className="flex gap-4 justify-between">
-                              <Button type="submit" size="sm" variant="light">
-                                <Status status={status as ReportStatus} />
-                              </Button>
-                              {hovered === status && (
-                                <div className="flex flex-col bordered rounded border-1 border-black items-center justify-center gap-4 p-1">
-                                  update
-                                </div>
-                              )}
-                            </div>
-                          </DropdownItem>
-                        ))}
-                      </DropdownMenu>
-                    </Dropdown>
+                    <StatusSelector report={report} />
                   ) : (
-                    <Status
-                      status={
-                        mode === 'create'
-                          ? ReportStatus.Open
-                          : (report?.status as ReportStatus)
-                      }
-                    />
+                    <div className="flex flex-col gap-2 items-center">
+                      <StatusSelector report={report} />
+                    </div>
                   )}
                 </div>
                 <div className="gap-4">
-                  <CompanySelector
-                    mode={mode}
-                    companies={companies}
-                    report={report}
-                  />
+                  <div className="flex gap-4 items-center">
+                    <CompanySelector
+                      mode={mode}
+                      companies={companies}
+                      report={report}
+                    />
+                    <div className="flex flex-col items-center gap-2">
+                      <CategorySelector
+                        userType={user?.userTypes}
+                        report={report}
+                      />
+                      <Category category={report?.category} />
+                    </div>
+                  </div>
                   {/* <Input
                     {...viewModeProps}
                     label="Company"
