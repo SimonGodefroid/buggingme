@@ -31,9 +31,9 @@ import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
 import { ReportWithTags } from '@/types/reports';
+import { UserWithCompanies } from '@/types/users';
 import { DragNDropFileUpload } from '@/components/common/drag-n-drop-file-upload';
 import { EditorClient } from '@/components/common/editor';
-import { UserWithCompanies } from '@/app/@admin/admin/page';
 import NotFound from '@/app/not-found';
 
 import { Category } from '../common/category';
@@ -48,6 +48,12 @@ const imageLoader = ({ width, height }: { width: number; height: number }) => {
   return `https://placehold.co/${width}x${height}?text=Your+screenshot+here`;
 };
 
+export enum Mode {
+  Create = 'create',
+  Edit = 'edit',
+  View = 'view',
+}
+
 export const ReportForm = ({
   user,
   report,
@@ -58,7 +64,7 @@ export const ReportForm = ({
   user?: UserWithCompanies | null;
   report?: ReportWithTags;
   disabled?: boolean;
-  mode: 'edit' | 'create' | 'view';
+  mode: Mode;
   handleCancel?: () => void;
 }) => {
   const FORM_ID = `${mode}-report`;
@@ -125,7 +131,7 @@ export const ReportForm = ({
   useEffect(() => {
     if (formState.success) {
       toast.success('Report edited successfully !');
-      redirect(`/reports/${mode === 'create' ? '' : report?.id}`);
+      redirect(`/reports/${mode === Mode.Create ? '' : report?.id}`);
     }
     if (formState.errors._form?.length) {
       toast.error(formState.errors._form.join(', '));
@@ -138,7 +144,7 @@ export const ReportForm = ({
     color: disabled ? ('primary' as InputProps['color']) : undefined,
   };
 
-  if ((mode === 'view' || mode === 'edit') && !report) {
+  if ((mode === Mode.View || mode === Mode.Edit) && !report) {
     return <NotFound />;
   }
 
@@ -149,7 +155,7 @@ export const ReportForm = ({
           {/* Upper */}
           <div className="grid grid-cols-12 ">
             {/* Left */}
-            <div className="col-span-6">
+            <div className="col-span-12 md:col-span-6">
               <div className="flex flex-col gap-4 m-4">
                 <div className="flex gap-4 items-center">
                   <Input
@@ -161,13 +167,9 @@ export const ReportForm = ({
                     label="Title"
                     placeholder="Wrong user information in profile"
                   />
-                  {report && report.id && mode === 'edit' ? (
-                    <StatusSelector report={report} />
-                  ) : (
-                    <div className="flex flex-col gap-2 items-center">
-                      <StatusSelector report={report} />
-                    </div>
-                  )}
+                  <div className="flex flex-col gap-2 items-center">
+                    <StatusSelector report={report} mode={mode} />
+                  </div>
                 </div>
                 <div className="gap-4">
                   <div className="flex gap-4 items-center">
@@ -321,8 +323,8 @@ export const ReportForm = ({
                   <Select
                     label="Impact"
                     name="impact"
-                    isRequired={mode !== 'view'}
-                    isDisabled={mode === 'view'}
+                    isRequired={mode !== Mode.View}
+                    isDisabled={mode === Mode.View}
                     placeholder="Select an impact level"
                     defaultSelectedKeys={[report?.impact || Impact.SingleUser]}
                     classNames={{ value: ['mt-1'] }}
@@ -339,9 +341,9 @@ export const ReportForm = ({
                   <Select
                     label="Severity"
                     name="severity"
-                    isRequired={mode !== 'view'}
+                    isRequired={mode !== Mode.View}
                     defaultSelectedKeys={[report?.severity || Severity.Medium]}
-                    isDisabled={mode === 'view'}
+                    isDisabled={mode === Mode.View}
                     placeholder="Select a severity degree"
                     classNames={{ value: ['mt-1'] }}
                     renderValue={(selected) => (
@@ -360,10 +362,10 @@ export const ReportForm = ({
                     label={<div className="mb-4">Tags</div>}
                     name="tags"
                     isLoading={!Boolean(tags.length > 0)}
-                    isDisabled={mode === 'view'}
+                    isDisabled={mode === Mode.View}
                     selectionMode="multiple"
                     endContent={
-                      mode !== 'view' &&
+                      mode !== Mode.View &&
                       !Boolean(tags.length === 0) &&
                       new Set(selectedTags).size > 0 ? (
                         <span
@@ -407,7 +409,7 @@ export const ReportForm = ({
               </div>
             </div>
             {/* Right */}
-            <div className="col-span-6">
+            <div className="col-span-12 md:col-span-6">
               <div className="flex m-4">
                 <div className="flex flex-col gap-4 w-full">
                   {!disabled && <DragNDropFileUpload setImages={setImages} />}
@@ -472,14 +474,14 @@ export const ReportForm = ({
           {/* Lower */}
           <div className="grid grid-cols-12">
             {/* Left */}
-            <div className="col-span-6 ">
+            <div className="col-span-12 md:col-span-6">
               <div className="flex flex-col gap-4 m-4">
                 <Textarea
                   {...viewModeProps}
                   label="Steps to reproduce"
                   name="steps"
                   defaultValue={report?.steps?.toString()}
-                  isRequired={mode !== 'view'}
+                  isRequired={mode !== Mode.View}
                   isInvalid={!!formState?.errors.steps}
                   errorMessage={formState?.errors.steps?.join(', ')}
                   placeholder={`1. Go to Settings\n2. Click on Personal information\n...`}
@@ -487,7 +489,7 @@ export const ReportForm = ({
                 <Textarea
                   {...viewModeProps}
                   label="Current Behavior"
-                  isRequired={mode !== 'view'}
+                  isRequired={mode !== Mode.View}
                   isInvalid={!!formState?.errors.currentBehavior}
                   errorMessage={formState?.errors.currentBehavior?.join(', ')}
                   defaultValue={report?.currentBehavior?.toString()}
@@ -499,7 +501,7 @@ export const ReportForm = ({
                   label="Expected Behavior"
                   defaultValue={report?.expectedBehavior?.toString()}
                   name="expectedBehavior"
-                  isRequired={mode !== 'view'}
+                  isRequired={mode !== Mode.View}
                   isInvalid={!!formState?.errors.expectedBehavior}
                   errorMessage={formState?.errors.expectedBehavior?.join(', ')}
                   placeholder="Displayed information under my profile should be mine"
@@ -507,7 +509,7 @@ export const ReportForm = ({
               </div>
             </div>
             {/* Right */}
-            <div className="col-span-6">
+            <div className="col-span-12 md:col-span-6">
               <div className="flex flex-col gap-4 m-4">
                 <Textarea
                   {...viewModeProps}
@@ -529,7 +531,7 @@ export const ReportForm = ({
             color="danger"
             variant="flat"
             onClick={
-              mode === 'create' && typeof handleCancel === 'function'
+              mode === Mode.Create && typeof handleCancel === 'function'
                 ? () => handleCancel()
                 : () => router.back()
             }

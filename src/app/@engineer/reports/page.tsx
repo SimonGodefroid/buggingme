@@ -1,5 +1,4 @@
 import { fetchUser } from '@/actions';
-import { auth } from '@/auth';
 import db from '@/db';
 
 import { ReportWithTags } from '@/types/reports';

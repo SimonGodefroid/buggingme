@@ -1,3 +1,4 @@
+import { Mode } from 'fs';
 import { Key, startTransition } from 'react';
 
 import { updateReportStatus } from '@/actions/reports';
@@ -9,11 +10,21 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from '@nextui-org/react';
-import { Report, ReportStatus } from '@prisma/client';
+import { Report, ReportStatus, UserType } from '@prisma/client';
 
 import { Status } from '../reports/status';
 
-export default function StatusSelector({ report }: { report?: Report }) {
+export default function StatusSelector({
+  report,
+  mode,
+}: {
+  report?: Report;
+  mode: Mode;
+}) {
+  const content = [report ? <Status status={report?.status} /> : null].filter(
+    Boolean,
+  );
+
   return (
     <Dropdown>
       <DropdownTrigger>
@@ -56,28 +67,28 @@ export default function StatusSelector({ report }: { report?: Report }) {
         //   }
         // }}
       >
-        {REPORT_STATUS_STATE_MACHINE['Engineer'][report?.status as ReportStatus].map(
-          (status: ReportStatus) => (
-            <DropdownItem
-              key={status!}
-              // onMouseEnter={() => {
-              //   setHovered(status as ReportStatus);
-              // }}
-              // onMouseLeave={() => setHovered(undefined)}
-            >
-              <div className="flex gap-4 justify-between">
-                <Button type="submit" size="sm" variant="light">
-                  <Status status={status as ReportStatus} />
-                </Button>
-                {/* {hovered === status && (
+        {REPORT_STATUS_STATE_MACHINE[UserType.ENGINEER][
+          (report?.status as ReportStatus) || ReportStatus.Open
+        ].map((status: ReportStatus) => (
+          <DropdownItem
+            key={status!}
+            // onMouseEnter={() => {
+            //   setHovered(status as ReportStatus);
+            // }}
+            // onMouseLeave={() => setHovered(undefined)}
+          >
+            <div className="flex gap-4 justify-between">
+              <Button type="submit" size="sm" variant="light">
+                <Status status={status as ReportStatus} />
+              </Button>
+              {/* {hovered === status && (
                   <div className="flex flex-col bordered rounded border-1 border-black items-center justify-center gap-4 p-1">
                     update
                   </div>
                 )} */}
-              </div>
-            </DropdownItem>
-          ),
-        )}
+            </div>
+          </DropdownItem>
+        ))}
       </DropdownMenu>
     </Dropdown>
   );

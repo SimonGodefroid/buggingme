@@ -8,7 +8,7 @@ import type { Prisma } from '@prisma/client';
 
 import { ReportWithTags } from '@/types/reports';
 import { BreadCrumbsClient } from '@/components/breadcrumbs';
-import { ReportForm } from '@/components/reports/report-form';
+import { Mode, ReportForm } from '@/components/reports/report-form';
 
 export default async function ViewReport({
   params,
@@ -30,7 +30,7 @@ export default async function ViewReport({
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-4">
         <BreadCrumbsClient
           crumbs={[
             { href: '/reports', text: 'Reports' },
@@ -56,7 +56,7 @@ export default async function ViewReport({
           </Button>
         </div>
       </div>
-      <ReportForm user={user} mode={'view'} report={report} disabled />
+      <ReportForm user={user} mode={Mode.View} report={report} disabled />
     </div>
   );
 }
