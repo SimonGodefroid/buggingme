@@ -406,7 +406,8 @@ export default function ReportsTable({
         </TableBody>
       </Table>
       <div className="md:hidden flex flex-col gap-4">
-        {reports.map((report) => (
+        {topContent}
+        {sortedItems.map((report) => (
           <ReportCard key={report.id} report={report} />
         ))}
       </div>
