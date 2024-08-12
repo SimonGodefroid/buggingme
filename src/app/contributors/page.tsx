@@ -5,12 +5,12 @@ import SignInGitHubButton from '@/components/common/sign-in-github-button';
 
 export default function Contributors() {
   return (
-    <div className="flex flex-col gap-4 items-center justify-center p-8">
+    <div className="flex flex-col gap-8 items-center justify-center p-8">
       <Card className="max-w-md p-6 my-auto mx-auto shadow-lg">
-        <CardHeader className="text-center">
+        <CardHeader className="justify-center">
           <h1 className="text-4xl font-bold">Contributor</h1>
         </CardHeader>
-        <CardBody>
+        <CardBody className="text-center">
           <p className="text-xl text-gray-600">/kənˈtrɪbjʊtə,ˈkɒntrɪbjuːtə/</p>
           <p className="text-lg font-bold mt-4">noun</p>
           <p className="text-lg mt-2">
@@ -20,7 +20,7 @@ export default function Contributors() {
         </CardBody>
       </Card>
       <Card className="max-w-6xl p-6 my-auto mx-auto shadow-lg">
-        <CardBody>
+        <CardBody className="text-center">
           <p className="text-lg font-bold mt-4">Join us</p>
           <p className="text-lg mt-2">
             If you're a developer, a designer, a tester, or a tech enthusiast,
@@ -28,10 +28,10 @@ export default function Contributors() {
             encountered with popular websites.
           </p>
         </CardBody>
-        <div className="flex justify-center">
-          <SignInGitHubButton label='' />
-        </div>
       </Card>
+      <div className="flex justify-center">
+        <SignInGitHubButton />
+      </div>
     </div>
   );
 }

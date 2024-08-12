@@ -1,12 +1,13 @@
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
+import { fetchUser } from '@/actions';
 import db from '@/db';
 import { Button, Link } from '@nextui-org/react';
 
+import { ReportWithTags } from '@/types/reports';
 import { BreadCrumbsClient } from '@/components/breadcrumbs';
-import { ReportForm } from '@/components/reports/report-form';
-
-import { ReportWithTags } from '../page';
+import PageHeader from '@/components/common/page-header';
+import { Mode, ReportForm } from '@/components/reports/report-form';
 
 export default async function EditReport({
   params,
@@ -14,6 +15,7 @@ export default async function EditReport({
   params: { reportId: string };
 }) {
   const { reportId } = params;
+  const user = await fetchUser();
 
   const report = (await db.report.findFirst({
     where: { id: params.reportId },
@@ -25,24 +27,18 @@ export default async function EditReport({
   }
   return (
     <div className="flex flex-col">
-      <div className="flex items-center justify-between">
-        <BreadCrumbsClient
-          crumbs={[
-            { href: '/reports', text: 'Reports' },
-            { href: `/reports/${report?.id}`, text: `${report?.id}` },
-            { href: `/reports/${report?.id}`, text: `Edit` },
-          ]}
-        />
-        <Button
-          href={`/reports/${reportId}`}
-          as={Link}
-          variant="ghost"
-          color="primary"
-        >
-          Back
-        </Button>
-      </div>
-      <ReportForm mode={'edit'} report={report} />
+      <PageHeader
+        crumbs={[
+          { href: '/reports', text: 'Reports' },
+          { href: `/reports/${report.id}`, text: `${report.title}` },
+          { href: `/reports/${report?.id}`, text: `Edit` },
+        ]}
+        buttonProps={{
+          secondary: { href: `/reports/${reportId}`, text: 'Back' },
+        }}
+      />
+
+      <ReportForm user={user} mode={'edit' as Mode} report={report} />
     </div>
   );
 }

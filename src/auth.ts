@@ -40,12 +40,12 @@ export const {
       }
       return session;
     },
-    async jwt({ token, account, user }) {
-      if (user) {
-        token.id = user.id;
-      }
-      return token;
-    },
+    // async jwt({ token, account, user }) {
+    //   if (user) {
+    //     token.id = user.id;
+    //   }
+    //   return token;
+    // },
   },
   events: {
     signIn: async (message) => {

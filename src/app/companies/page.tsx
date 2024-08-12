@@ -5,12 +5,12 @@ import SignInGitHubButton from '@/components/common/sign-in-github-button';
 
 export default function Companies() {
   return (
-    <div className="flex flex-col gap-4 items-center justify-center p-8">
-      <Card className="max-w-md p-6 my-auto mx-auto shadow-lg">
-        <CardHeader className="text-center">
+    <div className="flex flex-col gap-8 items-center justify-center p-8">
+      <Card className="max-w-xl p-6 my-auto mx-auto shadow-lg">
+        <CardHeader className="justify-center">
           <h1 className="text-4xl font-bold">Company</h1>
         </CardHeader>
-        <CardBody>
+        <CardBody className="text-center">
           <p className="text-xl text-gray-600">/ˈkʌmp(ə)ni/</p>
           <p className="text-lg font-bold mt-4">noun</p>
           <p className="text-lg mt-2">
@@ -19,8 +19,8 @@ export default function Companies() {
           </p>
         </CardBody>
       </Card>
-      <Card className="max-w-6xl p-6 my-auto mx-auto shadow-lg">
-        <CardBody>
+      <Card className="max-w-6xl p-6 my-auto mx-auto shadow-lg gap-4">
+        <CardBody className="text-center">
           <p className="text-lg font-bold mt-4">Join us</p>
           <p className="text-lg mt-2">
             If you are a representative of a company, you can use this platform
@@ -29,10 +29,10 @@ export default function Companies() {
             contributors who submit bugs.
           </p>
         </CardBody>
-        <div className="flex justify-center">
-          <SignInAuth0Button label="" />
-        </div>
       </Card>
+      <div className="flex justify-center">
+        <SignInAuth0Button />
+      </div>
     </div>
   );
 }

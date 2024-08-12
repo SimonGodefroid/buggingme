@@ -3,7 +3,7 @@ import { Metadata } from 'next';
 import db from '@/db';
 import { Prisma, UserType } from '@prisma/client';
 
-import { BreadCrumbsClient } from '@/components/breadcrumbs';
+import PageHeader from '@/components/common/page-header';
 import ContributorsTable from '@/components/contributors/contributors-table';
 
 export const metadata: Metadata = {
@@ -20,8 +20,9 @@ export default async function Contributors({ ...args }) {
   });
   return (
     <div className="flex flex-col gap-4">
-      <BreadCrumbsClient
+      <PageHeader
         crumbs={[{ href: '/contributors', text: 'Contributors' }]}
+        
       />
       <ContributorsTable contributors={contributors} />
     </div>
