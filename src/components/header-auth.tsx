@@ -41,12 +41,12 @@ export default function HeaderAuth({ user }: { user: Session['user'] | null }) {
         </PopoverTrigger>
         <PopoverContent>
           <div className="flex flex-col gap-4 p-4">
-            <form action={actions.signOut}>
-              <Button type="submit">Sign Out</Button>
-            </form>
             <Button as={Link} href={`/profile/${user.id}`}>
               Profile
             </Button>
+            <form action={actions.signOut}>
+              <Button type="submit">Sign Out</Button>
+            </form>
           </div>
         </PopoverContent>
       </Popover>

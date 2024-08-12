@@ -7,16 +7,8 @@ export const statusColorMap: Record<
   { color: ChipProps['color']; variant: ChipProps['variant'] }
 > = {
   [ReportStatus.Open]: { color: 'primary', variant: 'flat' },
-  [ReportStatus.UnderReview]: {
-    color: 'secondary',
-    variant: 'flat',
-  },
-  [ReportStatus.InProgress]: { color: 'warning', variant: 'flat' },
-  [ReportStatus.Resolved]: { color: 'success', variant: 'flat' },
   [ReportStatus.Closed]: { color: 'default', variant: 'flat' },
-  [ReportStatus.Deferred]: { color: 'warning', variant: 'bordered' },
   [ReportStatus.Cancelled]: { color: 'danger', variant: 'bordered' },
-  [ReportStatus.Rejected]: { color: 'danger', variant: 'solid' },
   [ReportStatus.Deleted]: { color: 'danger', variant: 'faded' },
 };
 

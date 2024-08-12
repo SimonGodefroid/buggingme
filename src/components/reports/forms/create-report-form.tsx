@@ -1,13 +1,11 @@
 'use client';
 
-import React, { useEffect, useState, useTransition } from 'react';
+import React, { useEffect, useState } from 'react';
 
 import Image from 'next/image';
 import { redirect, useRouter } from 'next/navigation';
 
-import { fetchAllCompanies } from '@/actions/companies/fetchAllCompanies';
 import { createReport } from '@/actions/reports/create';
-import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
 import { updateReport } from '@/actions/reports/update';
 import {
   Button,
@@ -20,7 +18,7 @@ import {
   Textarea,
   Tooltip,
 } from '@nextui-org/react';
-import { Impact, ReportStatus, Severity, Tag } from '@prisma/client';
+import { Impact, Severity, Tag } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
@@ -30,55 +28,42 @@ import { DragNDropFileUpload } from '@/components/common/drag-n-drop-file-upload
 import { EditorClient } from '@/components/common/editor';
 import NotFound from '@/app/not-found';
 
-import { Category } from '../common/category';
-import CategorySelector from '../common/category-selector';
-import StatusSelector from '../common/status-selector';
-import CompanySelector from '../companies/company-selector';
-import { ImpactChip } from './impact';
-import { SeverityChip } from './severity';
-import { Status } from './status';
+import CompanySelector from '../../companies/company-selector';
+import { ImpactChip } from '../impact';
+import { SeverityChip } from '../severity';
 
 const imageLoader = ({ width, height }: { width: number; height: number }) => {
   return `https://placehold.co/${width}x${height}?text=Your+screenshot+here`;
 };
 
-export enum Mode {
-  Create = 'create',
-  Edit = 'edit',
+enum Mode {
+  Creation = 'creation',
+  Update = 'update',
   View = 'view',
 }
 
-export const ReportForm = ({
+export const CreateReportForm = ({
   user,
+  tags,
   report,
-  disabled,
   mode,
   handleCancel,
 }: {
   user?: UserWithCompanies | null;
+  tags: Tag[];
   report?: ReportWithTags;
-  disabled?: boolean;
-  mode: Mode;
+  mode: 'view' | 'update' | 'creation';
   handleCancel?: () => void;
 }) => {
   const FORM_ID = `${mode}-report`;
+  const router = useRouter();
 
-  const [pending, startTransition] = useTransition();
-
-  const [hovered, setHovered] = React.useState<ReportStatus | undefined>(
-    undefined,
-  );
-
-  const [tags, setTags] = useState<Tag[] | []>([]);
   const [selectedTags, setSelectedTags] = useState<Selection>(
     new Set((report?.tags || []).map((tag) => tag.id)),
   );
 
-  const [companies, setCompanies] = useState<any[] | []>([]);
-
-  const router = useRouter();
   const [formState, action] = useFormState(
-    mode === 'edit' && report && report.id
+    mode === Mode.Update && report && report.id
       ? updateReport.bind(null, { id: report?.id })
       : createReport,
     {
@@ -91,41 +76,9 @@ export const ReportForm = ({
   >([]);
 
   useEffect(() => {
-    const loadTags = async () => {
-      try {
-        const allTags = await fetchAllTags();
-        setTags(allTags);
-      } catch (error: unknown) {
-        let message = 'Failed to load tags';
-        if (error instanceof Error) {
-          message += ` ${error.message}`;
-        }
-        toast.error(message);
-      }
-    };
-    loadTags();
-  }, []);
-
-  useEffect(() => {
-    const loadCompanies = async () => {
-      try {
-        const allCompanies = await fetchAllCompanies();
-        setCompanies(allCompanies);
-      } catch (error: unknown) {
-        let message = 'Failed to load companies';
-        if (error instanceof Error) {
-          message += ` ${error.message}`;
-        }
-        toast.error(message);
-      }
-    };
-    loadCompanies();
-  }, []);
-
-  useEffect(() => {
     if (formState.success) {
-      toast.success('Report edited successfully !');
-      redirect(`/reports/${mode === Mode.Create ? '' : report?.id}`);
+      toast.success(`Report ${mode.toLowerCase()} successful !`);
+      redirect(`/reports/${mode === Mode.Creation ? '' : report?.id}`);
     }
     if (formState.errors._form?.length) {
       toast.error(formState.errors._form.join(', '));
@@ -133,12 +86,12 @@ export const ReportForm = ({
   }, [formState]);
 
   const viewModeProps = {
-    isRequired: !disabled,
-    isReadOnly: disabled,
-    color: disabled ? ('primary' as InputProps['color']) : undefined,
+    isReadOnly: mode === Mode.View,
+    isDisabled: mode === Mode.View,
+    color: mode === Mode.View ? ('primary' as InputProps['color']) : undefined,
   };
 
-  if ((mode === Mode.View || mode === Mode.Edit) && !report) {
+  if ((mode === Mode.View || mode === Mode.Update) && !report) {
     return <NotFound />;
   }
 
@@ -161,25 +114,9 @@ export const ReportForm = ({
                     label="Title"
                     placeholder="Wrong user information in profile"
                   />
-                  <div className="flex flex-col gap-2 items-center">
-                    <StatusSelector report={report} mode={mode} />
-                  </div>
                 </div>
-                <div className="gap-4">
-                  <div className="flex gap-4 items-center">
-                    <CompanySelector
-                      mode={mode}
-                      companies={companies}
-                      report={report}
-                    />
-                    <div className="flex flex-col items-center gap-2">
-                      <CategorySelector
-                        userType={user?.userTypes}
-                        report={report}
-                      />
-                      <Category category={report?.category} />
-                    </div>
-                  </div>
+                <div className="w-full">
+                  <CompanySelector mode={mode} report={report} />
                 </div>
                 <div className="gap-4">
                   <Input
@@ -203,8 +140,7 @@ export const ReportForm = ({
                   <Select
                     label="Impact"
                     name="impact"
-                    isRequired={mode !== Mode.View}
-                    isDisabled={mode === Mode.View}
+                    {...viewModeProps}
                     placeholder="Select an impact level"
                     defaultSelectedKeys={[report?.impact || Impact.SingleUser]}
                     classNames={{ value: ['mt-1'] }}
@@ -221,9 +157,8 @@ export const ReportForm = ({
                   <Select
                     label="Severity"
                     name="severity"
-                    isRequired={mode !== Mode.View}
+                    {...viewModeProps}
                     defaultSelectedKeys={[report?.severity || Severity.Medium]}
-                    isDisabled={mode === Mode.View}
                     placeholder="Select a severity degree"
                     classNames={{ value: ['mt-1'] }}
                     renderValue={(selected) => (
@@ -241,7 +176,7 @@ export const ReportForm = ({
                   <Select
                     label={<div className="mb-4">Tags</div>}
                     name="tags"
-                    isLoading={!Boolean(tags.length > 0)}
+                    isLoading={!Boolean(tags?.length > 0)}
                     isDisabled={mode === Mode.View}
                     selectionMode="multiple"
                     selectedKeys={selectedTags}
@@ -266,13 +201,16 @@ export const ReportForm = ({
                             {value.textValue}
                           </Chip>
                         )),
-                        <Chip
-                          onClick={() => setSelectedTags(new Set([]))}
-                          className="m-1"
-                        >
-                          Clear
-                        </Chip>,
-                      ];
+                        mode !== Mode.View && (
+                          <Chip
+                            key="clear"
+                            onClick={() => setSelectedTags(new Set([]))}
+                            className="m-1"
+                          >
+                            Clear
+                          </Chip>
+                        ),
+                      ].filter(Boolean);
                     }}
                     isMultiline
                     placeholder="Select tags"
@@ -288,7 +226,9 @@ export const ReportForm = ({
             <div className="col-span-12 md:col-span-6">
               <div className="flex m-4">
                 <div className="flex flex-col gap-4 w-full">
-                  {!disabled && <DragNDropFileUpload setImages={setImages} />}
+                  {mode !== Mode.View && (
+                    <DragNDropFileUpload setImages={setImages} />
+                  )}
                   <div className="flex gap-4 justify-end">
                     {(images || []).map((image) => (
                       <Tooltip
@@ -297,7 +237,7 @@ export const ReportForm = ({
                         key={image.id}
                         content={
                           <div className="flex m-2 relative">
-                            {!disabled && (
+                            {mode !== Mode.View && (
                               <button
                                 className="text-lg text-primary cursor-pointer active:opacity-50 p-1 absolute top-4 right-4"
                                 onClick={(evt) => {
@@ -355,6 +295,7 @@ export const ReportForm = ({
                 <Textarea
                   {...viewModeProps}
                   label="Steps to reproduce"
+                  minRows={4}
                   name="steps"
                   defaultValue={report?.steps?.toString()}
                   isRequired={mode !== Mode.View}
@@ -365,6 +306,7 @@ export const ReportForm = ({
                 <Textarea
                   {...viewModeProps}
                   label="Current Behavior"
+                  minRows={4}
                   isRequired={mode !== Mode.View}
                   isInvalid={!!formState?.errors.currentBehavior}
                   errorMessage={formState?.errors.currentBehavior?.join(', ')}
@@ -375,6 +317,7 @@ export const ReportForm = ({
                 <Textarea
                   {...viewModeProps}
                   label="Expected Behavior"
+                  minRows={4}
                   defaultValue={report?.expectedBehavior?.toString()}
                   name="expectedBehavior"
                   isRequired={mode !== Mode.View}
@@ -394,20 +337,20 @@ export const ReportForm = ({
                   defaultValue={report?.suggestions?.toString()}
                   placeholder="You should check around the API call being made to Identité Numérique you are likely not doing what's needed"
                 />
-                <EditorClient readOnly={disabled} />
+                <EditorClient readOnly={mode === Mode.View} />
               </div>
             </div>
           </div>
         </div>
       </form>
 
-      {!disabled && (
+      {mode !== Mode.View && (
         <div className="flex justify-between m-4">
           <Button
             color="danger"
             variant="flat"
             onClick={
-              mode === Mode.Create && typeof handleCancel === 'function'
+              mode === Mode.Creation && typeof handleCancel === 'function'
                 ? () => handleCancel()
                 : () => router.back()
             }

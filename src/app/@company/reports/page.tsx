@@ -18,11 +18,8 @@ export default async function Reports() {
   }
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader
-        crumbs={[{ href: '/reports', text: 'Reports' }]}
-        
-      />
-      <ReportsTable reports={reports} />
+      <PageHeader crumbs={[{ href: '/reports', text: 'Reports' }]} />
+      <ReportsTable reports={reports} user={user} />
     </div>
   );
 }

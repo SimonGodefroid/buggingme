@@ -1,11 +1,11 @@
 'use server';
 
-import { ReportStatus, type Report } from '@prisma/client';
+import { ReportStatus, UserType, type Report } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { auth } from '@/auth';
 import db from '@/db';
-import { assertStateTransition, RoleType } from './helpers/reportStatus';
+import { assertStatusTransition } from './helpers/reportStatus';
 
 const updateReportStatusSchema = z.object({
   id: z.string(),
@@ -40,11 +40,12 @@ export async function updateReportStatus(
     )
   }
 
-  if (!assertStateTransition(oldStatus, newStatus, RoleType.Engineer)) {
+  if (!assertStatusTransition(oldStatus, newStatus, UserType.ENGINEER)) {
     throw new Error('You are trying to perform a forbidden status change');
   }
 
   const session = await auth();
+  console.log('session', session)
   if (!session || !session.user) {
     return {
       errors: {
@@ -52,6 +53,17 @@ export async function updateReportStatus(
       },
     };
   }
+
+  const reportToUpdate: Report | null = await db.report.findUnique({ where: { id } });
+
+  if (!reportToUpdate) {
+    return {
+      errors: {
+        _form: ['Report not found'],
+      },
+    };
+  }
+
 
   let report: Report;
 
@@ -68,6 +80,8 @@ export async function updateReportStatus(
           reportId: id,
           oldStatus: result.data.oldStatus,
           newStatus: result.data.newStatus,
+          oldCategory: reportToUpdate.category,
+          newCategory: reportToUpdate.category,
           changedAt: new Date(),
           changedBy: session?.user?.id!
         },

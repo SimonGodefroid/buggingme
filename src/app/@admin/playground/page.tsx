@@ -1,8 +1,30 @@
-export default async function Playground() {
+'use client';
+
+import {
+  Button,
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from '@nextui-org/react';
+
+export default function Playground() {
   return (
-    <div className="grid grid-cols-4 border-3 border-blue-400">
-      <div className="col-span-4 lg:col-span-2 border-3 border-green-200">col-span-1</div>
-      <div className="col-span-4 sm:col-span-2 border-3 border-yellow-300">col-span-1</div>
-    </div>
+    <Dropdown>
+      <DropdownTrigger>
+        <Button variant="light">Status</Button>
+      </DropdownTrigger>
+      <DropdownMenu classNames={{ list: 'w-60' }} onAction={alert}>
+        {['lol', 'lil'].map((status: string) => (
+          <DropdownItem key={status} textValue={status}>
+            <div className="flex gap-4 justify-between">
+              <Button size="sm" variant="light">
+                {status}
+              </Button>
+            </div>
+          </DropdownItem>
+        ))}
+      </DropdownMenu>
+    </Dropdown>
   );
 }

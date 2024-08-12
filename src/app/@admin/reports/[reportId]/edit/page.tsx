@@ -1,12 +1,11 @@
-import { notFound, redirect } from 'next/navigation';
+import { notFound } from 'next/navigation';
 
+import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
 import db from '@/db';
-import { Button, Link } from '@nextui-org/react';
 
 import { ReportWithTags } from '@/types/reports';
-import { BreadCrumbsClient } from '@/components/breadcrumbs';
 import PageHeader from '@/components/common/page-header';
-import { Mode, ReportForm } from '@/components/reports/report-form';
+import { UpdateReportForm } from '@/components/reports/forms/update-report-form';
 
 export default async function EditReport({
   params,
@@ -14,7 +13,7 @@ export default async function EditReport({
   params: { reportId: string };
 }) {
   const { reportId } = params;
-
+  const tags = await fetchAllTags();
   const report = (await db.report.findFirst({
     where: { id: params.reportId },
     include: { user: true, StatusHistory: true, tags: true, company: true },
@@ -35,7 +34,7 @@ export default async function EditReport({
           secondary: { href: `/reports/${reportId}`, text: 'Back' },
         }}
       />
-      <ReportForm mode={'edit' as Mode} report={report} />
+      <UpdateReportForm tags={tags} mode={'update'} report={report} />
     </div>
   );
 }

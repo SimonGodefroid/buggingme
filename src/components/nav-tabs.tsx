@@ -59,11 +59,26 @@ export default function NavTabs2({
     | { label: string; href: string; onPress: never }[]
     | { label: string; href: never; onPress: () => void }[];
 
+  const navItems = [
+    {
+      label: '🐛 Reports',
+      href: '/reports',
+      count: count.reports,
+    },
+    {
+      label: '👷👷‍♀️ Contributors',
+      href: '/contributors',
+      count: count.contributors,
+    },
+    { label: '🏢 Companies', href: '/companies', count: count.companies },
+    { label: '📢 Campaigns', href: '/campaigns', count: count.campaigns },
+    { label: '🏆 Leaderboard', href: '/leaderboard' },
+  ];
   const noop = () => {};
 
   return (
     <Navbar
-      classNames={{ base: 'justify-start md:p-4' }}
+      classNames={{ base: 'justify-start md:p-2' }}
       isBordered
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
@@ -86,56 +101,21 @@ export default function NavTabs2({
             <p className="font-bold text-inherit">Bug busters</p>
           </Link>
         </NavbarBrand>
-        <NavbarItem>
-          <Link color="foreground" isBlock href="/reports">
-            <div className="flex items-center space-x-2">
-              <span>🐛&nbsp;Reports</span>
-              <Chip size="sm" variant="faded">
-                {count.reports}
-              </Chip>
-            </div>
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" isBlock href="/contributors">
-            <div className="flex items-center space-x-2">
-              <span>👷👷‍♀️&nbsp;Contributors</span>
-              <Chip size="sm" variant="faded">
-                {count.contributors}
-              </Chip>
-            </div>
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" isBlock href="/companies">
-            <div className="flex items-center space-x-2">
-              <span>🏢&nbsp;Companies</span>
-              <Chip size="sm" variant="faded">
-                {count.companies}
-              </Chip>
-            </div>
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" isBlock href="/campaigns">
-            <div className="flex items-center space-x-2">
-              <span>📢&nbsp;Campaigns</span>
-              <Chip size="sm" variant="faded">
-                {count.campaigns}
-              </Chip>
-            </div>
-          </Link>
-        </NavbarItem>
-        <NavbarItem>
-          <Link color="foreground" isBlock href="/leaderboard">
-            <div className="flex items-center space-x-2">
-              <span>🏆&nbsp;Leaderboard</span>
-              <Chip size="sm" color="danger">
-                New
-              </Chip>
-            </div>
-          </Link>
-        </NavbarItem>
+
+        {navItems.map((item) => (
+          <NavbarItem isActive={item.href === `/${path.split('/')[1]}`} key={item.label}>
+            <Link color="foreground" isBlock href={item.href}>
+              <div className="flex items-center space-x-2">
+                <span>{item.label}</span>
+                {!('count' in item) || !user ? null : (
+                  <Chip size="sm" variant="faded">
+                    {item.count}
+                  </Chip>
+                )}
+              </div>
+            </Link>
+          </NavbarItem>
+        ))}
       </NavbarContent>
 
       <NavbarContent className="md:p-10">

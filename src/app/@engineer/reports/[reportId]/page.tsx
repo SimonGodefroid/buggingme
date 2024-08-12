@@ -1,14 +1,16 @@
 import { notFound } from 'next/navigation';
 
 import { fetchUser } from '@/actions';
+import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
 import { auth } from '@/auth';
 import db from '@/db';
 import { Button, Link } from '@nextui-org/react';
+import { ReportStatus } from '@prisma/client';
 
 import { ReportWithTags } from '@/types/reports';
 import { BreadCrumbsClient } from '@/components/breadcrumbs';
 import PageHeader from '@/components/common/page-header';
-import { Mode, ReportForm } from '@/components/reports/report-form';
+import { ViewReportForm } from '@/components/reports/forms/view-report-form';
 
 export default async function ViewReport({
   params,
@@ -24,6 +26,7 @@ export default async function ViewReport({
     include: { StatusHistory: true, tags: true, user: true, company: true },
   })) as ReportWithTags;
 
+  const tags = await fetchAllTags();
   if (!report) {
     notFound();
   }
@@ -37,14 +40,17 @@ export default async function ViewReport({
           { href: `/reports/${report.id}`, text: `View` },
         ]}
         buttonProps={{
-          primary: {
-            href: `/reports/${reportId}/edit`,
-            text: 'Edit',
-          },
+          primary:
+            report.status === ReportStatus.Open
+              ? {
+                  href: `/reports/${reportId}/edit`,
+                  text: 'Edit',
+                }
+              : undefined,
           secondary: { href: `/reports`, text: 'Back to reports' },
         }}
       />
-      <ReportForm user={user} mode={'view' as Mode} report={report} disabled />
+      <ViewReportForm tags={tags} mode={'view'} report={report} />
     </div>
   );
 }

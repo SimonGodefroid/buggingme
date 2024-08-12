@@ -27,6 +27,7 @@
     "@nextui-org/react": "^2.4.2",
     "@prisma/adapter-pg": "^5.16.2",
     "@prisma/client": "^5.14.0",
+    "boxicons": "^2.1.4",
     "framer-motion": "^11.1.7",
     "lodash.debounce": "^4.0.8",
     "lodash.differenceby": "^4.8.0",

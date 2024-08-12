@@ -7,7 +7,7 @@ export type Crumbs = Crumb[];
 const HOME_CRUMB = { href: '/', text: 'Home' };
 export const BreadCrumbsClient = ({ crumbs }: { crumbs: Crumbs }) => {
   return (
-    <div className="mt-4">
+    <div>
       <Breadcrumbs>
         {[HOME_CRUMB, ...crumbs].map((crumb, index) => (
           <BreadcrumbItem

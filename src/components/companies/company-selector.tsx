@@ -1,5 +1,8 @@
-import React, { Key, useState } from 'react';
+'use client';
 
+import React, { Key, useEffect, useState } from 'react';
+
+import { fetchAllCompanies } from '@/actions';
 import {
   Autocomplete,
   AutocompleteItem,
@@ -35,13 +38,27 @@ type CompanySuggestion = {
 
 export default function CompanySelector({
   mode,
-  companies,
   report,
 }: {
-  mode: 'create' | 'edit' | 'view';
-  companies: Company[];
+  mode: 'view' | 'update' | 'creation';
   report?: ReportWithTags;
 }) {
+  const [companies, setCompanies] = useState<Company[] | []>([]);
+  useEffect(() => {
+    const loadCompanies = async () => {
+      try {
+        const allCompanies = await fetchAllCompanies();
+        setCompanies(allCompanies);
+      } catch (error: unknown) {
+        let message = 'Failed to load companies';
+        if (error instanceof Error) {
+          message += ` ${error.message}`;
+        }
+        toast.error(message);
+      }
+    };
+    loadCompanies();
+  }, []);
   const [companyData, setCompanyData] = useState<
     { id: string } | CompanySuggestion | null
   >();
@@ -114,7 +131,7 @@ export default function CompanySelector({
 
   const debouncedFetchSuggestions = debounce(fetchSuggestions, 200);
 
-  if (report && mode !== 'create') {
+  if (report && mode !== 'creation') {
     return (
       <div className="flex border-2 bg-foreground-100 rounded-xl p-4 w-full">
         <a
@@ -167,7 +184,7 @@ export default function CompanySelector({
         <AutocompleteSection title="suggestions">
           {suggestions.map((suggestion) => (
             <AutocompleteItem key={`${suggestion.name}`}>
-              {suggestion.name}
+              {renderOption(suggestion)}
             </AutocompleteItem>
           ))}
         </AutocompleteSection>
