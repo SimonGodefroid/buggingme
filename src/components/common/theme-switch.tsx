@@ -15,6 +15,7 @@ export default function ThemeSwitch() {
       content={`Switch to ${resolvedTheme === Theme.light ? Theme.dark : Theme.light} theme`}
     >
       <Button
+      isIconOnly
         variant="light"
         onClick={() => {
           setTheme(resolvedTheme === Theme.light ? Theme.dark : Theme.light);

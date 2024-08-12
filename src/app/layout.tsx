@@ -5,10 +5,8 @@ import './globals.css';
 
 import { fetchAllCounts } from '@/actions/count/fetchAllCounts';
 import { fetchUser } from '@/actions/users/fetchUser';
-import { auth } from '@/auth';
-import { User, UserType } from '@prisma/client';
+import { UserType } from '@prisma/client';
 
-import Header from '@/components/header';
 import NavTabs from '@/components/nav-tabs';
 import Providers from '@/app/providers';
 
@@ -31,23 +29,15 @@ export default async function RootLayout({
   engineer: React.ReactNode;
 }) {
   const counts = await fetchAllCounts();
-  const authenticatedUser = await auth();
-  const user: User | null = authenticatedUser?.user?.id
-    ? await fetchUser(authenticatedUser?.user?.id as string)
-    : null;
+  const user = await fetchUser();
 
   return (
     <html lang="en">
       <body>
         <Providers>
           {/* Wrap main content with ThemeProvider */}
-          <Header />
           <NavTabs count={counts} user={user} />
           <main className="my-4 ">
-            {/* <main className="my-4 flex"> */}
-            {/* <aside className='border-3 border-white'>
-              <ListboxTabs />
-            </aside> */}
             {user?.userTypes.includes(UserType.GOD) ? admin : null}
             {user?.userTypes.includes(UserType.ENGINEER) ? engineer : null}
             {user?.userTypes.includes(UserType.COMPANY) ? company : null}

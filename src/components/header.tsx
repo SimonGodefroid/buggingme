@@ -9,7 +9,6 @@ import {
   NavbarContent,
   NavbarItem,
 } from '@nextui-org/react';
-import { User } from '@prisma/client';
 
 import HeaderAuth from '@/components/header-auth';
 

@@ -1,23 +1,17 @@
 'use client';
 
-import React, { useEffect, useState, useTransition, type Key } from 'react';
+import React, { useEffect, useState, useTransition } from 'react';
 
 import Image from 'next/image';
-import { notFound, redirect, useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 
 import { fetchAllCompanies } from '@/actions/companies/fetchAllCompanies';
 import { createReport } from '@/actions/reports/create';
-import { REPORT_STATUS_STATE_MACHINE } from '@/actions/reports/helpers/reportStatus';
 import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
 import { updateReport } from '@/actions/reports/update';
-import { updateReportStatus } from '@/actions/reports/updateStatus';
 import {
   Button,
   Chip,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
   Input,
   InputProps,
   Select,
@@ -30,11 +24,15 @@ import { Impact, ReportStatus, Severity, Tag } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
+import { ReportWithTags } from '@/types/reports';
+import { UserWithCompanies } from '@/types/users';
 import { DragNDropFileUpload } from '@/components/common/drag-n-drop-file-upload';
 import { EditorClient } from '@/components/common/editor';
-import ReportNotFound from '@/app/@engineer/reports/[reportId]/not-found';
-import { ReportWithTags } from '@/app/@engineer/reports/[reportId]/page';
+import NotFound from '@/app/not-found';
 
+import { Category } from '../common/category';
+import CategorySelector from '../common/category-selector';
+import StatusSelector from '../common/status-selector';
 import CompanySelector from '../companies/company-selector';
 import { ImpactChip } from './impact';
 import { SeverityChip } from './severity';
@@ -44,15 +42,23 @@ const imageLoader = ({ width, height }: { width: number; height: number }) => {
   return `https://placehold.co/${width}x${height}?text=Your+screenshot+here`;
 };
 
+export enum Mode {
+  Create = 'create',
+  Edit = 'edit',
+  View = 'view',
+}
+
 export const ReportForm = ({
+  user,
   report,
   disabled,
   mode,
   handleCancel,
 }: {
+  user?: UserWithCompanies | null;
   report?: ReportWithTags;
   disabled?: boolean;
-  mode: 'edit' | 'create' | 'view';
+  mode: Mode;
   handleCancel?: () => void;
 }) => {
   const FORM_ID = `${mode}-report`;
@@ -119,7 +125,7 @@ export const ReportForm = ({
   useEffect(() => {
     if (formState.success) {
       toast.success('Report edited successfully !');
-      redirect(`/reports/${mode === 'create' ? '' : report?.id}`);
+      redirect(`/reports/${mode === Mode.Create ? '' : report?.id}`);
     }
     if (formState.errors._form?.length) {
       toast.error(formState.errors._form.join(', '));
@@ -132,9 +138,10 @@ export const ReportForm = ({
     color: disabled ? ('primary' as InputProps['color']) : undefined,
   };
 
-  if ((mode === 'view' || mode === 'edit') && !report) {
-    return <ReportNotFound />;
+  if ((mode === Mode.View || mode === Mode.Edit) && !report) {
+    return <NotFound />;
   }
+
   return (
     <div>
       <form className="" id={FORM_ID} action={action}>
@@ -142,7 +149,7 @@ export const ReportForm = ({
           {/* Upper */}
           <div className="grid grid-cols-12 ">
             {/* Left */}
-            <div className="col-span-6">
+            <div className="col-span-12 md:col-span-6">
               <div className="flex flex-col gap-4 m-4">
                 <div className="flex gap-4 items-center">
                   <Input
@@ -153,203 +160,26 @@ export const ReportForm = ({
                     name="title"
                     label="Title"
                     placeholder="Wrong user information in profile"
-                    // endContent={}
                   />
-                  {report && report.id && mode === 'edit' ? (
-                    <Dropdown>
-                      <DropdownTrigger>
-                        <Button
-                          // size="lg"
-                          variant="light"
-                          isDisabled={mode !== 'edit'}
-                          className={
-                            mode !== 'edit'
-                              ? 'justify-end'
-                              : 'min-w-[200px] justify-between p-6'
-                          }
-                        >
-                          {mode === 'edit' && <span>Status: </span>}
-                          <Status status={report?.status as ReportStatus} />
-                        </Button>
-                      </DropdownTrigger>
-                      <DropdownMenu
-                        classNames={{ list: 'w-60' }}
-                        onAction={(newStatus: Key) => {
-                          if (
-                            confirm(
-                              `Please confirm your status update from ${report.status} to ${newStatus}`,
-                            )
-                          ) {
-                            startTransition(async () => {
-                              try {
-                                await updateReportStatus({
-                                  id: report.id,
-                                  oldStatus: report.status as ReportStatus,
-                                  newStatus: newStatus as ReportStatus,
-                                });
-                              } catch (err: unknown) {
-                                if (err instanceof Error) {
-                                  toast.error(err.message);
-                                }
-                              }
-                            });
-                          }
-                        }}
-                      >
-                        {REPORT_STATUS_STATE_MACHINE['Engineer'][
-                          report.status
-                        ].map((status) => (
-                          <DropdownItem
-                            key={status!}
-                            onMouseEnter={() => {
-                              setHovered(status as ReportStatus);
-                            }}
-                            onMouseLeave={() => setHovered(undefined)}
-                          >
-                            <div className="flex gap-4 justify-between">
-                              <Button type="submit" size="sm" variant="light">
-                                <Status status={status as ReportStatus} />
-                              </Button>
-                              {hovered === status && (
-                                <div className="flex flex-col bordered rounded border-1 border-black items-center justify-center gap-4 p-1">
-                                  update
-                                </div>
-                              )}
-                            </div>
-                          </DropdownItem>
-                        ))}
-                      </DropdownMenu>
-                    </Dropdown>
-                  ) : (
-                    <Status
-                      status={
-                        mode === 'create'
-                          ? ReportStatus.Open
-                          : (report?.status as ReportStatus)
-                      }
-                    />
-                  )}
+                  <div className="flex flex-col gap-2 items-center">
+                    <StatusSelector report={report} mode={mode} />
+                  </div>
                 </div>
                 <div className="gap-4">
-                  <CompanySelector
-                    mode={mode}
-                    companies={companies}
-                    report={report}
-                  />
-                  {/* <Input
-                    {...viewModeProps}
-                    label="Company"
-                    defaultValue={report?.company}
-                    name="company"
-                    // startContent={}
-                    // endContent={}
-                    placeholder="Example Inc."
-                    isInvalid={!!formState?.errors.company}
-                    errorMessage={formState?.errors.company?.join(', ')}
-                  /> */}
-                  {/*<Autocomplete
-                    allowsCustomValue
-                    classNames={{
-                      listboxWrapper: 'max-h-[320px]',
-                      selectorButton: 'text-default-500',
-                    }}
-                    // onClear={() => setCompaniesSuggestions([])}
-                    onInputChange={(value) => {
-                      debouncedFetchCompanies(value);
-                    }}
-                    inputProps={{
-                      classNames: {
-                        input: 'ml-1',
-                        inputWrapper: 'h-[60px] bg-background',
-                        label: 'mb-2',
-                      },
-                      autoFocus: true,
-                    }}
-                    isRequired
-                    listboxProps={{
-                      hideSelectedIcon: true,
-                      itemClasses: {
-                        base: [
-                          'rounded-medium',
-                          'text-default-500',
-                          'transition-opacity',
-                          'data-[hover=true]:text-foreground',
-                          'dark:data-[hover=true]:bg-default-50',
-                          'data-[pressed=true]:opacity-70',
-                          'data-[hover=true]:bg-default-200',
-                          'data-[selectable=true]:focus:bg-default-100',
-                          'data-[focus-visible=true]:ring-default-500',
-                        ],
-                      },
-                    }}
-                    aria-label="Select a company"
-                    label="Company"
-                    placeholder="Search company name"
-                    popoverProps={{
-                      offset: 10,
-                      classNames: {
-                        base: 'rounded-large',
-                        content:
-                          'p-1 border-small border-default-100 bg-background',
-                      },
-                    }}
-                    startContent={'🔍'}
-                    variant="bordered"
-                  >
-                    <AutocompleteSection title="Existing Companies">
-                      {dbCompanies.map((company: CompanySuggestion) => (
-                        <AutocompleteItem
-                          key={company.id}
-                          value={company.id}
-                          textValue={company.name}
-                        >
-                          {renderOption(company)}
-                        </AutocompleteItem>
-                      ))}
-                    </AutocompleteSection>
-                    <AutocompleteSection title="New Companies">
-                      {companiesSuggestions.map(
-                        (company: CompanySuggestion) => (
-                          <AutocompleteItem
-                            key={company.id}
-                            value={company.id}
-                            textValue={company.name}
-                          >
-                            {renderOption(company)}
-                          </AutocompleteItem>
-                        ),
-                      )}
-                    </AutocompleteSection>
-                    {/* {(item) => (
-                      <AutocompleteItem key={item.domain} textValue={item.name}>
-                        <div className="flex justify-between items-center">
-                          <div className="flex gap-2 items-center">
-                            <Avatar
-                              alt={item.name}
-                              className="flex-shrink-0"
-                              size="sm"
-                              src={item.logo}
-                            />
-                            <div className="flex flex-col">
-                              <span className="text-small">{item.name}</span>
-                              <span className="text-tiny text-default-400">
-                                {item.domain}
-                              </span>
-                            </div>
-                          </div>
-                          <Button
-                            className="border-small mr-0.5 font-medium shadow-small"
-                            radius="full"
-                            size="sm"
-                            variant="bordered"
-                            // onPress={() => createCompany(item)}
-                          >
-                            Create
-                          </Button>
-                        </div>
-                      </AutocompleteItem>
-                    )} 
-                  </Autocomplete>*/}
+                  <div className="flex gap-4 items-center">
+                    <CompanySelector
+                      mode={mode}
+                      companies={companies}
+                      report={report}
+                    />
+                    <div className="flex flex-col items-center gap-2">
+                      <CategorySelector
+                        userType={user?.userTypes}
+                        report={report}
+                      />
+                      <Category category={report?.category} />
+                    </div>
+                  </div>
                 </div>
                 <div className="gap-4">
                   <Input
@@ -373,8 +203,8 @@ export const ReportForm = ({
                   <Select
                     label="Impact"
                     name="impact"
-                    isRequired={mode !== 'view'}
-                    isDisabled={mode === 'view'}
+                    isRequired={mode !== Mode.View}
+                    isDisabled={mode === Mode.View}
                     placeholder="Select an impact level"
                     defaultSelectedKeys={[report?.impact || Impact.SingleUser]}
                     classNames={{ value: ['mt-1'] }}
@@ -391,9 +221,9 @@ export const ReportForm = ({
                   <Select
                     label="Severity"
                     name="severity"
-                    isRequired={mode !== 'view'}
+                    isRequired={mode !== Mode.View}
                     defaultSelectedKeys={[report?.severity || Severity.Medium]}
-                    isDisabled={mode === 'view'}
+                    isDisabled={mode === Mode.View}
                     placeholder="Select a severity degree"
                     classNames={{ value: ['mt-1'] }}
                     renderValue={(selected) => (
@@ -412,41 +242,37 @@ export const ReportForm = ({
                     label={<div className="mb-4">Tags</div>}
                     name="tags"
                     isLoading={!Boolean(tags.length > 0)}
-                    isDisabled={mode === 'view'}
+                    isDisabled={mode === Mode.View}
                     selectionMode="multiple"
-                    endContent={
-                      mode !== 'view' &&
-                      !Boolean(tags.length === 0) &&
-                      new Set(selectedTags).size > 0 ? (
-                        <span
-                          className="text-sm border-1 border-black rounded-full px-2"
-                          onClick={() => setSelectedTags(new Set([]))}
-                        >
-                          Clear
-                        </span>
-                      ) : undefined
-                    }
                     selectedKeys={selectedTags}
                     onSelectionChange={setSelectedTags}
                     renderValue={(values) => {
-                      return values.map((value) => (
+                      return [
+                        ...values.map((value) => (
+                          <Chip
+                            color="primary"
+                            isCloseable
+                            onClose={() => {
+                              // Remove the item from the selectedTags set
+                              const newSelectedTags = new Set(selectedTags);
+                              if (value.key) {
+                                newSelectedTags.delete(value?.key as string);
+                                setSelectedTags(newSelectedTags);
+                              }
+                            }}
+                            key={value.key}
+                            className="m-1"
+                          >
+                            {value.textValue}
+                          </Chip>
+                        )),
                         <Chip
-                          color="primary"
-                          isCloseable
-                          onClose={() => {
-                            // Remove the item from the selectedTags set
-                            const newSelectedTags = new Set(selectedTags);
-                            if (value.key) {
-                              newSelectedTags.delete(value?.key as string);
-                              setSelectedTags(newSelectedTags);
-                            }
-                          }}
-                          key={value.key}
+                          onClick={() => setSelectedTags(new Set([]))}
                           className="m-1"
                         >
-                          {value.textValue}
-                        </Chip>
-                      ));
+                          Clear
+                        </Chip>,
+                      ];
                     }}
                     isMultiline
                     placeholder="Select tags"
@@ -459,7 +285,7 @@ export const ReportForm = ({
               </div>
             </div>
             {/* Right */}
-            <div className="col-span-6">
+            <div className="col-span-12 md:col-span-6">
               <div className="flex m-4">
                 <div className="flex flex-col gap-4 w-full">
                   {!disabled && <DragNDropFileUpload setImages={setImages} />}
@@ -524,14 +350,14 @@ export const ReportForm = ({
           {/* Lower */}
           <div className="grid grid-cols-12">
             {/* Left */}
-            <div className="col-span-6 ">
+            <div className="col-span-12 md:col-span-6">
               <div className="flex flex-col gap-4 m-4">
                 <Textarea
                   {...viewModeProps}
                   label="Steps to reproduce"
                   name="steps"
                   defaultValue={report?.steps?.toString()}
-                  isRequired={mode !== 'view'}
+                  isRequired={mode !== Mode.View}
                   isInvalid={!!formState?.errors.steps}
                   errorMessage={formState?.errors.steps?.join(', ')}
                   placeholder={`1. Go to Settings\n2. Click on Personal information\n...`}
@@ -539,7 +365,7 @@ export const ReportForm = ({
                 <Textarea
                   {...viewModeProps}
                   label="Current Behavior"
-                  isRequired={mode !== 'view'}
+                  isRequired={mode !== Mode.View}
                   isInvalid={!!formState?.errors.currentBehavior}
                   errorMessage={formState?.errors.currentBehavior?.join(', ')}
                   defaultValue={report?.currentBehavior?.toString()}
@@ -551,7 +377,7 @@ export const ReportForm = ({
                   label="Expected Behavior"
                   defaultValue={report?.expectedBehavior?.toString()}
                   name="expectedBehavior"
-                  isRequired={mode !== 'view'}
+                  isRequired={mode !== Mode.View}
                   isInvalid={!!formState?.errors.expectedBehavior}
                   errorMessage={formState?.errors.expectedBehavior?.join(', ')}
                   placeholder="Displayed information under my profile should be mine"
@@ -559,7 +385,7 @@ export const ReportForm = ({
               </div>
             </div>
             {/* Right */}
-            <div className="col-span-6">
+            <div className="col-span-12 md:col-span-6">
               <div className="flex flex-col gap-4 m-4">
                 <Textarea
                   {...viewModeProps}
@@ -581,7 +407,7 @@ export const ReportForm = ({
             color="danger"
             variant="flat"
             onClick={
-              mode === 'create' && typeof handleCancel === 'function'
+              mode === Mode.Create && typeof handleCancel === 'function'
                 ? () => handleCancel()
                 : () => router.back()
             }

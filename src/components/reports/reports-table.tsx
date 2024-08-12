@@ -13,6 +13,7 @@ import {
   DropdownMenu,
   DropdownTrigger,
   Input,
+  Link,
   Pagination,
   Selection,
   SortDescriptor,
@@ -28,10 +29,11 @@ import {
 import { ReportStatus } from '@prisma/client';
 import { Key } from '@react-types/shared';
 
-import { ReportWithTags } from '@/app/@engineer/reports/[reportId]/page';
+import { ReportWithTags } from '@/types/reports';
 
 import { columns } from '../reports/data';
 import { ImpactChip } from './impact';
+import ReportCard from './report-card';
 import { SeverityChip } from './severity';
 import { Status } from './status';
 import { TagChip } from './tag';
@@ -187,13 +189,14 @@ export default function ReportsTable({
         case 'actions':
           return (
             <div className="relative flex justify-end items-center gap-2">
-              <Button>View</Button>
-              <Button>Edit</Button>
+              <Button as={Link} href={`/reports/${report.id}/edit`}>
+                Edit
+              </Button>
               <Button>Delete</Button>
             </div>
           );
-        // default:
-        //   return <>{cellValue}</>;
+        default:
+          return <>{cellValue}</>;
       }
     },
     [],
@@ -360,45 +363,54 @@ export default function ReportsTable({
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
   return (
-    <Table
-      aria-label="Reports table"
-      isHeaderSticky
-      isStriped
-      bottomContent={bottomContent}
-      bottomContentPlacement="outside"
-      classNames={{
-        wrapper: 'max-h-[382px]',
-      }}
-      sortDescriptor={sortDescriptor}
-      topContent={topContent}
-      topContentPlacement="outside"
-      onSelectionChange={setSelectedKeys}
-      onSortChange={setSortDescriptor}
-    >
-      <TableHeader columns={headerColumns}>
-        {(column: any) => (
-          <TableColumn
-            key={column.uid}
-            align={column.uid === 'actions' ? 'center' : 'start'}
-            allowsSorting={column.sortable}
-          >
-            {column.name}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody emptyContent={'No reports found'} items={sortedItems}>
-        {(item) => (
-          <TableRow
-            key={item.id}
-            className="cursor-pointer"
-            onClick={() => router.push(`/reports/${item.id}`)}
-          >
-            {(columnKey) => (
-              <TableCell>{renderCell(item, columnKey)}</TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <>
+      <Table
+        className="hidden md:flex"
+        aria-label="Reports table"
+        isHeaderSticky
+        isStriped
+        bottomContent={bottomContent}
+        bottomContentPlacement="outside"
+        classNames={{
+          wrapper: 'max-h-[382px]',
+        }}
+        sortDescriptor={sortDescriptor}
+        topContent={topContent}
+        topContentPlacement="outside"
+        onSelectionChange={setSelectedKeys}
+        onSortChange={setSortDescriptor}
+      >
+        <TableHeader columns={headerColumns}>
+          {(column: any) => (
+            <TableColumn
+              key={column.uid}
+              align={column.uid === 'actions' ? 'center' : 'start'}
+              allowsSorting={column.sortable}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody emptyContent={'No reports found'} items={sortedItems}>
+          {(item) => (
+            <TableRow
+              key={item.id}
+              className="cursor-pointer"
+              onClick={() => router.push(`/reports/${item.id}`)}
+            >
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <div className="md:hidden flex flex-col gap-4">
+        {topContent}
+        {sortedItems.map((report) => (
+          <ReportCard key={report.id} report={report} />
+        ))}
+      </div>
+    </>
   );
 }

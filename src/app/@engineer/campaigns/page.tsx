@@ -9,6 +9,7 @@ import {
 
 import { BreadCrumbsClient } from '@/components/breadcrumbs';
 import CampaignCard from '@/components/campaigns/campaign-card';
+import PageHeader from '@/components/common/page-header';
 
 export default function Campaigns() {
   const list = [
@@ -55,13 +56,10 @@ export default function Campaigns() {
   ];
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <BreadCrumbsClient
-          crumbs={[{ href: '/campaigns', text: 'Campaigns' }]}
-        />
-        <div className="flex flex-col flex-wrap gap-4"></div>
-        <div className="flex items-center gap-4"></div>
-      </div>
+      <PageHeader
+        crumbs={[{ href: '/campaigns', text: 'Campaigns' }]}
+        
+      />
       <div className="gap-2 grid grid-cols-2 sm:grid-cols-4">
         {list.map((item, index) => (
           <CampaignCard key={index} item={item} />

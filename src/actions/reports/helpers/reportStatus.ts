@@ -1,11 +1,7 @@
-import { ReportStatus } from "@prisma/client";
+import { ReportStatus, UserType } from "@prisma/client";
 
-export enum RoleType {
-  Engineer = 'Engineer',
-  Company = 'Company'
-}
 export const REPORT_STATUS_STATE_MACHINE = {
-  [RoleType.Engineer]: {
+  [UserType.GOD]: {
     [ReportStatus.Open]: [ReportStatus.Cancelled],
     [ReportStatus.InProgress]: [],
     [ReportStatus.Resolved]: [ReportStatus.Closed],
@@ -16,7 +12,18 @@ export const REPORT_STATUS_STATE_MACHINE = {
     [ReportStatus.Rejected]: [],
     [ReportStatus.Deleted]: []
   },
-  [RoleType.Company]: {
+  [UserType.ENGINEER]: {
+    [ReportStatus.Open]: [ReportStatus.Cancelled],
+    [ReportStatus.InProgress]: [],
+    [ReportStatus.Resolved]: [ReportStatus.Closed],
+    [ReportStatus.UnderReview]: [],
+    [ReportStatus.Closed]: [],
+    [ReportStatus.Deferred]: [],
+    [ReportStatus.Cancelled]: [ReportStatus.Open],
+    [ReportStatus.Rejected]: [],
+    [ReportStatus.Deleted]: []
+  },
+  [UserType.COMPANY]: {
     [ReportStatus.Open]: [ReportStatus.UnderReview,],
     [ReportStatus.UnderReview]: [ReportStatus.InProgress, ReportStatus.Deferred, ReportStatus.Rejected],
     [ReportStatus.InProgress]: [ReportStatus.Resolved, ReportStatus.Deferred],
@@ -31,7 +38,7 @@ export const REPORT_STATUS_STATE_MACHINE = {
 
 
 
-export const assertStateTransition = (currentStatus: ReportStatus, nextStatus: ReportStatus, role: RoleType) => {
+export const assertStateTransition = (currentStatus: ReportStatus, nextStatus: ReportStatus, role: UserType) => {
   if (!currentStatus || !nextStatus || !role) {
     return false;
   } else {

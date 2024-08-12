@@ -1,15 +1,14 @@
 import { notFound } from 'next/navigation';
 
+import { fetchUser } from '@/actions';
+import { auth } from '@/auth';
 import db from '@/db';
 import { Button, Link } from '@nextui-org/react';
-import type { Prisma } from '@prisma/client';
 
+import { ReportWithTags } from '@/types/reports';
 import { BreadCrumbsClient } from '@/components/breadcrumbs';
-import { ReportForm } from '@/components/reports/report-form';
-
-export type ReportWithTags = Prisma.ReportGetPayload<{
-  include: { tags: true; user: true; StatusHistory: true; company: true };
-}>;
+import PageHeader from '@/components/common/page-header';
+import { Mode, ReportForm } from '@/components/reports/report-form';
 
 export default async function ViewReport({
   params,
@@ -17,6 +16,8 @@ export default async function ViewReport({
   params: { reportId: string };
 }) {
   const { reportId } = params;
+
+  const user = await fetchUser();
 
   const report = (await db.report.findUnique({
     where: { id: reportId },
@@ -29,30 +30,21 @@ export default async function ViewReport({
 
   return (
     <div className="flex flex-col">
-      <div className="flex items-center justify-between">
-        <BreadCrumbsClient
-          crumbs={[
-            { href: '/reports', text: 'Reports' },
-            { href: `/reports/${report.id}`, text: `${report.id}` },
-            { href: `/reports/${report.id}`, text: `View` },
-          ]}
-        />
-        <div className="flex flex-col flex-wrap gap-4"></div>
-        <div className="flex items-center gap-4">
-          <Button href={`/reports`} as={Link} color="primary" variant="ghost">
-            Back to reports
-          </Button>
-          <Button
-            href={`/reports/${reportId}/edit`}
-            as={Link}
-            color="primary"
-            variant="solid"
-          >
-            Edit
-          </Button>
-        </div>
-      </div>
-      <ReportForm mode={'view'} report={report} disabled />
+      <PageHeader
+        crumbs={[
+          { href: '/reports', text: 'Reports' },
+          { href: `/reports/${report.id}`, text: `${report.title}` },
+          { href: `/reports/${report.id}`, text: `View` },
+        ]}
+        buttonProps={{
+          primary: {
+            href: `/reports/${reportId}/edit`,
+            text: 'Edit',
+          },
+          secondary: { href: `/reports`, text: 'Back to reports' },
+        }}
+      />
+      <ReportForm user={user} mode={'view' as Mode} report={report} disabled />
     </div>
   );
 }
