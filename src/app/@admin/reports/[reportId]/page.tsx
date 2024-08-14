@@ -1,11 +1,12 @@
 import { notFound } from 'next/navigation';
 
 import { fetchUser } from '@/actions';
+import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
 import db from '@/db';
 
 import { ReportWithTags } from '@/types/reports';
 import PageHeader from '@/components/common/page-header';
-import { Mode, ReportForm } from '@/components/reports/report-form';
+import { ViewReportForm } from '@/components/reports/forms/view-report-form';
 
 export default async function ViewReport({
   params,
@@ -18,7 +19,7 @@ export default async function ViewReport({
     where: { id: reportId },
     include: { StatusHistory: true, tags: true, user: true, company: true },
   })) as ReportWithTags;
-
+  const tags = await fetchAllTags();
   if (!report) {
     notFound();
   }
@@ -39,7 +40,7 @@ export default async function ViewReport({
           secondary: { href: `/reports`, text: 'Back to reports' },
         }}
       />
-      <ReportForm user={user} mode={'view' as Mode} report={report} disabled />
+      <ViewReportForm tags={tags} mode={'view'} report={report} />
     </div>
   );
 }

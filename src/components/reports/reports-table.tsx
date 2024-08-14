@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { pascalToSentenceCase } from '@/helpers/strings/pascalToSentenceCase';
 import {
   Button,
-  Chip,
   Dropdown,
   DropdownItem,
   DropdownMenu,
@@ -26,11 +25,13 @@ import {
   Tooltip,
   User,
 } from '@nextui-org/react';
-import { ReportStatus } from '@prisma/client';
+import { ReportStatus, UserType } from '@prisma/client';
 import { Key } from '@react-types/shared';
 
 import { ReportWithTags } from '@/types/reports';
+import { UserWithCompanies } from '@/types/users';
 
+import { Category } from '../common/category';
 import { columns } from '../reports/data';
 import { ImpactChip } from './impact';
 import ReportCard from './report-card';
@@ -38,30 +39,32 @@ import { SeverityChip } from './severity';
 import { Status } from './status';
 import { TagChip } from './tag';
 
-const INITIAL_VISIBLE_COLUMNS = [
-  'title',
-  'company',
-  'status',
-  'user',
-  'tags',
-  'severity',
-  'impact',
-  'createdAt',
-  'actions',
-];
-
 export default function ReportsTable({
   reports,
+  user,
 }: {
   reports: ReportWithTags[];
+  user?: UserWithCompanies | null;
 }) {
+  const INITIAL_VISIBLE_COLUMNS = [
+    'title',
+    'company',
+    'status',
+    'user',
+    'tags',
+    'severity',
+    'impact',
+    'category',
+    'createdAt',
+    user?.userTypes.includes(UserType.ENGINEER) ? 'actions' : undefined,
+  ];
   const router = useRouter();
   const [filterValue, setFilterValue] = React.useState('');
   const [selectedKeys, setSelectedKeys] = React.useState<Selection>(
     new Set([]),
   );
   const [visibleColumns, setVisibleColumns] = React.useState<Selection>(
-    new Set(INITIAL_VISIBLE_COLUMNS),
+    new Set(INITIAL_VISIBLE_COLUMNS.filter(Boolean) as Key[]),
   );
   const [statusFilter, setStatusFilter] = React.useState<
     Selection | ReportStatus
@@ -124,7 +127,11 @@ export default function ReportsTable({
   }, [sortDescriptor, items]);
 
   const renderCell = React.useCallback(
-    (report: ReportWithTags, columnKey: React.Key) => {
+    (
+      report: ReportWithTags,
+      columnKey: React.Key,
+      user?: UserWithCompanies | null,
+    ) => {
       const cellValue = report[columnKey as keyof ReportWithTags];
       switch (columnKey) {
         case 'company':
@@ -157,11 +164,8 @@ export default function ReportsTable({
             </a>
           );
         case 'createdAt':
-          return (
-            <Chip color="default" size="sm">
-              {new Date(report.createdAt).toISOString()}
-            </Chip>
-          );
+        case 'updatedAt':
+          return <span>{new Date(report[columnKey]).toISOString()}</span>;
         case 'steps':
           return (
             <div>
@@ -178,7 +182,7 @@ export default function ReportsTable({
           );
         case 'tags':
           return (
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
               {report.tags.map((tag) => (
                 <TagChip key={tag.id} tag={tag} />
               ))}
@@ -186,14 +190,31 @@ export default function ReportsTable({
           );
         case 'status':
           return <Status status={report.status} />;
+        case 'category':
+          return <Category category={report.category} />;
         case 'actions':
           return (
-            <div className="relative flex justify-end items-center gap-2">
-              <Button as={Link} href={`/reports/${report.id}/edit`}>
-                Edit
-              </Button>
-              <Button>Delete</Button>
-            </div>
+            user?.userTypes?.includes(UserType.ENGINEER) && (
+              <div className="relative flex justify-end items-center gap-2">
+                <Button
+                  className={`${report.status !== ReportStatus.Open ? 'cursor-not-allowed' : ''}`}
+                  size="sm"
+                  color={
+                    report.status !== ReportStatus.Open ? 'default' : 'primary'
+                  }
+                  variant={'light'}
+                  as={Link}
+                  href={
+                    report.status !== ReportStatus.Open
+                      ? undefined
+                      : `/reports/${report.id}/edit`
+                  }
+                >
+                  Edit
+                </Button>
+                {/* <Button>Delete</Button> */}
+              </div>
+            )
           );
         default:
           return <>{cellValue}</>;
@@ -294,9 +315,16 @@ export default function ReportsTable({
                 })}
               </DropdownMenu>
             </Dropdown>
-            {/* <Button color="primary" endContent={'+'}>
-              Add New
-            </Button> */}
+            {user?.userTypes.includes(UserType.ENGINEER) && (
+              <Button
+                as={Link}
+                color="primary"
+                endContent={'+'}
+                href="/reports/create"
+              >
+                Create report
+              </Button>
+            )}
           </div>
         </div>
         <div className="flex justify-between items-center">
@@ -363,7 +391,7 @@ export default function ReportsTable({
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
   return (
-    <>
+    <div className="md:mx-4">
       <Table
         className="hidden md:flex"
         aria-label="Reports table"
@@ -372,7 +400,7 @@ export default function ReportsTable({
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
         classNames={{
-          wrapper: 'max-h-[382px]',
+          wrapper: 'max-h-[70vh] p-0 m-0 border-8 border-white',
         }}
         sortDescriptor={sortDescriptor}
         topContent={topContent}
@@ -399,18 +427,18 @@ export default function ReportsTable({
               onClick={() => router.push(`/reports/${item.id}`)}
             >
               {(columnKey) => (
-                <TableCell>{renderCell(item, columnKey)}</TableCell>
+                <TableCell>{renderCell(item, columnKey, user)}</TableCell>
               )}
             </TableRow>
           )}
         </TableBody>
       </Table>
-      <div className="md:hidden flex flex-col gap-4">
+      <div className="md:hidden flex flex-col gap-4 m-2">
         {topContent}
         {sortedItems.map((report) => (
           <ReportCard key={report.id} report={report} />
         ))}
       </div>
-    </>
+    </div>
   );
 }

@@ -1,11 +1,14 @@
 import { notFound } from 'next/navigation';
 
 import { fetchUser } from '@/actions';
+import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
 import db from '@/db';
 
 import { ReportWithTags } from '@/types/reports';
+import Selector from '@/components/common/category-selector/selector';
 import PageHeader from '@/components/common/page-header';
-import { Mode, ReportForm } from '@/components/reports/report-form';
+import { ViewReportForm } from '@/components/reports/forms/view-report-form';
+import { Mode } from '@/components/reports/report-form';
 
 export default async function ViewReport({
   params,
@@ -20,12 +23,14 @@ export default async function ViewReport({
     include: { StatusHistory: true, tags: true, user: true, company: true },
   })) as ReportWithTags;
 
+  const tags = await fetchAllTags();
+
   if (!report) {
     notFound();
   }
 
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col ">
       <PageHeader
         crumbs={[
           { href: '/reports', text: 'Reports' },
@@ -33,14 +38,19 @@ export default async function ViewReport({
           { href: `/reports/${report.id}`, text: `View` },
         ]}
         buttonProps={{
-          primary: { href: `/reports/${reportId}/edit`, text: 'Edit' },
           secondary: {
             href: `/reports`,
             text: 'Back to reports',
           },
+          custom: <Selector report={report}/>,
         }}
       />
-      <ReportForm user={user} mode={'view' as Mode} report={report} disabled />
+      <ViewReportForm
+        tags={tags}
+        mode={'view' as Mode}
+        report={report}
+        user={user}
+      />
     </div>
   );
 }

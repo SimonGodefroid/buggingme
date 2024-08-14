@@ -6,15 +6,24 @@ import { Editor } from '@monaco-editor/react';
 
 import { LanguagePicker } from './language-picker';
 
-export const EditorClient = ({ readOnly = false }: { readOnly?: boolean }) => {
-  const [code, setCode] = useState("// coucou c'est pour du js");
+export const EditorClient = ({
+  readOnly = false,
+  snippets,
+}: {
+  readOnly?: boolean;
+  snippets?: string | null;
+}) => {
+  const [code, setCode] = useState(
+    snippets ?? '// type somethinig helpful here',
+  );
   const [language, setLanguage] = useState('javascript');
   const handleEditorChange = (value: string = '') => {
     setCode(value);
   };
+
   return (
     <div className="flex flex-col gap-4">
-      <input hidden name="snippets" value={code} readOnly />
+      <textarea hidden name="snippets" value={code} readOnly />
       <input hidden name="language" value={language} readOnly />
       <LanguagePicker
         setLanguage={setLanguage}
@@ -22,11 +31,20 @@ export const EditorClient = ({ readOnly = false }: { readOnly?: boolean }) => {
         readOnly={readOnly}
       />
       <Editor
-        height="20vh"
+        className="py-4 bg-[rgb(28,28,28)] rounded-lg"
+        wrapperProps={{ className: '' }}
+        height="30vh"
         theme="vs-dark"
         defaultValue={code}
         language={language}
-        options={{ minimap: { enabled: false }, readOnly }}
+        options={{
+          minimap: { enabled: false },
+          wordWrap: 'wordWrapColumn',
+          wordWrapColumn: 80,
+          readOnly,
+          formatOnPaste: true,
+          formatOnType: true,
+        }}
         onChange={handleEditorChange}
       />
     </div>

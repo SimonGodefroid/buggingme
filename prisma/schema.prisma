@@ -71,15 +71,10 @@ model Tag {
 }
 
 enum ReportStatus {
-  Open
-  UnderReview // remove
-  InProgress // remove
-  Resolved // keep
-  Closed // keep
-  Deferred // remove
-  Cancelled // keep
-  Rejected // remove
-  Deleted // keep
+  Open // default
+  Closed // 
+  Cancelled // closed by the contributor
+  Deleted // private status soft deletion
 }
 
 enum ReportVisibility {
@@ -88,14 +83,18 @@ enum ReportVisibility {
 }
 
 enum ReportCategory {
-  New // 
-  Valid // 
-  PendingCampaign // 
-  InformationNeeded //
-  Informative // 
-  NotApplicable // 
-  Duplicate // 
-  Spam // 
+  // open
+  New // default
+  Valid // triaged
+  PendingCompanyReview // not triaged by company but reviewed by admin team only company can move the status
+  Testing // fix implemented and waiting for testing
+  InformationNeeded // waiting for more information from the contributor
+  // closed
+  Resolved // fixed
+  Informative // won't fix but is informative
+  NotApplicable // not applicable
+  Duplicate // duplicate
+  Spam // garbage
 }
 
 enum Severity {
@@ -113,13 +112,15 @@ enum Impact {
 }
 
 model StatusHistory {
-  id        String       @id @default(cuid())
-  reportId  String
-  oldStatus ReportStatus
-  newStatus ReportStatus
-  changedAt DateTime     @default(now())
-  changedBy String // You might want to relate this to a User or include userId
-  report    Report       @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  id          String         @id @default(cuid())
+  reportId    String
+  oldStatus   ReportStatus
+  newStatus   ReportStatus
+  oldCategory ReportCategory
+  newCategory ReportCategory
+  changedAt   DateTime       @default(now())
+  changedBy   String // You might want to relate this to a User or include userId
+  report      Report         @relation(fields: [reportId], references: [id], onDelete: Cascade)
 }
 
 model UpdateHistory {

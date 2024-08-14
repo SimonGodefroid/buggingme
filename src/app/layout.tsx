@@ -55,34 +55,47 @@ export default async function RootLayout({
         <Providers>
           {/* Wrap main content with ThemeProvider */}
           <NavTabs count={counts} user={user} />
-          <main className="flex flex-col m-4 md:m-4 min-h-[80vh] my-4 overflow-auto mb-10">
+          {/* overflow-auto  */}
+          <main className="flex flex-col m-4 md:m-4 min-h-[80vh] my-4 mb-10">
             {rendered()}
-            {/* {!user ? children : <>coucou</>} */}
           </main>
-          <footer className="border-t-1 md:m-4">
-            <div className="grid grid-cols-3">
-              <div className="col-span-1 m-2">
-                <h4 className="text-left">Privacy</h4>
-                <div className="flex flex-col items-start text-small">
-                  <a href="https://www.google.com">Privacy Policy</a>
-                  <a href="https://www.google.com">Cookies and Consent</a>
-                </div>
-              </div>
-              <div className="col-span-1 m-2">
-                <h4 className="text-center md:text-left">Legal</h4>
-                <div className="flex flex-col items-center md:items-start text-small  whitespace-nowrap">
-                  <a href="https://www.google.com">Terms & conditions</a>
-                  <a href="https://www.google.com">Legal Terms</a>
-                </div>
-              </div>
-              <div className="col-span-1 m-2">
-                <h4 className="text-right md:text-left">Contact</h4>
-                <div className="flex flex-col items-end md:items-start text-small">
-                  <a href="https://www.google.com">Email</a>
-                  <a href="https://www.google.com">Github</a>
-                  <a href="https://www.google.com">Twitter</a>
-                </div>
-              </div>
+          <footer className="border-t-1 py-2">
+            <div
+              className="flex flex-col items-center
+            text-small gap-1 md:flex-row md:gap-4 md:justify-center"
+            >
+              <span>&copy; {new Date().getFullYear()} &nbsp;Bug busters</span>
+              <a
+                className="hover:text-background p-1 rounded bg-gradient-to-r hover:from-teal-400 hover:to-blue-500"
+                href="https://www.google.com"
+              >
+                Privacy Policy
+              </a>
+
+              <a
+                className="hover:text-background p-1 rounded bg-gradient-to-r hover:from-teal-400 hover:to-blue-500"
+                href="https://www.google.com"
+              >
+                Terms and Conditions
+              </a>
+              <a
+                className="hover:text-background p-1 rounded bg-gradient-to-r hover:from-teal-400 hover:to-blue-500"
+                href="https://www.google.com"
+              >
+                Cookie Policy
+              </a>
+              <a
+                className="hover:text-background p-1 rounded bg-gradient-to-r hover:from-teal-400 hover:to-blue-500"
+                href="https://www.google.com"
+              >
+                Contact
+              </a>
+              <a
+                className="hover:text-background p-1 rounded bg-gradient-to-r hover:from-teal-400 hover:to-blue-500"
+                href="https://www.google.com"
+              >
+                Github
+              </a>
             </div>
           </footer>
         </Providers>

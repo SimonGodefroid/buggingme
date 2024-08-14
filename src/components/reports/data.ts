@@ -12,6 +12,8 @@ const columns = [
   { name: "TAGS", uid: "tags", },
   { name: "CREATED AT", uid: "createdAt", sortable: true },
   { name: "UPDATED AT", uid: "updatedAt", sortable: true },
+  { name: "CATEGORY", uid: "category", sortable: true },
+  
   { name: "ACTIONS", uid: "actions" },
 ];
 

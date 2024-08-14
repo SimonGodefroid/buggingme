@@ -26,7 +26,8 @@ import { Key } from '@react-types/shared';
 
 import { CompanyWithReports } from '@/app/@engineer/companies/page';
 
-import { columns } from './data';
+import CompanyCard from './company-card';
+import { columns } from './columns';
 
 const INITIAL_VISIBLE_COLUMNS = ['name', 'reports'];
 
@@ -117,7 +118,7 @@ export default function CompaniesTable({
         case 'reports':
           return <span>{company?.reports?.length}</span>;
         default:
-          return <span>{company?.[columnKey]}</span>;
+          return <span>{String(company?.[columnKey])}</span>;
       }
     },
     [],
@@ -279,47 +280,56 @@ export default function CompaniesTable({
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
   return (
-    <Table
-      aria-label="Example table with custom cells, pagination and sorting"
-      isHeaderSticky
-      bottomContent={bottomContent}
-      bottomContentPlacement="outside"
-      classNames={{
-        wrapper: 'max-h-[382px]',
-      }}
-      selectedKeys={selectedKeys}
-      sortDescriptor={sortDescriptor}
-      topContent={topContent}
-      topContentPlacement="outside"
-      onSelectionChange={setSelectedKeys}
-      onSortChange={setSortDescriptor}
-    >
-      <TableHeader columns={headerColumns}>
-        {(column: any) => (
-          <TableColumn
-            key={column.uid}
-            align={column.uid === 'actions' ? 'center' : 'start'}
-            allowsSorting={column.sortable}
-          >
-            {column.name}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody emptyContent={'No companies found'} items={sortedItems}>
-        {(item) => (
-          <TableRow
-            key={item.id}
-            className="cursor-pointer"
-            onClick={() => router.push(`/companies/${item.id}`)}
-          >
-            {(columnKey) => (
-              <TableCell>
-                {renderCell(item, columnKey as keyof CompanyWithReports)}
-              </TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <div className="md:mx-4">
+      <Table
+        className="hidden md:flex"
+        aria-label="Companies table"
+        isHeaderSticky
+        bottomContent={bottomContent}
+        bottomContentPlacement="outside"
+        classNames={{
+          wrapper: 'max-h-[382px] p-0 border-8  border-white',
+        }}
+        selectedKeys={selectedKeys}
+        sortDescriptor={sortDescriptor}
+        topContent={topContent}
+        topContentPlacement="outside"
+        onSelectionChange={setSelectedKeys}
+        onSortChange={setSortDescriptor}
+      >
+        <TableHeader columns={headerColumns}>
+          {(column: any) => (
+            <TableColumn
+              key={column.uid}
+              align={column.uid === 'actions' ? 'center' : 'start'}
+              allowsSorting={column.sortable}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody emptyContent={'No companies found'} items={sortedItems}>
+          {(item) => (
+            <TableRow
+              key={item.id}
+              className="cursor-pointer"
+              onClick={() => router.push(`/companies/${item.id}`)}
+            >
+              {(columnKey) => (
+                <TableCell>
+                  {renderCell(item, columnKey as keyof CompanyWithReports)}
+                </TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <div className="md:hidden flex flex-col gap-4 m-2">
+        {topContent}
+        {sortedItems.map((company) => (
+          <CompanyCard key={company.id} company={company} />
+        ))}
+      </div>
+    </div>
   );
 }

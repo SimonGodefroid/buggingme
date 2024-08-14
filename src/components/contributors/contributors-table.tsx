@@ -27,6 +27,7 @@ import { Key } from '@react-types/shared';
 import { ContributorWithReports } from '@/app/@engineer/contributors/page';
 
 import { columns } from '../contributors/data';
+import ContributorCard from './contributor-card';
 
 const INITIAL_VISIBLE_COLUMNS = ['name', 'reports', 'actions'];
 
@@ -263,47 +264,56 @@ export default function ContributorsTable({
   }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
 
   return (
-    <Table
-      aria-label="Reports table"
-      isHeaderSticky
-      isStriped
-      bottomContent={bottomContent}
-      bottomContentPlacement="outside"
-      classNames={{
-        wrapper: 'max-h-[382px]',
-      }}
-      sortDescriptor={sortDescriptor}
-      topContent={topContent}
-      topContentPlacement="outside"
-      onSelectionChange={setSelectedKeys}
-      onSortChange={setSortDescriptor}
-    >
-      <TableHeader columns={headerColumns}>
-        {(column: any) => (
-          <TableColumn
-            key={column.uid}
-            align={column.uid === 'actions' ? 'end' : 'start'}
-            allowsSorting={column.sortable}
-          >
-            {column.name}
-          </TableColumn>
-        )}
-      </TableHeader>
-      <TableBody emptyContent={'No contributors found'} items={sortedItems}>
-        {(item) => (
-          <TableRow
-            key={item.id}
-            className="cursor-pointer"
-            onClick={(evt) => {
-              router.push(`/contributors/${item.id}`);
-            }}
-          >
-            {(columnKey) => (
-              <TableCell>{renderCell(item, columnKey)}</TableCell>
-            )}
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
+    <div className="md:mx-4">
+      <Table
+        className="hidden md:flex"
+        aria-label="Contributors table"
+        isHeaderSticky
+        isStriped
+        bottomContent={bottomContent}
+        bottomContentPlacement="outside"
+        classNames={{
+          wrapper: 'max-h-[382px]',
+        }}
+        sortDescriptor={sortDescriptor}
+        topContent={topContent}
+        topContentPlacement="outside"
+        onSelectionChange={setSelectedKeys}
+        onSortChange={setSortDescriptor}
+      >
+        <TableHeader columns={headerColumns}>
+          {(column: any) => (
+            <TableColumn
+              key={column.uid}
+              align={column.uid === 'actions' ? 'end' : 'start'}
+              allowsSorting={column.sortable}
+            >
+              {column.name}
+            </TableColumn>
+          )}
+        </TableHeader>
+        <TableBody emptyContent={'No contributors found'} items={sortedItems}>
+          {(item) => (
+            <TableRow
+              key={item.id}
+              className="cursor-pointer"
+              onClick={(evt) => {
+                router.push(`/contributors/${item.id}`);
+              }}
+            >
+              {(columnKey) => (
+                <TableCell>{renderCell(item, columnKey)}</TableCell>
+              )}
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
+      <div className="md:hidden flex flex-col gap-4 m-2">
+        {topContent}
+        {sortedItems.map((contributor) => (
+          <ContributorCard key={contributor.id} contributor={contributor} />
+        ))}
+      </div>
+    </div>
   );
 }
