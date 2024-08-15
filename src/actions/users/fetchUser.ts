@@ -1,8 +1,9 @@
 'use server';
+import { cache } from 'react';
 import { auth } from "@/auth";
 import db from "@/db";
 
-export async function fetchUser() {
+export const fetchUser = cache(async () => {
   const authenticatedUser = await auth();
   const id = authenticatedUser?.user?.id;
   if (!id) {
@@ -11,4 +12,4 @@ export async function fetchUser() {
     const user = await db.user.findUnique({ where: { id }, include: { companies: true } });
     return user;
   }
-}
+});

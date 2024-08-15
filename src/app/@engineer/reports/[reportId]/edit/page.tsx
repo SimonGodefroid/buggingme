@@ -7,7 +7,6 @@ import db from '@/db';
 import { ReportWithTags } from '@/types/reports';
 import PageHeader from '@/components/common/page-header';
 import { UpdateReportForm } from '@/components/reports/forms/update-report-form';
-import { Mode } from '@/components/reports/report-form';
 
 export default async function EditReport({
   params,
@@ -41,7 +40,7 @@ export default async function EditReport({
             : {}
         }
       />
-      <UpdateReportForm tags={tags} mode={'update' as Mode} report={report} />
+      <UpdateReportForm tags={tags} report={report} />
     </div>
   );
 }
