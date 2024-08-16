@@ -1,21 +1,22 @@
-import { fetchUser } from '@/actions';
-import db from '@/db';
-import {
-  Button,
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from '@nextui-org/react';
+import { Suspense } from 'react';
 
-import { ReportWithTags } from '@/types/reports';
-import StatusSelector from '@/components/common/status-selector';
+import PlaygroundComponent from '@/components/playground/playground-component';
 
-export default async function App() {
-  const user = await fetchUser();
-  console.log('user'.repeat(200), user);
-  const reports: ReportWithTags[] = await db.report.findMany({
-    include: { company: true, tags: true, user: true, StatusHistory: true },
-  });
-  return <StatusSelector report={reports[0]} />;
+import Loading from './loading';
+
+export const dynamic = 'force-dynamic';
+
+export default function Playground({
+  params,
+}: {
+  params: { reportId: string };
+}) {
+  return (
+    <div className="flex flex-col">
+      <h1>Testing the suspense</h1>
+      <Suspense fallback={<Loading />}>
+        <PlaygroundComponent reportId={params.reportId} />
+      </Suspense>
+    </div>
+  );
 }

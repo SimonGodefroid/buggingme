@@ -1,14 +1,11 @@
-import { fetchAllCompanies, fetchAllUsers } from '@/actions';
-import { Prisma } from '@prisma/client';
+import { getAllCompanies, getAllUsers } from '@/queries';
 
-import { LinkUserForm } from '@/components/users/link-user-form';
 import { UserWithCompanies } from '@/types/users';
-
-
+import { LinkUserForm } from '@/components/users/link-user-form';
 
 export default async function Admin() {
-  const users = (await fetchAllUsers()) as UserWithCompanies[];
-  const companies = await fetchAllCompanies();
+  const users = (await getAllUsers()) as UserWithCompanies[];
+  const companies = await getAllCompanies();
 
   return (
     <div className="flex flex-col">

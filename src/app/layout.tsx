@@ -67,32 +67,32 @@ export default async function RootLayout({
               <span>&copy; {new Date().getFullYear()} &nbsp;Bug busters</span>
               <a
                 className="hover:text-background p-1 rounded bg-gradient-to-r hover:from-teal-400 hover:to-blue-500"
-                href="https://www.google.com"
+                href="/privacy-policy.html"
               >
                 Privacy Policy
               </a>
 
               <a
                 className="hover:text-background p-1 rounded bg-gradient-to-r hover:from-teal-400 hover:to-blue-500"
-                href="https://www.google.com"
+                href="/terms-and-conditions.html"
               >
                 Terms and Conditions
               </a>
               <a
                 className="hover:text-background p-1 rounded bg-gradient-to-r hover:from-teal-400 hover:to-blue-500"
-                href="https://www.google.com"
+                href="/cookie-policy.html"
               >
                 Cookie Policy
               </a>
               <a
                 className="hover:text-background p-1 rounded bg-gradient-to-r hover:from-teal-400 hover:to-blue-500"
-                href="https://www.google.com"
+                href="/contact.html"
               >
                 Contact
               </a>
               <a
                 className="hover:text-background p-1 rounded bg-gradient-to-r hover:from-teal-400 hover:to-blue-500"
-                href="https://www.google.com"
+                href="/github.html"
               >
                 Github
               </a>

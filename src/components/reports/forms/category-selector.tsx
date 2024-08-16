@@ -23,11 +23,11 @@ import {
   ReportWithTags,
 } from '@/types/reports';
 
-import { Category } from '../category';
-import Icon from '../Icon';
+import { Category } from '../../common/category';
+import Icon from '../../common/Icon';
 
 const FORM_ID = 'update-category-form';
-export default function Selector({
+export default function CategorySelector({
   report,
   size = 'md',
   variant,

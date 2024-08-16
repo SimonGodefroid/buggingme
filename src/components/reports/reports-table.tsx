@@ -400,7 +400,7 @@ export default function ReportsTable({
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
         classNames={{
-          wrapper: 'max-h-[70vh] p-0 m-0 border-8 border-white',
+          wrapper: 'max-h-[70vh] p-0 m-0 border-8 border-background',
         }}
         sortDescriptor={sortDescriptor}
         topContent={topContent}

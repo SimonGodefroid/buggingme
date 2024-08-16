@@ -288,7 +288,7 @@ export default function CompaniesTable({
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
         classNames={{
-          wrapper: 'max-h-[382px] p-0 border-8  border-white',
+          wrapper: 'max-h-[382px] p-0 border-8  border-background',
         }}
         selectedKeys={selectedKeys}
         sortDescriptor={sortDescriptor}

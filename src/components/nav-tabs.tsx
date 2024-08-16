@@ -35,7 +35,7 @@ export type Count = {
   reports: number;
 };
 
-export default function NavTabs2({
+export default function NavTabs({
   user,
   count,
 }: {
@@ -61,18 +61,34 @@ export default function NavTabs2({
 
   const navItems = [
     {
-      label: '🐛 Reports',
+      emoji: '🐛',
+      label: 'Reports',
       href: '/reports',
       count: count.reports,
     },
     {
-      label: '👷👷‍♀️ Contributors',
+      emoji: '👷👷‍♀️',
+      label: 'Contributors',
       href: '/contributors',
       count: count.contributors,
     },
-    { label: '🏢 Companies', href: '/companies', count: count.companies },
-    { label: '📢 Campaigns', href: '/campaigns', count: count.campaigns },
-    { label: '🏆 Leaderboard', href: '/leaderboard' },
+    {
+      emoji: '🏢',
+      label: 'Companies',
+      href: '/companies',
+      count: count.companies,
+    },
+    {
+      emoji: '📢',
+      label: 'Campaigns',
+      href: '/campaigns',
+      count: count.campaigns,
+    },
+    {
+      emoji: '🏆',
+      label: 'Leaderboard',
+      href: '/leaderboard',
+    },
   ];
   const noop = () => {};
 
@@ -95,7 +111,7 @@ export default function NavTabs2({
         </NavbarBrand>
       </NavbarContent>
 
-      <NavbarContent className="hidden sm:flex gap-4" justify="center">
+      <NavbarContent className="hidden sm:flex gap-4 sm:text-sm md:flex-nowrap" justify="center">
         <NavbarBrand className="cursor-pointer">
           <Link color="foreground" href="/">
             <p className="font-bold text-inherit">Bug busters</p>
@@ -103,12 +119,16 @@ export default function NavTabs2({
         </NavbarBrand>
 
         {navItems.map((item) => (
-          <NavbarItem isActive={item.href === `/${path.split('/')[1]}`} key={item.label}>
+          <NavbarItem
+            isActive={item.href === `/${path.split('/')[1]}`}
+            key={item.label}
+          >
             <Link color="foreground" isBlock href={item.href}>
               <div className="flex items-center space-x-2">
+                <span className='sm:hidden lg:block'>{item.emoji}&nbsp;</span>
                 <span>{item.label}</span>
                 {!('count' in item) || !user ? null : (
-                  <Chip size="sm" variant="faded">
+                  <Chip size="sm" variant="faded" className='sm:hidden lg:block'>
                     {item.count}
                   </Chip>
                 )}
@@ -119,7 +139,7 @@ export default function NavTabs2({
       </NavbarContent>
 
       <NavbarContent className="md:p-10">
-        <NavbarItem className="md:hidden">
+        <NavbarItem className="lg:hidden">
           <Popover>
             <PopoverTrigger>
               <Avatar size="sm" src={user?.image || ''} />

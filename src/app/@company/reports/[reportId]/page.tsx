@@ -5,10 +5,9 @@ import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
 import db from '@/db';
 
 import { ReportWithTags } from '@/types/reports';
-import Selector from '@/components/common/category-selector/selector';
 import PageHeader from '@/components/common/page-header';
-import { ViewReportForm } from '@/components/reports/forms/view-report-form';
-import { Mode } from '@/components/reports/report-form';
+import ViewReportForm from '@/components/reports/forms/view-report-form';
+import CategorySelector from '@/components/reports/forms/category-selector';
 
 export default async function ViewReport({
   params,
@@ -42,15 +41,10 @@ export default async function ViewReport({
             href: `/reports`,
             text: 'Back to reports',
           },
-          custom: <Selector report={report}/>,
+          custom: <CategorySelector report={report} />,
         }}
       />
-      <ViewReportForm
-        tags={tags}
-        mode={'view' as Mode}
-        report={report}
-        user={user}
-      />
+      <ViewReportForm report={report} />
     </div>
   );
 }
