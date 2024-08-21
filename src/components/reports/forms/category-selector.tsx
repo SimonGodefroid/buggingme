@@ -76,7 +76,6 @@ export default function CategorySelector({
       <form action={action} id={FORM_ID}>
         <DropdownMenu
           classNames={{ list: '' }}
-          onAction={(lol) => console.log('', lol)}
           aria-label="Update report category"
         >
           <DropdownSection title="Open categories">

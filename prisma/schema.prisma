@@ -40,20 +40,21 @@ model Session {
 }
 
 model User {
-  id                      String     @id @default(cuid())
+  id                      String       @id @default(cuid())
   name                    String?
-  email                   String?    @unique
+  email                   String?      @unique
   emailVerified           DateTime?
   image                   String?
-  validPublicReportsCount Int        @default(0)
+  validPublicReportsCount Int          @default(0)
   accounts                Account[]
   sessions                Session[]
   userTypes               UserType[]
   Report                  Report[]
   Comment                 Comment[]
-  createdAt               DateTime   @default(now())
-  updatedAt               DateTime?  @updatedAt
-  companies               Company[]  @relation("UserCompanies")
+  createdAt               DateTime     @default(now())
+  updatedAt               DateTime?    @updatedAt
+  companies               Company[]    @relation("UserCompanies")
+  attachments             Attachment[]
 }
 
 model VerificationToken {
@@ -159,20 +160,22 @@ model Report {
   severity         Severity         @default(Medium)
   impact           Impact           @default(SingleUser)
   company          Company?         @relation(fields: [companyId], references: [id])
+  attachments      Attachment[] // Attachments related to the report
 }
 
 model Comment {
-  id        String    @id @default(cuid())
-  content   String
-  reportId  String
-  userId    String
-  parentId  String?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  parent    Comment?  @relation("Comments", fields: [parentId], references: [id], onDelete: Cascade)
-  report    Report    @relation(fields: [reportId], references: [id], onDelete: Cascade)
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  children  Comment[] @relation("Comments")
+  id          String       @id @default(cuid())
+  content     String
+  reportId    String
+  userId      String
+  parentId    String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  parent      Comment?     @relation("Comments", fields: [parentId], references: [id], onDelete: Cascade)
+  report      Report       @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  user        User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  children    Comment[]    @relation("Comments")
+  attachments Attachment[] // Attachments related to the report
 }
 
 model Company {
@@ -184,4 +187,17 @@ model Company {
   users     User[]   @relation("UserCompanies")
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+model Attachment {
+  id        String    @id @default(cuid())
+  url       String
+  userId    String
+  filename  String
+  user      User      @relation(fields: [userId], references: [id])
+  reportId  String? // Nullable, for report attachments
+  commentId String? // Nullable, for comment attachments
+  report    Report?   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  comment   Comment?  @relation(fields: [commentId], references: [id], onDelete: Cascade)
+  createdAt DateTime  @default(now())
 }

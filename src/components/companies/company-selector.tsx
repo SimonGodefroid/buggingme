@@ -39,9 +39,11 @@ type CompanySuggestion = {
 export default function CompanySelector({
   mode,
   report,
+  errors,
 }: {
   mode: 'view' | 'update' | 'creation';
   report?: ReportWithTags;
+  errors?: string[];
 }) {
   const [companies, setCompanies] = useState<Company[] | []>([]);
   useEffect(() => {
@@ -150,6 +152,8 @@ export default function CompanySelector({
       <Autocomplete
         name="company"
         isRequired
+        isInvalid={!!errors?.length}
+        errorMessage={errors?.join(', ')}
         isLoading={loading}
         classNames={{
           listboxWrapper: 'max-h-[320px]',
@@ -162,7 +166,6 @@ export default function CompanySelector({
             label: 'mb-2',
           },
         }}
-        className="max-w-xs"
         variant="bordered"
         allowsCustomValue
         onSelectionChange={handleSelectionChange}
@@ -183,7 +186,10 @@ export default function CompanySelector({
         </AutocompleteSection>
         <AutocompleteSection title="suggestions">
           {suggestions.map((suggestion) => (
-            <AutocompleteItem key={`${suggestion.name}`}>
+            <AutocompleteItem
+              key={`${suggestion.name}`}
+              textValue={suggestion.name}
+            >
               {renderOption(suggestion)}
             </AutocompleteItem>
           ))}

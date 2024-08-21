@@ -30,14 +30,14 @@ export default function HeaderAuth({ user }: { user: Session['user'] | null }) {
     authContent = (
       <Popover placement="bottom">
         <PopoverTrigger>
-          <User
-            className="cursor-pointer"
-            avatarProps={{ radius: 'lg', src: `${user?.image}` }}
-            description={<span className="">{user.email}</span>}
-            name={user?.name}
-          >
-            {user?.name}
-          </User>
+            <User
+              className="cursor-pointer"
+              avatarProps={{ radius: 'lg', src: `${user?.image}` }}
+              description={<span className="">{user.email}</span>}
+              name={user?.name}
+            >
+              {user?.name}
+            </User>
         </PopoverTrigger>
         <PopoverContent>
           <div className="flex flex-col gap-4 p-4">

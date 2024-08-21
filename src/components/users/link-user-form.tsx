@@ -7,11 +7,10 @@ import { Button, Select, SelectItem, Tooltip } from '@nextui-org/react';
 import { Company } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
+import { UserWithCompanies } from '@/types';
 
-import { UserWithCompanies } from '@/app/@admin/admin/page';
 
 const LINK_FORM_ID = 'link-user';
-const UNLINK_FORM_ID = 'unlink-user';
 export function LinkUserForm({
   users = [],
   companies = [],
@@ -45,7 +44,6 @@ export function LinkUserForm({
               const selectedUser = users.find(
                 (user) => user.id === value[0].key,
               );
-              console.log('selectedUser', selectedUser);
               return (
                 <div className="flex  justify-between items-center">
                   {selectedUser?.email}{' '}

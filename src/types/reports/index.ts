@@ -1,7 +1,7 @@
 import { Prisma, ReportCategory } from "@prisma/client";
 
 export type ReportWithTags = Prisma.ReportGetPayload<{
-  include: { tags: true; user: true; StatusHistory: true; company: true };
+  include: { tags: true; user: true; StatusHistory: true; company: true, attachments: true };
 }>;
 
 export const CLOSING_CATEGORIES: ReportCategory[] = [ReportCategory.Spam, ReportCategory.Duplicate, ReportCategory.NotApplicable, ReportCategory.Informative, ReportCategory.Resolved];

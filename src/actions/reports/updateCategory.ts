@@ -25,7 +25,6 @@ export async function updateReportCategory(
   formState: UpdateReportCategoryFormState = { errors: {} },
   formData: FormData,
 ): Promise<UpdateReportCategoryFormState> {
-  console.log('lol  '.repeat(200), id, formState, formData)
   const result = updateReportCategorySchema.safeParse({
     id,
     category: formData.get('category') as ReportCategory,
@@ -83,10 +82,6 @@ export async function updateReportCategory(
   //     }
   //   }
   // }
-
-  console.log('reportToUpdate.status', reportToUpdate.status)
-  console.log('reportToUpdate.category', reportToUpdate.category)
-  console.log('reportToUpdate.status', reportToUpdate.status)
 
   try {
     const [report] = await db.$transaction([

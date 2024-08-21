@@ -94,12 +94,17 @@ export default function NavTabs({
 
   return (
     <Navbar
-      classNames={{ base: 'justify-start md:p-2' }}
+      classNames={{
+        base: 'justify-start md:justify-between md:p-2 border-3 border-pink-400 max-w-8xl',
+        wrapper: 'border-3 border-blue-300 flex max-w-8xl justify-end',
+        content: 'border-3 border-yellow-300',
+        menu: 'border-3 border-green-300',
+      }}
       isBordered
       isMenuOpen={isMenuOpen}
       onMenuOpenChange={setIsMenuOpen}
     >
-      <NavbarContent className="sm:hidden" justify="start">
+      <NavbarContent className="sm:hidden">
         <NavbarMenuToggle
           aria-label={isMenuOpen ? 'Close menu' : 'Open menu'}
         />
@@ -111,7 +116,10 @@ export default function NavTabs({
         </NavbarBrand>
       </NavbarContent>
 
-      <NavbarContent className="hidden sm:flex gap-4 sm:text-sm md:flex-nowrap" justify="center">
+      <NavbarContent
+        className="hidden sm:flex gap-4 sm:text-sm md:flex-nowrap"
+        justify="center"
+      >
         <NavbarBrand className="cursor-pointer">
           <Link color="foreground" href="/">
             <p className="font-bold text-inherit">Bug busters</p>
@@ -125,10 +133,10 @@ export default function NavTabs({
           >
             <Link color="foreground" isBlock href={item.href}>
               <div className="flex items-center space-x-2">
-                <span className='sm:hidden lg:block'>{item.emoji}&nbsp;</span>
+                <span className="sm:hidden xl:block">{item.emoji}&nbsp;</span>
                 <span>{item.label}</span>
                 {!('count' in item) || !user ? null : (
-                  <Chip size="sm" variant="faded" className='sm:hidden lg:block'>
+                  <Chip size="sm" variant="faded" className="sm:hidden xl:flex">
                     {item.count}
                   </Chip>
                 )}
@@ -138,7 +146,7 @@ export default function NavTabs({
         ))}
       </NavbarContent>
 
-      <NavbarContent className="md:p-10">
+      <NavbarContent className="md:p-10 border-4 border-violet-600 flex flex-row-reverse justify-between">
         <NavbarItem className="lg:hidden">
           <Popover>
             <PopoverTrigger>
@@ -163,11 +171,11 @@ export default function NavTabs({
             </PopoverContent>
           </Popover>
         </NavbarItem>
+        <NavbarItem className="hidden lg:flex lg:justify-end border-3 border-orange-300">
+          <HeaderAuth user={user} />
+        </NavbarItem>
         <NavbarItem>
           <ThemeSwitch />
-        </NavbarItem>
-        <NavbarItem className="hidden lg:flex">
-          <HeaderAuth user={user} />
         </NavbarItem>
       </NavbarContent>
 

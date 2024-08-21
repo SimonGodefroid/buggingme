@@ -41,7 +41,7 @@ interface UpdateReportFormState {
 }
 
 export async function updateReport(
-  
+
   { id }: { id: string },
   formState: UpdateReportFormState,
   formData: FormData
@@ -85,24 +85,35 @@ export async function updateReport(
   const tagIds = result.data.tags.map(tagId => ({ id: tagId }));
 
   try {
-    report = await db.report.update({
-      where: { id },
-      data: {
-        title: result.data.title,
-        url: result.data.url,
-        steps: result.data.steps,
-        currentBehavior: result.data.currentBehavior,
-        expectedBehavior: result.data.expectedBehavior,
-        suggestions: result.data.suggestions,
-        snippets: result.data.snippets,
-        language: result.data.language,
-        impact: result.data.impact,
-        severity: result.data.severity,
-        tags: {
-          set: tagIds,
-        }
+    report = await db.$transaction(async (tx) => {
+      const user = await tx.user.findUnique({
+        where: { id: session.user?.id! },
+      });
+
+      if (!user) {
+        throw new Error('User not found.');
       }
+      const updatedReport = await db.report.update({
+        where: { id },
+        data: {
+          title: result.data.title,
+          url: result.data.url,
+          steps: result.data.steps,
+          currentBehavior: result.data.currentBehavior,
+          expectedBehavior: result.data.expectedBehavior,
+          suggestions: result.data.suggestions,
+          snippets: result.data.snippets,
+          language: result.data.language,
+          impact: result.data.impact,
+          severity: result.data.severity,
+          tags: {
+            set: tagIds,
+          }
+        }
+      });
+      return updatedReport;
     });
+
   } catch (err: unknown) {
     console.error('>'.repeat(200), err)
     if (err instanceof Error) {

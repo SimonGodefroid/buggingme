@@ -7,15 +7,17 @@ import { Tag } from '@prisma/client';
 export default function TagsSelector({
   report,
   tags,
+  mode,
 }: {
   report?: ReportWithTags;
   tags: Tag[];
+  mode: 'view' | 'update' | 'creation';
 }) {
   return (
     <Select
       label={<div className="mb-4">Tags</div>}
       name="tags"
-      isDisabled
+      isDisabled={mode === 'view'}
       selectionMode="multiple"
       selectedKeys={report?.tags.map((tag) => tag.id)}
       renderValue={(values) => {

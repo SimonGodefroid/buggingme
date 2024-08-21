@@ -3,7 +3,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { auth } from '@/auth';
 import db from '@/db';
-import { UserWithCompanies } from '@/app/@admin/admin/page';
+import { UserWithCompanies } from '@/types';
 
 const linkUserToCompaniesSchema = z.object({
   id: z.string(),
@@ -30,7 +30,6 @@ export async function linkUserToCompanies(
     companyIds: formData.getAll('companyIds'),
   });
 
-  console.log('result', result)
   if (!result.success) {
     const errors = result.error.flatten().fieldErrors;
     console.error('Validation error', errors);

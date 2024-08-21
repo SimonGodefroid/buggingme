@@ -14,7 +14,7 @@ export const EditorClient = ({
   snippets?: string | null;
 }) => {
   const [code, setCode] = useState(
-    snippets ?? '// type somethinig helpful here',
+    snippets ?? '// type something helpful here',
   );
   const [language, setLanguage] = useState('javascript');
   const handleEditorChange = (value: string = '') => {

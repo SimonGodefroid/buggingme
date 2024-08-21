@@ -10,9 +10,8 @@ export default async function Reports() {
   const user: UserWithCompanies | null = await fetchUser();
   const reports: ReportWithTags[] = await db.report.findMany({
     // where: { companyId: { in: user?.companies.map((company) => company.id) } },
-    include: { company: true, tags: true, user: true, StatusHistory: true },
+    include: { company: true, tags: true, user: true, StatusHistory: true , attachments: true },
   });
-  console.log('reports', reports);
 
   if (!user) {
     return <div>Not authorized</div>;
