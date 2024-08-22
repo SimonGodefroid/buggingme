@@ -45,7 +45,6 @@ export async function updateReportStatus(
   }
 
   const session = await auth();
-  console.log('session', session)
   if (!session || !session.user) {
     return {
       errors: {

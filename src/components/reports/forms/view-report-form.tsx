@@ -12,8 +12,6 @@ import ImageTooltip from '@/components/common/image-tooltip';
 import NotFound from '@/app/not-found';
 
 import CompanySelector from '../../companies/company-selector';
-import { ImpactChip } from '../impact';
-import { SeverityChip } from '../severity';
 import { Status } from '../status';
 import ImpactSelector from './impact-selector';
 import SeveritySelector from './severity-selector';
@@ -24,25 +22,12 @@ export default async function ViewReportForm({
   report,
 }: {
   report: ReportWithTags;
-  handleCancel?: () => void;
 }) {
   const tags = await db.tag.findMany();
   const FORM_ID = `view-report`;
-
-  const images = [
-    {
-      id: 1,
-      url: 'https://placehold.co/400x200?text=Your+screenshot+here',
-    },
-    {
-      id: 2,
-      url: 'https://placehold.co/400x200?text=Your+screenshot+here',
-    },
-    {
-      id: 3,
-      url: 'https://placehold.co/400x200?text=Your+screenshot+here',
-    },
-  ];
+  const images = report?.attachments
+    ?.map((a) => ({ url: a.url, filename: a.filename }))
+    .filter(Boolean);
 
   const viewModeProps = {
     isReadOnly: true,
@@ -119,20 +104,20 @@ export default async function ViewReportForm({
                   />
                 </div>
                 <div className="gap-4">
-                  <TagsSelector tags={tags} report={report} />
+                  <TagsSelector mode={'view'} tags={tags} report={report} />
                 </div>
               </div>
             </div>
             <div className="col-span-12 md:col-span-6">
-              <div className="flex m-4">
+              {images?.length > 0 && (
                 <div className="flex flex-col gap-4 w-full">
-                  <div className="flex gap-4 justify-end">
-                    {(images || []).map((image) => (
-                      <ImageTooltip image={image} images={images}/>
+                  <div className="flex justify-center md:justify-start flex-wrap">
+                    {images?.map((image) => (
+                      <ImageTooltip image={image} images={images} />
                     ))}
                   </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
           <div className="grid grid-cols-12">

@@ -26,21 +26,23 @@ const createReportSchema = z.object({
   tags: z.string().array(),
   visibility: z.nativeEnum(ReportVisibility).optional().nullable(),
   category: z.nativeEnum(ReportCategory).optional().nullable(),
-}).refine((data) => {
-  if (data.companyId) {
-    return !data.companyName && !data.companyLogo && !data.companyDomain;
-  } else {
-    return data.companyName;
-  }
-}, {
-  message: "Provide either companyId or (companyName, companyDomain, and optionally companyLogo).",
-  path: ["companyId", "companyName", "companyDomain", "companyLogo"],
-});
+})
+  .refine((data) => {
+    if (data.companyId) {
+      return !data.companyName && !data.companyLogo && !data.companyDomain;
+    } else {
+      return data.companyName;
+    }
+  }, {
+    message: "Please select a company from the list of existing companies or provide a new company name.",
+    path: ["companyId", "companyName", "companyDomain", "companyLogo"],
+  });
 
 interface CreateReportFormState {
   errors: {
     title?: string[],
     company?: string[],
+    companyId?: string[],
     url?: string[],
     steps?: string[],
     currentBehavior?: string[],
@@ -81,7 +83,7 @@ export async function createReport(
   const validation = validationMiddleware(result);
   if (validation.errors) {
     return {
-      ...formState,
+      success: false,
       errors: validation.errors,
     };
   }
@@ -151,6 +153,18 @@ export async function createReport(
         }
       });
 
+      const attachments = JSON.parse(formData.get('attachments') as string) as { url: string; filename: string }[];
+      if (attachments.length > 0) {
+        await tx.attachment.createMany({
+          data: attachments.map(({ url, filename }) => ({
+            url,
+            reportId: newReport.id,
+            userId: session?.user?.id!,
+            filename
+          })),
+        });
+      }
+
       // if (validation.data?.visibility === 'PUBLIC' && validation.data?.category === 'Valid') {
       //   await tx.user.update({
       //     where: { id: userId },
@@ -160,7 +174,6 @@ export async function createReport(
 
       return newReport;
     });
-    console.log('report', report);
   } catch (err: unknown) {
     console.error('error' + '>'.repeat(200), err)
     if (err instanceof Error) {

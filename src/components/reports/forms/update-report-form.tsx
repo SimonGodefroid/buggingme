@@ -14,7 +14,7 @@ import {
   SelectItem,
   Textarea,
 } from '@nextui-org/react';
-import { Impact, Severity, Tag } from '@prisma/client';
+import { Tag } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
@@ -30,6 +30,7 @@ import StatusSelector from '../../common/status-selector';
 import CompanySelector from '../../companies/company-selector';
 import ImpactSelector from './impact-selector';
 import SeveritySelector from './severity-selector';
+import TagsSelector from './tags-selector';
 
 export const UpdateReportForm = ({
   user,
@@ -51,8 +52,12 @@ export const UpdateReportForm = ({
   );
 
   const [images, setImages] = React.useState<
-    { id: number; url: string }[] | []
-  >([]);
+    { url: string; filename: string }[]
+  >(
+    (report?.attachments || [])
+      .map((a) => ({ url: a.url, filename: a.filename }))
+      .filter(Boolean),
+  );
 
   useEffect(() => {
     if (formState.success) {
@@ -130,16 +135,24 @@ export const UpdateReportForm = ({
                     <SeveritySelector />
                   </div>
                 </div>
+                  <div className="gap-4">
+                    <TagsSelector mode={'creation'} tags={tags} />
+                  </div>
               </div>
             </div>
             {/* Right */}
             <div className="col-span-12 md:col-span-6">
               <div className="flex m-4">
                 <div className="flex flex-col gap-4 w-full">
-                  <DragNDropFileUpload setImages={setImages} />
-                  <div className="flex gap-4 justify-end">
-                    {(images || []).map((image) => (
+                  <DragNDropFileUpload
+                    setImages={setImages}
+                    images={images}
+                    report={report}
+                  />
+                  <div className="flex justify-center md:justify-start flex-wrap">
+                    {images?.map((image) => (
                       <ImageTooltip
+                        report={report}
                         image={image}
                         setImages={setImages}
                         images={images}

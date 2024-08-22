@@ -18,7 +18,7 @@ export default async function EditReport({
   const tags = await fetchAllTags();
   const report = (await db.report.findFirst({
     where: { id: params.reportId },
-    include: { user: true, StatusHistory: true, tags: true, company: true },
+    include: { user: true, StatusHistory: true, tags: true, company: true, attachments: true },
   })) as ReportWithTags;
 
   if (!report?.id || !report) {

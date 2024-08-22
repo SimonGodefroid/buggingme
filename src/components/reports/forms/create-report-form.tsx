@@ -33,27 +33,25 @@ export const CreateReportForm = ({
   const FORM_ID = `create-report`;
   const router = useRouter();
 
-  const [selectedTags, setSelectedTags] = useState<Selection>(
-    new Set((report?.tags || []).map((tag) => tag.id)),
-  );
-
   const [formState, action] = useFormState(createReport, {
     errors: {},
   });
 
   const [images, setImages] = React.useState<
-    { id: number; url: string }[] | []
+    { url: string; filename: string }[]
   >([]);
 
   useEffect(() => {
     if (formState.success) {
       toast.success(`Report creation successful !`);
-      redirect(`/reports/`);
+      redirect(`/reports`);
     }
     if (formState.errors._form?.length) {
       toast.error(formState.errors._form.join(', '));
     }
   }, [formState]);
+
+  const [url, setUrl] = useState<string>('');
 
   return (
     <div>
@@ -74,14 +72,28 @@ export const CreateReportForm = ({
                     placeholder="Wrong user information in profile"
                   />
                 </div>
-                <div className="w-full">
-                  <CompanySelector mode={'creation'} report={report} />
+                <div className="col-span-12">
+                  <CompanySelector
+                    mode={'creation'}
+                    report={report}
+                    errors={formState?.errors?.companyId}
+                  />
                 </div>
                 <div className="gap-4">
                   <Input
                     label="url"
                     name="url"
+                    isClearable
                     placeholder="www.example.com"
+                    value={url}
+                    onClear={() => setUrl('')}
+                    onChange={(e) => {
+                      const cleanedUrl = e.target.value.replace(
+                        /(^\w+:|^)\/\//,
+                        '',
+                      );
+                      setUrl(cleanedUrl);
+                    }}
                     defaultValue={report?.url?.toString()}
                     startContent={
                       <div className="pointer-events-none flex items-center">
@@ -99,7 +111,7 @@ export const CreateReportForm = ({
                   <SeveritySelector />
                 </div>
                 <div className="gap-4">
-                  <TagsSelector tags={tags} />
+                  <TagsSelector mode={'creation'} tags={tags} />
                 </div>
               </div>
             </div>
@@ -107,9 +119,15 @@ export const CreateReportForm = ({
             <div className="col-span-12 md:col-span-6">
               <div className="flex m-4">
                 <div className="flex flex-col gap-4 w-full">
-                  <DragNDropFileUpload setImages={setImages} />
-                  <div className="flex gap-4 justify-end">
-                    {(images || []).map((image) => (
+                  <DragNDropFileUpload
+                    setImages={setImages}
+                    images={images}
+                    report={report}
+                    mode="creation"
+                  />
+                  <div className="flex justify-center md:justify-start flex-wrap">
+                    {/* <div className="flex gap-4 justify-end"> */}
+                    {images?.map((image) => (
                       <ImageTooltip
                         image={image}
                         setImages={setImages}

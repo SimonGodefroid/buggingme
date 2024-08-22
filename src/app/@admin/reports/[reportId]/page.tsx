@@ -6,7 +6,7 @@ import db from '@/db';
 
 import { ReportWithTags } from '@/types/reports';
 import PageHeader from '@/components/common/page-header';
-import { ViewReportForm } from '@/components/reports/forms/view-report-form';
+import ViewReportForm from '@/components/reports/forms/view-report-form';
 
 export default async function ViewReport({
   params,
@@ -40,7 +40,7 @@ export default async function ViewReport({
           secondary: { href: `/reports`, text: 'Back to reports' },
         }}
       />
-      <ViewReportForm tags={tags} mode={'view'} report={report} />
+      <ViewReportForm report={report} />
     </div>
   );
 }

@@ -18,7 +18,13 @@ export default async function ViewReport({
 
   const report = (await db.report.findUnique({
     where: { id: reportId },
-    include: { StatusHistory: true, tags: true, user: true, company: true },
+    include: {
+      StatusHistory: true,
+      tags: true,
+      user: true,
+      company: true,
+      attachments: true,
+    },
   })) as ReportWithTags;
 
   if (!report) {

@@ -2,69 +2,115 @@
 
 import Image from 'next/image';
 
-import { Tooltip } from '@nextui-org/react';
+import { ReportWithTags } from '@/types';
+import { Button, Card, CardFooter, Tooltip } from '@nextui-org/react';
+
+import DeleteAttachmentForm from '../attachments/delete-attachment-form';
 
 export default function ImageTooltip({
+  report,
   image,
   images,
   setImages,
 }: {
-  image: { id: number; url: string };
-  images?: { id: number; url: string }[];
+  report?: ReportWithTags;
+  image: { url: string; filename: string };
+  images?: { url: string; filename: string }[];
   setImages?: React.Dispatch<
-    React.SetStateAction<{ id: number; url: string }[]>
+    React.SetStateAction<{ url: string; filename: string }[]>
   >;
 }) {
   const imageLoader = ({
     width = 400,
     height = 200,
+    url = `https://placehold.co/${width}x${height}?text=Your+screenshot+here`,
   }: {
     width?: number;
     height?: number;
+    url?: string;
   }) => {
-    return `https://placehold.co/${width}x${height}?text=Your+screenshot+here`;
+    return url;
   };
+  const imageCount = Math.max(
+    Math.min(images?.filter(Boolean).length ?? 0, 6),
+    2,
+  );
+  const widthClass = `w-1/${imageCount}`;
   return (
     <Tooltip
-      placement="bottom"
-      offset={-150}
-      key={image.id}
+      placement={images?.length ?? 0 > 1 ? 'bottom-end' : 'left'}
+      crossOffset={images?.length ?? 0 > 1 ? -200 : 0}
+      offset={images?.length ?? 0 > 1 ? -200 : 0}
+      key={image.url}
       content={
         <div className="flex m-2 relative">
-          {setImages && images && (
-            <button
-              className="text-lg text-primary cursor-pointer active:opacity-50 p-1 absolute top-4 right-4"
-              onClick={(evt) => {
-                evt.stopPropagation();
-                if (confirm('Are you sure you want to delete this report?')) {
-                  setImages((prevImages) => {
-                    const images = prevImages.filter(
-                      (img) => img.id !== image.id,
-                    );
-                    return images;
-                  });
-                  // deleteReport(report.id);
-                }
-              }}
-            >
-              <div className="text-medium bg-red-400 w-8 h-8 flex justify-center items-center rounded-full mx-auto">
-                🗑️
+          {images && (
+            <div>
+              <div className="absolute top-4 left-4 bg-slate-500">
+                {image.filename}
               </div>
-            </button>
+              <div className="text-lg text-primary cursor-pointer active:opacity-50 p-1 absolute top-4 right-4 flex gap-4">
+                {/* <div className="text-medium bg-red-400 w-8 h-8 flex justify-center items-center rounded-full mx-auto"> */}
+                {report?.attachments.map((a) => a.url).includes(image.url) &&
+                  setImages && (
+                    <DeleteAttachmentForm
+                      attachmentUrl={image.url}
+                      onDelete={() => {
+                        setImages((prevImages) =>
+                          prevImages.filter((img) => img !== image),
+                        );
+                      }}
+                    />
+                  )}
+                {/* </div> */}
+              </div>
+            </div>
           )}
-          <Image
-            loader={() => imageLoader({})}
-            src={'placeholder.png'}
-            width={400}
-            height={200}
-            alt="image screenshot"
-          />
+          <Card isFooterBlurred radius="lg" className="border-none">
+            <Image
+              loader={() => imageLoader({ url: image.url })}
+              src={image.url}
+              width={600}
+              height={300}
+              alt="image screenshot"
+            />
+            <CardFooter className="justify-between before:bg-white/10 border-white/20 border-1 overflow-hidden py-1 absolute before:rounded-xl rounded-large bottom-1 w-[calc(100%_-_8px)] shadow-small ml-1 z-10 bg-pink-800 bg-opacity-60	 ">
+              <p className="text-tiny text-white/80">{image.filename}</p>
+              {report?.attachments.map((a) => a.url).includes(image.url) &&
+                setImages && (
+                  <DeleteAttachmentForm
+                    attachmentUrl={image.url}
+                    onDelete={() => {
+                      setImages((prevImages) =>
+                        prevImages.filter((img) => img !== image),
+                      );
+                    }}
+                  />
+                )}
+              {!report?.attachments.map((a) => a.url).includes(image.url) &&
+                setImages && (
+                  <Button
+                    onClick={() => {
+                      setImages((prevImages) =>
+                        prevImages.filter((img) => img !== image),
+                      );
+                    }}
+                  >
+                    Discard
+                  </Button>
+                )}
+            </CardFooter>
+          </Card>
         </div>
       }
     >
-      <div className={`w-1/${images?.length || 1}`}>
-        <img className={`max-h-40`} src={image.url} />
-      </div>
+      <img
+        className={`${widthClass} max-h-1/4 border-1 border-white cursor-pointer`}
+        src={image.url}
+        onClick={() => {
+          window.open(image.url, '_blank');
+        }}
+      />
     </Tooltip>
   );
 }

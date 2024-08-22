@@ -3,12 +3,19 @@
 import React, {
   Dispatch,
   SetStateAction,
+  useCallback,
   useEffect,
   useMemo,
+  useRef,
   useState,
+  useTransition,
 } from 'react';
+
+import { uploadAttachments } from '@/actions';
+import { convertBytesToReadable } from '@/helpers';
+import { ReportWithTags } from '@/types';
 import { Button } from '@nextui-org/react';
-import { useDropzone, FileRejection } from 'react-dropzone';
+import { FileRejection, useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';
 
 const styles: { [key: string]: React.CSSProperties } = {
@@ -18,6 +25,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     flexDirection: 'column',
     alignItems: 'center',
     padding: '20px',
+    maxHeight: '100px',
     borderWidth: 2,
     borderRadius: 2,
     borderColor: '#eeeeee',
@@ -42,7 +50,7 @@ const styles: { [key: string]: React.CSSProperties } = {
     border: '1px solid #eaeaea',
     marginBottom: 8,
     marginRight: 8,
-    width: 100,
+    width: 'auto',
     height: 100,
     padding: 4,
     boxSizing: 'border-box',
@@ -65,90 +73,83 @@ const styles: { [key: string]: React.CSSProperties } = {
   },
 };
 
-interface Image {
-  id: number;
-  url: string;
-}
-
 interface DragNDropFileUploadProps {
-  setImages: Dispatch<SetStateAction<Image[]>>;
+  setImages: Dispatch<SetStateAction<{ url: string; filename: string }[]>>;
+  images: { url: string; filename: string }[];
+  report?: ReportWithTags;
+  mode?: 'update' | 'creation';
 }
 
 export const DragNDropFileUpload: React.FC<DragNDropFileUploadProps> = ({
+  report,
+  mode = 'update',
   setImages,
+  images,
 }) => {
   interface FileWithPreview extends File {
     preview: string;
   }
-  
+  const [isPending, startTransition] = useTransition();
   const [files, setFiles] = useState<FileWithPreview[]>([]);
   const [uploading, setUploading] = useState(false);
+  const attachmentsInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    // Update the hidden input value whenever images change
+    if (attachmentsInputRef.current) {
+      attachmentsInputRef.current.value = JSON.stringify(
+        images?.map((img) => img),
+      );
+    }
+  }, [images]);
 
   const handleUpload = async () => {
-    if (files.length === 0) {
-      alert('Please select a file to upload.');
-      return;
-    }
-
+    const form = new FormData();
+    files.forEach((file) => {
+      form.append('fileUpload', file, file.name);
+    });
+    // form.append('attachments', JSON.stringify(images)); // Attachments as JSON
     setUploading(true);
-
-    await Promise.all(files.map(async (file) => {
+    startTransition(async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_BASE_URL}/api/upload`,
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ filename: file.name, contentType: file.type }),
-          }
-        );
+        const { success, uploadedImages } = await uploadAttachments({
+          id: report?.id!,
+          form,
+        });
 
-        if (response.ok) {
-          const { url, fields } = await response.json();
-          const formData = new FormData();
-          Object.entries(fields).forEach(([key, value]) => formData.append(key, value as string));
-          formData.append('file', file);
-
-          const uploadResponse = await fetch(url, { method: 'POST', body: formData });
-
-          if (uploadResponse.ok) {
-            const bucketImageUrl = uploadResponse.headers.get('Location') || '';
-            setImages(prevImages => [...prevImages, { id: prevImages.length + 1, url: bucketImageUrl }]);
-            toast.success('Upload successful!');
-          } else {
-            console.error('S3 Upload Error:', uploadResponse);
-            alert('Upload failed.');
-          }
-        } else {
-          alert('Failed to get pre-signed URL.');
+        if (success) {
+          setImages((prev) => [...prev, ...uploadedImages]);
+          setFiles([]);
         }
-      } catch (error) {
-        console.error('Upload Error:', error);
-        alert('Upload failed.');
+      } catch (err) {
+        if (err instanceof Error) {
+          toast.error(err.message);
+        }
+      } finally {
+        setUploading(false);
       }
-    }));
-    setFiles([]);
-    setUploading(false);
+    });
   };
 
   const removeFile = (fileName: string) => {
-    setFiles(prevFiles => prevFiles.filter(file => file.name !== fileName));
+    setFiles((prevFiles) => prevFiles.filter((file) => file.name !== fileName));
   };
 
   useEffect(() => {
-    return () => files.forEach(file => URL.revokeObjectURL(file.preview));
+    return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
   }, [files]);
 
-  const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } = useDropzone({
-    accept: { 'image/*': [] },
-    maxSize: 10485760,
-    onDrop: (acceptedFiles: File[], fileRejections: FileRejection[]) => {
-      const mappedFiles = acceptedFiles.map(file =>
-        Object.assign(file, { preview: URL.createObjectURL(file) })
-      );
-      setFiles(prevFiles => [...prevFiles, ...mappedFiles]);
-    },
-  });
+  const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } =
+    useDropzone({
+      accept: { 'image/*': [] },
+      maxSize: 10485760,
+      onDrop: (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+        const mappedFiles = acceptedFiles.map((file) =>
+          Object.assign(file, { preview: URL.createObjectURL(file) }),
+        );
+        setFiles((prevFiles) => [...prevFiles, ...mappedFiles]);
+      },
+    });
 
   const style = useMemo(
     () => ({
@@ -157,13 +158,15 @@ export const DragNDropFileUpload: React.FC<DragNDropFileUploadProps> = ({
       ...(isDragAccept ? styles.accept : {}),
       ...(isDragReject ? styles.reject : {}),
     }),
-    [isFocused, isDragAccept, isDragReject]
+    [isFocused, isDragAccept, isDragReject],
   );
 
-  const fileList = files.map(file => (
+  const fileList = files.map((file) => (
     <li key={file.name}>
       <div className="flex gap-4 mt-4 items-center">
-        <div className="flex">{file.name} - {file.size} bytes</div>
+        <div className="flex">
+          {file.name} - {`${convertBytesToReadable(file.size)}`}
+        </div>
         <Button
           type="button"
           variant="bordered"
@@ -176,7 +179,7 @@ export const DragNDropFileUpload: React.FC<DragNDropFileUploadProps> = ({
     </li>
   ));
 
-  const thumbs = files.map(file => (
+  const thumbs = files.map((file) => (
     <div style={styles.thumb} key={file.name}>
       <div style={styles.thumbInner}>
         <img
@@ -192,10 +195,15 @@ export const DragNDropFileUpload: React.FC<DragNDropFileUploadProps> = ({
     <section className="container flex flex-col gap-2 h-full">
       <div {...getRootProps({ style })}>
         <input {...getInputProps()} />
-        <p>Drop files <strong>here</strong> or <strong style={{ cursor: 'pointer' }}>click</strong> to select files</p>
+        <p>
+          Drop files <strong>here</strong> or{' '}
+          <strong style={{ cursor: 'pointer' }}>click</strong> to select files
+        </p>
       </div>
       <aside style={styles.thumbsContainer}>{thumbs}</aside>
-      <aside><ul>{fileList}</ul></aside>
+      <aside>
+        <ul>{fileList}</ul>
+      </aside>
       {files.length > 0 && (
         <Button
           type="button"
@@ -208,6 +216,7 @@ export const DragNDropFileUpload: React.FC<DragNDropFileUploadProps> = ({
           Upload
         </Button>
       )}
+      <input type="hidden" name="attachments" ref={attachmentsInputRef} />
     </section>
   );
 };

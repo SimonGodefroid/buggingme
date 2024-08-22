@@ -69,7 +69,7 @@ export default function ReportsTable({
   const [statusFilter, setStatusFilter] = React.useState<
     Selection | ReportStatus
   >('all');
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [rowsPerPage, setRowsPerPage] = React.useState(15);
   const [sortDescriptor, setSortDescriptor] = React.useState<SortDescriptor>({
     column: 'createdAt',
     direction: 'descending',
@@ -149,7 +149,24 @@ export default function ReportsTable({
           );
         case 'title':
           return (
-            <Tooltip content={<pre></pre>}>
+            <Tooltip
+              isDisabled={report?.attachments.length === 0}
+              content={
+                <div className='flex gap-4'>
+                  {report?.attachments
+                    .map((a) => (
+                      <img
+                        key={a.url}
+                        src={a.url}
+                        alt={a.filename}
+                        height={100}
+                        width={100}
+                      />
+                    ))
+                    .filter(Boolean)}
+                </div>
+              }
+            >
               <div className="flex flex-col">
                 <p className="text-bold text-small capitalize">
                   {report.title}
@@ -337,9 +354,9 @@ export default function ReportsTable({
               className="bg-transparent outline-none text-default-400 text-small"
               onChange={onRowsPerPageChange}
             >
-              <option value="5">5</option>
-              <option value="10">10</option>
               <option value="15">15</option>
+              <option value="20">20</option>
+              <option value="25">25</option>
             </select>
           </label>
         </div>
@@ -393,7 +410,7 @@ export default function ReportsTable({
   return (
     <div className="md:mx-4">
       <Table
-        className="hidden md:flex"
+        className="hidden md:flex h-[75vh]"
         aria-label="Reports table"
         isHeaderSticky
         isStriped
