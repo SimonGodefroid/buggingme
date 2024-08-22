@@ -5,6 +5,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import db from '@/db';
 import { authMiddleware, validationMiddleware } from '@/middlewares';
+import { computeFileHash } from '@/helpers';
 
 const createReportSchema = z.object({
   title: z.string().min(10),
@@ -153,17 +154,26 @@ export async function createReport(
         }
       });
 
-      const attachments = JSON.parse(formData.get('attachments') as string) as { url: string; filename: string }[];
+      const attachments = JSON.parse(formData.get('attachments') as string) as { url: string; filename: string, rawData: File }[];
       if (attachments.length > 0) {
+        const attachmentData = await Promise.all(
+          attachments.map(async (file, index) => {
+            const hash = await computeFileHash(file.rawData);
+            return {
+              url: attachments[index].url,
+              reportId: newReport.id,
+              userId: session?.user?.id!,
+              filename: attachments[index].filename,
+              hash, // Store the computed hash
+            };
+          })
+        );
+
         await tx.attachment.createMany({
-          data: attachments.map(({ url, filename }) => ({
-            url,
-            reportId: newReport.id,
-            userId: session?.user?.id!,
-            filename
-          })),
+          data: attachmentData,
         });
       }
+
 
       // if (validation.data?.visibility === 'PUBLIC' && validation.data?.category === 'Valid') {
       //   await tx.user.update({

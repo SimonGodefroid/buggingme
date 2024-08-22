@@ -194,6 +194,7 @@ model Attachment {
   url       String
   userId    String
   filename  String
+  hash      String
   user      User      @relation(fields: [userId], references: [id])
   reportId  String? // Nullable, for report attachments
   commentId String? // Nullable, for comment attachments

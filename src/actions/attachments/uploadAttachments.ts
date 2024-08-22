@@ -3,7 +3,7 @@
 import db from '@/db';
 import { authMiddleware } from '@/middlewares';
 import { revalidatePath } from 'next/cache';
-
+import { computeFileHash } from '@/helpers'
 interface UploadAttachmentsFormState {
   errors: {
     urls?: string[];
@@ -12,6 +12,7 @@ interface UploadAttachmentsFormState {
   uploadedImages: { url: string, filename: string }[];
   success?: boolean;
 }
+
 
 export async function uploadAttachments({
   id,
@@ -33,6 +34,23 @@ export async function uploadAttachments({
 
   try {
     for (const attachment of attachments) {
+
+      const hash = await computeFileHash(attachment);
+
+      // Check if the hash already exists in the database
+      const existingAttachment = await db.attachment.findUnique({
+        where: { hash },
+      });
+
+      if (existingAttachment) {
+        uploadedImages.push({
+          url: existingAttachment.url,
+          filename: existingAttachment.filename,
+        });
+        continue; // Skip upload if file is a duplicate
+      }
+
+
       const { url, bucketImageUrl } = await uploadToS3(attachment);
 
       uploadedImages.push({ url: bucketImageUrl, filename: attachment.name });

@@ -105,10 +105,16 @@ export const DragNDropFileUpload: React.FC<DragNDropFileUploadProps> = ({
 
   const handleUpload = async () => {
     const form = new FormData();
+    const attachments = files.map((file) => ({
+      url: '', // URL will be set after upload
+      filename: file.name,
+      rawData: file, // Attach the raw file data
+    }));
+
     files.forEach((file) => {
       form.append('fileUpload', file, file.name);
     });
-    // form.append('attachments', JSON.stringify(images)); // Attachments as JSON
+    form.append('attachments', JSON.stringify(attachments)); // Attachments as JSON
     setUploading(true);
     startTransition(async () => {
       try {
