@@ -11,9 +11,12 @@ import { cache } from "react";
 //   }
 // });
 
-
-
 export const getAllCompanies = cache(async () => {
   const companies = await db.company.findMany();
   return companies;
 });
+
+export async function countCompanies() {
+  const count = await db.company.count();
+  return count;
+}

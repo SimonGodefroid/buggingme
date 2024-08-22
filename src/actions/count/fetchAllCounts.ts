@@ -1,6 +1,6 @@
 'use server';
 
-import { countCampaigns, countCompanies, countContributors, countReports } from "@/queries";
+import { countCampaigns, countCompanies, countContributors, countReports } from "@/db/queries";
 
 
 export async function fetchAllCounts() {

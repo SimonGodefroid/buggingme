@@ -126,14 +126,18 @@ export const CreateReportForm = ({
                     mode="creation"
                   />
                   <div className="flex justify-center md:justify-start flex-wrap">
-                    {/* <div className="flex gap-4 justify-end"> */}
-                    {images?.map((image) => (
-                      <ImageTooltip
-                        image={image}
-                        setImages={setImages}
-                        images={images}
-                      />
-                    ))}
+                    <div
+                      className={`grid grid-cols-${Math.min(Math.max(images.length - 1, 4), 2)}`}
+                    >
+                      {images?.map((image) => (
+                        <ImageTooltip
+                          key={image.filename}
+                          image={image}
+                          setImages={setImages}
+                          images={images}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>

@@ -15,7 +15,7 @@ import NotFound from './not-found';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'Bug busters - Find glitches get money',
+  title: 'BugBusters - Find glitches get money',
   description: 'Submit bugs, get noticed, get paid',
 };
 
@@ -64,7 +64,7 @@ export default async function RootLayout({
               className="flex flex-col items-center
             text-small gap-1 md:flex-row md:gap-4 md:justify-center"
             >
-              <span>&copy; {new Date().getFullYear()} &nbsp;Bug busters</span>
+              <span>&copy; {new Date().getFullYear()} &nbsp;BugBusters</span>
               <a
                 className="hover:text-background p-1 rounded bg-gradient-to-r hover:from-teal-400 hover:to-blue-500"
                 href="/privacy-policy.html"

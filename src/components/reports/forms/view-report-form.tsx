@@ -6,6 +6,8 @@ import db from '@/db';
 import { Chip, Input, Textarea } from '@nextui-org/react';
 
 import { ReportWithTags } from '@/types/reports';
+import CommentCreateForm from '@/components/comments/comment-create-form';
+import CommentList from '@/components/comments/comment-list';
 import { Category } from '@/components/common/category';
 import { EditorClient } from '@/components/common/editor';
 import ImageTooltip from '@/components/common/image-tooltip';
@@ -112,9 +114,17 @@ export default async function ViewReportForm({
               {images?.length > 0 && (
                 <div className="flex flex-col gap-4 w-full">
                   <div className="flex justify-center md:justify-start flex-wrap">
-                    {images?.map((image) => (
-                      <ImageTooltip image={image} images={images} />
-                    ))}
+                    <div
+                      className={`grid grid-cols-${Math.min(Math.max(images.length - 1, 4), 2)}`}
+                    >
+                      {images?.map((image) => (
+                        <ImageTooltip
+                          key={image.filename}
+                          image={image}
+                          images={images}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               )}
@@ -161,6 +171,13 @@ export default async function ViewReportForm({
           </div>
         </div>
       </form>
+      <div className="space-y-3 max-h-[400px] overflow-auto">
+        <h1 className="text-lg font-bold">
+          All comments ({report?.comments?.length})
+        </h1>
+        <CommentCreateForm reportId={report.id} startOpen />
+        <CommentList reportId={report.id} />
+      </div>
     </div>
   );
 }
