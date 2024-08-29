@@ -5,7 +5,7 @@ import { Prisma, UserType } from '@prisma/client';
 
 import PageHeader from '@/components/common/page-header';
 import ContributorsTable from '@/components/contributors/contributors-table';
-import { getContributors } from '@/queries/contributors/getContributors';
+import { getContributors } from '@/db/queries';
 
 export const metadata: Metadata = {
   title: 'Contributors - Engineers raising the bar',

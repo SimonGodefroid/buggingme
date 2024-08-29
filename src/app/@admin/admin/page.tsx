@@ -1,4 +1,4 @@
-import { getAllCompanies, getAllUsers } from '@/queries';
+import { getAllCompanies, getAllUsers } from '@/db/queries';
 
 import { UserWithCompanies } from '@/types/users';
 import { LinkUserForm } from '@/components/users/link-user-form';

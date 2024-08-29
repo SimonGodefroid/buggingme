@@ -10,6 +10,7 @@ import {
   Button,
   Chip,
   Link,
+  LinkProps,
   Navbar,
   NavbarBrand,
   NavbarContent,
@@ -23,6 +24,7 @@ import {
 } from '@nextui-org/react';
 import { User } from 'next-auth';
 
+import Icon from './common/Icon';
 import SignInAuth0Button from './common/sign-in-auth0-button';
 import SignInGitHubButton from './common/sign-in-github-button';
 import ThemeSwitch from './common/theme-switch';
@@ -52,40 +54,61 @@ export default function NavTabs({
     { label: 'Companies', href: '/companies' },
     { label: 'Campaigns', href: '/campaigns' },
     { label: 'Leaderboard', href: '/leaderboard' },
-    user ? { label: 'Log Out', href: '/logout' } : null,
+    user
+      ? { label: 'Log Out', onPress: () => signOut(), color: 'danger' }
+      : null,
     !user ? { label: 'Sign in | Engineer', onPress: () => signIn() } : null,
     !user ? { label: 'Sign in | Company', onPress: () => signInAuth0() } : null,
   ].filter(Boolean) as
-    | { label: string; href: string; onPress: never }[]
-    | { label: string; href: never; onPress: () => void }[];
+    | {
+        label: string;
+        href: string;
+        onPress: never;
+        color?: LinkProps['color'] | undefined;
+      }[]
+    | {
+        label: string;
+        href: never;
+        onPress: () => void;
+        color?: LinkProps['color'] | undefined;
+      }[];
 
   const navItems = [
     {
-      emoji: '🐛',
+      emoji: <Icon name="bug" />,
+      // emoji: '🐛',
       label: 'Reports',
       href: '/reports',
       count: count.reports,
     },
     {
-      emoji: '👷👷‍♀️',
+      emoji: <Icon name='group'/>,
+      // emoji: '👷👷‍♀️',
       label: 'Contributors',
       href: '/contributors',
       count: count.contributors,
     },
     {
-      emoji: '🏢',
+      emoji: <Icon name="buildings" />,
+      // emoji: '🏢',
       label: 'Companies',
       href: '/companies',
       count: count.companies,
     },
     {
-      emoji: '📢',
+      emoji: (
+        <div className="flex">
+          <i className="bx bxs-megaphone bx-sm text-foreground"></i>
+        </div>
+      ),
+      // emoji: '📢',
       label: 'Campaigns',
       href: '/campaigns',
       count: count.campaigns,
     },
     {
-      emoji: '🏆',
+      // emoji: '🏆',
+      emoji: <Icon name="trophy" />,
       label: 'Leaderboard',
       href: '/leaderboard',
     },
@@ -95,10 +118,8 @@ export default function NavTabs({
   return (
     <Navbar
       classNames={{
-        base: 'justify-start md:justify-between md:p-2 border-3 border-pink-400 max-w-8xl',
-        wrapper: 'border-3 border-blue-300 flex max-w-8xl justify-end',
-        content: 'border-3 border-yellow-300',
-        menu: 'border-3 border-green-300',
+        base: 'justify-start md:justify-between md:p-2 max-w-8xl',
+        wrapper: 'flex max-w-8xl justify-end',
       }}
       isBordered
       isMenuOpen={isMenuOpen}
@@ -112,7 +133,7 @@ export default function NavTabs({
 
       <NavbarContent className="sm:hidden pr-3" justify="center">
         <NavbarBrand>
-          <p className="font-bold text-inherit">Bug busters</p>
+          <p className="font-bold text-inherit">BugBusters</p>
         </NavbarBrand>
       </NavbarContent>
 
@@ -122,7 +143,7 @@ export default function NavTabs({
       >
         <NavbarBrand className="cursor-pointer">
           <Link color="foreground" href="/">
-            <p className="font-bold text-inherit">Bug busters</p>
+            <p className="font-bold text-inherit">BugBusters</p>
           </Link>
         </NavbarBrand>
 
@@ -133,10 +154,10 @@ export default function NavTabs({
           >
             <Link color="foreground" isBlock href={item.href}>
               <div className="flex items-center space-x-2">
-                <span className="sm:hidden xl:block">{item.emoji}&nbsp;</span>
+                <span className="sm:hidden xl:flex">{item.emoji}</span>
                 <span>{item.label}</span>
                 {!('count' in item) || !user ? null : (
-                  <Chip size="sm" variant="faded" className="sm:hidden xl:flex">
+                  <Chip size="sm" variant='flat' color='primary' className="sm:hidden xl:flex">
                     {item.count}
                   </Chip>
                 )}
@@ -146,7 +167,7 @@ export default function NavTabs({
         ))}
       </NavbarContent>
 
-      <NavbarContent className="md:p-10 border-4 border-violet-600 flex flex-row-reverse justify-between">
+      <NavbarContent className="md:p-10 flex flex-row-reverse justify-between">
         <NavbarItem className="lg:hidden">
           <Popover>
             <PopoverTrigger>
@@ -171,7 +192,7 @@ export default function NavTabs({
             </PopoverContent>
           </Popover>
         </NavbarItem>
-        <NavbarItem className="hidden lg:flex lg:justify-end border-3 border-orange-300">
+        <NavbarItem className="hidden lg:flex lg:justify-end">
           <HeaderAuth user={user} />
         </NavbarItem>
         <NavbarItem>
@@ -185,10 +206,10 @@ export default function NavTabs({
             <Link
               className="w-full"
               color={
-                item.href === `/${path.split('/')[1]}`
-                  ? 'warning'
-                  : item?.href === '/logout'
-                    ? 'danger'
+                item?.color
+                  ? item?.color
+                  : item.href === `/${path.split('/')[1]}`
+                    ? 'warning'
                     : 'foreground'
               }
               href={item.href}

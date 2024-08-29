@@ -24,6 +24,7 @@ export default async function ViewReport({
       user: true,
       company: true,
       attachments: true,
+      comments:true
     },
   })) as ReportWithTags;
 

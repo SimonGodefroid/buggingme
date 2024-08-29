@@ -10,7 +10,7 @@ export const BreadCrumbsClient = ({ crumbs }: { crumbs: Crumbs }) => {
     <div>
       <Breadcrumbs>
         {[HOME_CRUMB, ...crumbs].map((crumb, index) => (
-          <BreadcrumbItem
+          <BreadcrumbItem classNames={{ 'item': 'text-red-300 text-wrap' }}
             key={crumb.href + index + crumb.text}
             href={crumb.href}
           >

@@ -150,11 +150,11 @@ export default function ReportsTable({
         case 'title':
           return (
             <Tooltip
-              isDisabled={report?.attachments.length === 0}
+              isDisabled={report?.attachments?.length === 0}
               content={
-                <div className='flex gap-4'>
+                <div className="flex gap-4">
                   {report?.attachments
-                    .map((a) => (
+                    ?.map((a) => (
                       <img
                         key={a.url}
                         src={a.url}

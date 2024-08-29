@@ -21,7 +21,7 @@ export default async function Header() {
     <Navbar className="shadow mb-6">
       <NavbarBrand>
         <Link href="/" className="font-bold">
-          Bug busters
+          BugBusters
         </Link>
       </NavbarBrand>
       <NavbarContent justify="center"></NavbarContent>

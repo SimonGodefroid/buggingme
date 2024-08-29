@@ -31,11 +31,6 @@ export default function ImageTooltip({
   }) => {
     return url;
   };
-  const imageCount = Math.max(
-    Math.min(images?.filter(Boolean).length ?? 0, 6),
-    2,
-  );
-  const widthClass = `w-1/${imageCount}`;
   return (
     <Tooltip
       placement={images?.length ?? 0 > 1 ? 'bottom-end' : 'left'}
@@ -50,7 +45,6 @@ export default function ImageTooltip({
                 {image.filename}
               </div>
               <div className="text-lg text-primary cursor-pointer active:opacity-50 p-1 absolute top-4 right-4 flex gap-4">
-                {/* <div className="text-medium bg-red-400 w-8 h-8 flex justify-center items-center rounded-full mx-auto"> */}
                 {report?.attachments.map((a) => a.url).includes(image.url) &&
                   setImages && (
                     <DeleteAttachmentForm
@@ -62,7 +56,6 @@ export default function ImageTooltip({
                       }}
                     />
                   )}
-                {/* </div> */}
               </div>
             </div>
           )}
@@ -105,7 +98,7 @@ export default function ImageTooltip({
       }
     >
       <img
-        className={`${widthClass} max-h-1/4 border-1 border-white cursor-pointer`}
+        className={`max-h-1/4 border-1 border-white cursor-pointer `}
         src={image.url}
         onClick={() => {
           window.open(image.url, '_blank');

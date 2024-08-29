@@ -135,9 +135,9 @@ export const UpdateReportForm = ({
                     <SeveritySelector />
                   </div>
                 </div>
-                  <div className="gap-4">
-                    <TagsSelector mode={'creation'} tags={tags} />
-                  </div>
+                <div className="gap-4">
+                  <TagsSelector mode={'creation'} tags={tags} />
+                </div>
               </div>
             </div>
             {/* Right */}
@@ -150,14 +150,19 @@ export const UpdateReportForm = ({
                     report={report}
                   />
                   <div className="flex justify-center md:justify-start flex-wrap">
-                    {images?.map((image) => (
-                      <ImageTooltip
-                        report={report}
-                        image={image}
-                        setImages={setImages}
-                        images={images}
-                      />
-                    ))}
+                    <div
+                      className={`grid grid-cols-${Math.min(Math.max(images.length - 1, 4), 2)}`}
+                    >
+                      {images?.map((image) => (
+                        <ImageTooltip
+                          key={image.filename}
+                          report={report}
+                          image={image}
+                          setImages={setImages}
+                          images={images}
+                        />
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
