@@ -16,7 +16,7 @@ export default function Providers({ children }: ProvidersProps) {
     <SessionProvider>
       <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
         <ToastContainer />
-        <NextUIProvider>{children}</NextUIProvider>
+        <NextUIProvider locale='en-GB'>{children}</NextUIProvider>
       </ThemeProvider>
     </SessionProvider>
   );

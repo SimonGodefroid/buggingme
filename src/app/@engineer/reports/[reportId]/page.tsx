@@ -5,7 +5,7 @@ import { notFound } from 'next/navigation';
 import db from '@/db';
 import { ReportStatus } from '@prisma/client';
 
-import { ReportWithTags } from '@/types/reports';
+import { ReportWithTags } from '@/types';
 import PageHeader from '@/components/common/page-header';
 import ViewReportForm from '@/components/reports/forms/view-report-form';
 

@@ -11,19 +11,16 @@ export const metadata: Metadata = {
   description: 'Folks finding problems and fixing them',
 };
 export type ContributorWithReports = Prisma.UserGetPayload<{
-  include: { Report: true };
+  include: { Report: true; attachments: true };
 }>;
 export default async function Contributors({ ...args }) {
-  const contributors: ContributorWithReports[] = await db.user.findMany({
+  const contributors: ContributorWithReports[] = (await db.user.findMany({
     where: { userTypes: { has: UserType.ENGINEER } },
     include: { Report: true },
-  });
+  })) as ContributorWithReports[];
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader
-        crumbs={[{ href: '/contributors', text: 'Contributors' }]}
-        
-      />
+      <PageHeader crumbs={[{ href: '/contributors', text: 'Contributors' }]} />
       <ContributorsTable contributors={contributors} />
     </div>
   );

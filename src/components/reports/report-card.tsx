@@ -7,7 +7,7 @@ import {
   Link,
 } from '@nextui-org/react';
 
-import { ReportWithTags } from '@/types/reports';
+import { ReportWithTags } from '@/types';
 
 import { Category } from '../common/category';
 import { Status } from './status';

@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 
 import db from '@/db';
 
-import { ContributorWithReports } from '@/types/users';
+import { ContributorWithReports } from '@/types';
 import PageHeader from '@/components/common/page-header';
 import ContributorStats from '@/components/contributors/contributor-stats';
 

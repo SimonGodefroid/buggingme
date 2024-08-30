@@ -1,14 +1,13 @@
 import { notFound } from 'next/navigation';
 
 import db from '@/db';
+import { ContributorWithReports } from '@/types';
 import { Button, Link } from '@nextui-org/react';
 import type { Prisma } from '@prisma/client';
 
 import { BreadCrumbsClient } from '@/components/breadcrumbs';
 import PageHeader from '@/components/common/page-header';
 import ContributorStats from '@/components/contributors/contributor-stats';
-
-import { ContributorWithReports } from '../page';
 
 export default async function ViewContributor({
   params,
@@ -19,7 +18,7 @@ export default async function ViewContributor({
 
   const contributor = (await db.user.findUnique({
     where: { id: userId },
-    include: { Report: true },
+    include: { Report: { include: { attachments: true } } },
   })) as ContributorWithReports;
   if (!contributor) {
     notFound();

@@ -24,7 +24,7 @@ import {
 } from '@nextui-org/react';
 import { Key } from '@react-types/shared';
 
-import { ContributorWithReports } from '@/app/@engineer/contributors/page';
+import { ContributorWithReports } from '@/types';
 
 import { columns } from '../contributors/data';
 import ContributorCard from './contributor-card';
@@ -273,7 +273,7 @@ export default function ContributorsTable({
         bottomContent={bottomContent}
         bottomContentPlacement="outside"
         classNames={{
-          wrapper: 'max-h-[382px]',
+          wrapper: 'max-h-[70vh] p-0 m-0 border-8 border-background',
         }}
         sortDescriptor={sortDescriptor}
         topContent={topContent}

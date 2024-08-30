@@ -1,6 +1,6 @@
 import { getAllCompanies, getAllUsers } from '@/db/queries';
 
-import { UserWithCompanies } from '@/types/users';
+import { UserWithCompanies } from '@/types';
 import { LinkUserForm } from '@/components/users/link-user-form';
 
 export default async function Admin() {

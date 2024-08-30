@@ -19,7 +19,7 @@ export default async function CreateReport() {
           secondary: { text: 'Back' },
         }}
       />
-      <CreateReportForm user={user} tags={tags} mode={'creation'} />
+      <CreateReportForm user={user} tags={tags} />
     </div>
   );
 }
