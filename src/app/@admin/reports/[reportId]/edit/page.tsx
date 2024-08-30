@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
 import db from '@/db';
 
-import { ReportWithTags } from '@/types/reports';
+import { ReportWithTags } from '@/types';
 import PageHeader from '@/components/common/page-header';
 import { UpdateReportForm } from '@/components/reports/forms/update-report-form';
 

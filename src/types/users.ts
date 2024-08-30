@@ -1,9 +1,9 @@
 import { Prisma } from "@prisma/client";
 
 export type ContributorWithReports = Prisma.UserGetPayload<{
-  include: { Report: true };
+  include: { Report: { include: { attachments: true } }, };
 }>;
 
 export type UserWithCompanies = Prisma.UserGetPayload<{
-  include: { companies: true };
+  include: { companies: true, };
 }>;

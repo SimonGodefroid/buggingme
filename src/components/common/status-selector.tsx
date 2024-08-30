@@ -14,7 +14,7 @@ import {
 import { ReportStatus, UserType } from '@prisma/client';
 import { toast } from 'react-toastify';
 
-import { ReportWithTags } from '@/types/reports';
+import { ReportWithTags } from '@/types';
 import { Status } from '@/components/reports/status';
 
 export default function StatusSelector({

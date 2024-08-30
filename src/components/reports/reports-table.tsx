@@ -28,8 +28,8 @@ import {
 import { ReportStatus, UserType } from '@prisma/client';
 import { Key } from '@react-types/shared';
 
-import { ReportWithTags } from '@/types/reports';
-import { UserWithCompanies } from '@/types/users';
+import { ReportWithTags } from '@/types';
+import { UserWithCompanies } from '@/types';
 
 import { Category } from '../common/category';
 import { columns } from '../reports/data';

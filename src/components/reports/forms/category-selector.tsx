@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 
 import { updateReportCategory } from '@/actions/reports/updateCategory';
 import { pascalToSentenceCase } from '@/helpers/strings/pascalToSentenceCase';
+import { CLOSING_CATEGORIES, OPEN_CATEGORIES, ReportWithTags } from '@/types';
 import {
   Button,
   ButtonProps,
@@ -16,12 +17,6 @@ import {
 import { ReportCategory } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
-
-import {
-  CLOSING_CATEGORIES,
-  OPEN_CATEGORIES,
-  ReportWithTags,
-} from '@/types/reports';
 
 import { Category } from '../../common/category';
 import Icon from '../../common/Icon';

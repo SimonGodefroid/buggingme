@@ -5,7 +5,7 @@ import React from 'react';
 import db from '@/db';
 import { Chip, Input, Textarea } from '@nextui-org/react';
 
-import { ReportWithTags } from '@/types/reports';
+import { ReportWithTags } from '@/types';
 import CommentCreateForm from '@/components/comments/comment-create-form';
 import CommentList from '@/components/comments/comment-list';
 import { Category } from '@/components/common/category';

@@ -10,8 +10,8 @@ import { Tag } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
-import { ReportWithTags } from '@/types/reports';
-import { UserWithCompanies } from '@/types/users';
+import { ReportWithTags } from '@/types';
+import { UserWithCompanies } from '@/types';
 import { DragNDropFileUpload } from '@/components/common/drag-n-drop-file-upload';
 import { EditorClient } from '@/components/common/editor';
 import ImageTooltip from '@/components/common/image-tooltip';

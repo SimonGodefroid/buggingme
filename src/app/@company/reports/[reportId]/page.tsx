@@ -4,7 +4,7 @@ import { fetchUser } from '@/actions';
 import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
 import db from '@/db';
 
-import { ReportWithTags } from '@/types/reports';
+import { ReportWithTags } from '@/types';
 import PageHeader from '@/components/common/page-header';
 import ViewReportForm from '@/components/reports/forms/view-report-form';
 import CategorySelector from '@/components/reports/forms/category-selector';

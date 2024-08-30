@@ -14,7 +14,7 @@ import debounce from 'lodash.debounce';
 import differenceby from 'lodash.differenceby';
 import { toast } from 'react-toastify';
 
-import { ReportWithTags } from '@/types/reports';
+import { ReportWithTags } from '@/types';
 
 const noop = () => {};
 

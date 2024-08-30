@@ -2,7 +2,7 @@ import { fetchUser } from '@/actions';
 import { auth } from '@/auth';
 import db from '@/db';
 
-import { ReportWithTags } from '@/types/reports';
+import { ReportWithTags } from '@/types';
 import PageHeader from '@/components/common/page-header';
 import ReportsTable from '@/components/reports/reports-table';
 

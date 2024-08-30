@@ -82,7 +82,7 @@ export default function NavTabs({
       count: count.reports,
     },
     {
-      emoji: <Icon name='group'/>,
+      emoji: <Icon name="group" />,
       // emoji: '👷👷‍♀️',
       label: 'Contributors',
       href: '/contributors',
@@ -98,7 +98,7 @@ export default function NavTabs({
     {
       emoji: (
         <div className="flex">
-          <i className="bx bxs-megaphone bx-sm text-foreground"></i>
+          <i className="bx bxs-megaphone bx-sm"></i>
         </div>
       ),
       // emoji: '📢',
@@ -152,12 +152,22 @@ export default function NavTabs({
             isActive={item.href === `/${path.split('/')[1]}`}
             key={item.label}
           >
-            <Link color="foreground" isBlock href={item.href}>
+            <Link
+              color="foreground"
+              isBlock
+              href={item.href}
+              className="hover:text-violet-300"
+            >
               <div className="flex items-center space-x-2">
                 <span className="sm:hidden xl:flex">{item.emoji}</span>
                 <span>{item.label}</span>
                 {!('count' in item) || !user ? null : (
-                  <Chip size="sm" variant='flat' color='primary' className="sm:hidden xl:flex">
+                  <Chip
+                    size="sm"
+                    variant="flat"
+                    color="primary"
+                    className="sm:hidden xl:flex"
+                  >
                     {item.count}
                   </Chip>
                 )}
