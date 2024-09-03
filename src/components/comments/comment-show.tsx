@@ -66,7 +66,7 @@ export default function CommentShow({
           </form>
         </div>
       )}
-      <div className="flex gap-3">
+      <div className="flex flex-col md:flex-row gap-3">
         <Image
           src={comment.user.image || ''}
           alt="user image"

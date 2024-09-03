@@ -73,7 +73,7 @@ export default function StatusSelector({
   );
 
   return (
-    <div className="flex flex-col items-center gap-2">
+    <div className="flex justify-between md:flex-col items-center gap-2">
       <Selector />
       <Status status={report!.status} />
     </div>

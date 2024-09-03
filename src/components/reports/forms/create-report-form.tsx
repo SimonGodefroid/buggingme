@@ -5,13 +5,13 @@ import React, { useEffect, useState } from 'react';
 import { redirect, useRouter } from 'next/navigation';
 
 import { createReport } from '@/actions/reports/create';
+import { ReportWithTags, UserWithCompanies } from '@/types';
 import { Button, Input, Selection, Textarea } from '@nextui-org/react';
 import { Tag } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
-import { ReportWithTags } from '@/types';
-import { UserWithCompanies } from '@/types';
+import CampaignSelector from '@/components/campaigns/campaign-selector';
 import { DragNDropFileUpload } from '@/components/common/drag-n-drop-file-upload';
 import { EditorClient } from '@/components/common/editor';
 import ImageTooltip from '@/components/common/image-tooltip';
@@ -52,6 +52,17 @@ export const CreateReportForm = ({
   }, [formState]);
 
   const [url, setUrl] = useState<string>('');
+  const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
+  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+
+  const handleCampaignChange = (campaign: any | null) => {
+    setSelectedCampaign(campaign);
+    if (campaign) {
+      setSelectedCompany(campaign.companyId); // Force the company selector to the campaign's company
+    } else {
+      setSelectedCompany(null); // Allow free selection if no campaign is selected
+    }
+  };
 
   return (
     <div>
@@ -73,9 +84,17 @@ export const CreateReportForm = ({
                   />
                 </div>
                 <div className="col-span-12">
+                  <CampaignSelector
+                    user={user!}
+                    onCampaignChange={handleCampaignChange}
+                  />
+                </div>
+                <div className="col-span-12">
                   <CompanySelector
                     mode={'creation'}
                     report={report}
+                    selectedCampaign={selectedCampaign}
+                    selectedCompanyId={selectedCompany || undefined} // Pass selected company ID
                     errors={formState?.errors?.companyId}
                   />
                 </div>
@@ -84,6 +103,7 @@ export const CreateReportForm = ({
                     label="url"
                     name="url"
                     isClearable
+                    isRequired
                     placeholder="www.example.com"
                     value={url}
                     onClear={() => setUrl('')}
@@ -110,9 +130,7 @@ export const CreateReportForm = ({
                   <ImpactSelector />
                   <SeveritySelector />
                 </div>
-                <div className="gap-4">
-                  <TagsSelector mode={'creation'} tags={tags} />
-                </div>
+                <TagsSelector mode={'creation'} tags={tags} />
               </div>
             </div>
             {/* Right */}
@@ -147,7 +165,7 @@ export const CreateReportForm = ({
           <div className="grid grid-cols-12">
             {/* Left */}
             <div className="col-span-12 md:col-span-6">
-              <div className="flex flex-col gap-4 m-4">
+              <div className="flex flex-col gap-4 mx-4">
                 <Textarea
                   label="Steps to reproduce"
                   minRows={4}
@@ -181,7 +199,7 @@ export const CreateReportForm = ({
             </div>
             {/* Right */}
             <div className="col-span-12 md:col-span-6">
-              <div className="flex flex-col gap-4 m-4">
+              <div className="flex flex-col gap-4 m-4 md:mx-4 md:my-0">
                 <Textarea
                   label="Suggestions"
                   name="suggestions"

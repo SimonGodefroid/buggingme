@@ -9,15 +9,15 @@ import {
 } from '@nextui-org/react';
 
 export default function ContributorCard({
-  contributor,
+  item,
 }: {
-  contributor: ContributorWithReports;
+  item: ContributorWithReports;
 }) {
   return (
-    <Card className="p-4" as={Link} href={`/contributors/${contributor.id}`}>
-      <CardHeader>{contributor.name}</CardHeader>
+    <Card className="p-4" as={Link} href={`/contributors/${item.id}`}>
+      <CardHeader>{item.name}</CardHeader>
       <CardBody className="flex flex-col p-4 gap-4">
-        <pre>{JSON.stringify(contributor, null, '\t')}</pre>
+        <pre>{JSON.stringify(item, null, '\t')}</pre>
       </CardBody>
       <CardFooter className="justify-end">
         {/* <Button>Edit</Button> */}

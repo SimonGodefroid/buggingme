@@ -1,7 +1,5 @@
 'use client';
 
-import React from 'react';
-
 import { CampaignWithCompany, UserWithCompanies } from '@/types';
 import { parseDate } from '@internationalized/date';
 import {
@@ -13,6 +11,8 @@ import {
   Textarea,
 } from '@nextui-org/react';
 import { CampaignType } from '@prisma/client';
+
+import { InvitationWithUser } from '@/types/invitations';
 
 export const ViewCampaignForm = ({
   campaign,
@@ -32,7 +32,7 @@ export const ViewCampaignForm = ({
                 name="type"
                 isDisabled
                 placeholder="Select a campaign type"
-                defaultSelectedKeys={[CampaignType.Public]}
+                defaultSelectedKeys={[campaign.type]}
                 classNames={{ value: ['mt-1'] }}
                 renderValue={(selected) => {
                   return <Chip size="sm">{selected[0].textValue}</Chip>;
@@ -44,6 +44,36 @@ export const ViewCampaignForm = ({
                   </SelectItem>
                 ))}
               </Select>
+              {campaign.type === CampaignType.InvitationOnly && (
+                <>
+                  <Select
+                    label="Invited users"
+                    name="invitedUsers"
+                    isDisabled
+                    placeholder="Select users"
+                    selectionMode="multiple"
+                    selectedKeys={
+                      campaign.invitations.map(
+                        (invitation) => invitation.user?.id,
+                      ) as string[]
+                    }
+                    multiple
+                    isMultiline
+                  >
+                    {/* Replace with actual users fetched from your DB */}
+                    {campaign.invitations.map(
+                      (invitation: InvitationWithUser) => (
+                        <SelectItem
+                          key={`${invitation.user?.id.toString()}`}
+                          textValue={`${invitation.user?.name}`}
+                        >
+                          <Chip>{invitation.user?.name}</Chip>
+                        </SelectItem>
+                      ),
+                    )}
+                  </Select>
+                </>
+              )}
               <Input
                 isDisabled
                 name="name"

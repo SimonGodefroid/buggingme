@@ -53,6 +53,7 @@ export default function NavTabs({
     { label: 'Contributors', href: '/contributors' },
     { label: 'Companies', href: '/companies' },
     { label: 'Campaigns', href: '/campaigns' },
+    { label: 'Invitations', href: '/invitations' },
     { label: 'Leaderboard', href: '/leaderboard' },
     user
       ? { label: 'Log Out', onPress: () => signOut(), color: 'danger' }
@@ -107,6 +108,12 @@ export default function NavTabs({
       count: count.campaigns,
     },
     {
+      emoji: <Icon name="envelope" />,
+      // emoji: '✉️',
+      label: 'Invitations',
+      href: '/invitations',
+    },
+    {
       // emoji: '🏆',
       emoji: <Icon name="trophy" />,
       label: 'Leaderboard',
@@ -118,7 +125,7 @@ export default function NavTabs({
   return (
     <Navbar
       classNames={{
-        base: 'justify-start md:justify-between md:p-2 max-w-8xl',
+        base: 'justify-start md:justify-between md:max-w-8xl sm:bg-orange-800 md:bg-green-800 lg:bg-pink-800',
         wrapper: 'flex max-w-8xl justify-end',
       }}
       isBordered
@@ -178,7 +185,7 @@ export default function NavTabs({
       </NavbarContent>
 
       <NavbarContent className="md:p-10 flex flex-row-reverse justify-between">
-        <NavbarItem className="lg:hidden">
+        <NavbarItem className="xl:hidden">
           <Popover>
             <PopoverTrigger>
               <Avatar size="sm" src={user?.image || ''} />
@@ -202,7 +209,7 @@ export default function NavTabs({
             </PopoverContent>
           </Popover>
         </NavbarItem>
-        <NavbarItem className="hidden lg:flex lg:justify-end">
+        <NavbarItem className="hidden xl:flex xl:justify-end">
           <HeaderAuth user={user} />
         </NavbarItem>
         <NavbarItem>

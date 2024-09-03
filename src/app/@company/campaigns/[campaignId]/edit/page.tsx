@@ -1,6 +1,9 @@
 import { fetchUser } from '@/actions';
 import db from '@/db';
-import { CampaignWithCompany, UserWithCompanies } from '@/types';
+import {
+  CampaignWithInvitations,
+  UserWithCompanies,
+} from '@/types';
 import { Button } from '@nextui-org/react';
 import { CampaignStatus } from '@prisma/client';
 
@@ -14,10 +17,14 @@ export default async function ViewCampaign({
   params: { campaignId: string };
 }) {
   const user: UserWithCompanies | null = await fetchUser();
-  const campaign: CampaignWithCompany | null = await db.campaign.findFirst({
-    where: { id: campaignId },
-    include: { User: true, company: true },
-  });
+  const campaign: CampaignWithInvitations| null =
+    await db.campaign.findFirst({
+      where: { id: campaignId },
+      include: {
+        company: true,
+        invitations: { include: { invitee: true, invitor: true } },
+      },
+    });
 
   if (!user) {
     return <div>Not authorized</div>;

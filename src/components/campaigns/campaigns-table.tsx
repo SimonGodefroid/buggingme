@@ -25,10 +25,9 @@ import {
 import { Campaign, User, UserType } from '@prisma/client';
 import { Key } from '@react-types/shared';
 
-import { CampaignWithCompany } from '@/types';
-
 import CampaignCard from './campaign-card';
 import { columns } from './columns';
+import { CampaignWithInvitations } from '@/types';
 
 const INITIAL_VISIBLE_COLUMNS = [
   'name',
@@ -43,7 +42,7 @@ export default function CampaignsTable({
   campaigns,
   user,
 }: {
-  campaigns: CampaignWithCompany[];
+  campaigns: CampaignWithInvitations[];
   user: User;
 }) {
   const router = useRouter();
@@ -113,7 +112,7 @@ export default function CampaignsTable({
   }, [sortDescriptor, items]);
 
   const renderCell = React.useCallback(
-    (campaign: CampaignWithCompany, columnKey: keyof CampaignWithCompany) => {
+    (campaign: CampaignWithInvitations, columnKey: keyof CampaignWithInvitations) => {
       columnKey === 'status' && console.log('status', campaign.status);
       switch (columnKey) {
         case 'startDate':

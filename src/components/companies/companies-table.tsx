@@ -327,7 +327,7 @@ export default function CompaniesTable({
       <div className="md:hidden flex flex-col gap-4 m-2">
         {topContent}
         {sortedItems.map((company) => (
-          <CompanyCard key={company.id} company={company} />
+          <CompanyCard key={company.id} item={company} />
         ))}
       </div>
     </div>

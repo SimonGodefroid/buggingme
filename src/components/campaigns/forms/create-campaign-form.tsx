@@ -5,7 +5,8 @@ import React, { useEffect, useState } from 'react';
 import { redirect, useRouter } from 'next/navigation';
 
 import { createCampaign } from '@/actions/campaigns';
-import { getLocalTimeZone, parseDate, today } from '@internationalized/date';
+import { UserWithCompanies } from '@/types';
+import { getLocalTimeZone, today } from '@internationalized/date';
 import {
   Button,
   Chip,
@@ -14,19 +15,21 @@ import {
   Input,
   RangeValue,
   Select,
+  Selection,
   SelectItem,
   Textarea,
 } from '@nextui-org/react';
-import { CampaignType } from '@prisma/client';
+import { CampaignType, User } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
-import { UserWithCompanies } from '@/types';
-
 export const CreateCampaignForm = ({
   user,
+  users,
 }: {
   user?: UserWithCompanies | null;
+  // users: { user: User }[];
+  users: User[];
 }) => {
   const FORM_ID = `create-campaign`;
   const router = useRouter();
@@ -38,6 +41,9 @@ export const CreateCampaignForm = ({
     start: today(getLocalTimeZone()),
     end: today(getLocalTimeZone()),
   });
+
+  const [type, setType] = React.useState<CampaignType>(CampaignType.Public);
+  const [invitedUsers, setInvitedUsers] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (formState.success) {
@@ -60,11 +66,11 @@ export const CreateCampaignForm = ({
                   label="Type"
                   name="type"
                   placeholder="Select a campaign type"
-                  defaultSelectedKeys={[CampaignType.Public]}
-                  classNames={{ value: ['mt-1'] }}
-                  renderValue={(selected) => {
-                    return <Chip size="sm">{selected[0].textValue}</Chip>;
+                  onSelectionChange={(keys: Selection) => {
+                    const selectedType = Array.from(keys)[0] as CampaignType;
+                    setType(selectedType);
                   }}
+                  defaultSelectedKeys={[CampaignType.Public]}
                 >
                   {Object.values(CampaignType).map((type) => (
                     <SelectItem key={type} textValue={type}>
@@ -72,10 +78,48 @@ export const CreateCampaignForm = ({
                     </SelectItem>
                   ))}
                 </Select>
+
+                {type === CampaignType.InvitationOnly && (
+                  <>
+                    <input
+                      hidden
+                      name="invitedUsers"
+                      value={Array.from(invitedUsers).join(',')}
+                    />
+                    <Select
+                      label="Invited users"
+                      name="invitedUsers"
+                      placeholder="Select users"
+                      selectionMode="multiple"
+                      onSelectionChange={(keys: Selection) => {
+                        const selectedKeys = new Set(keys);
+                        setInvitedUsers((prevUsers) => {
+                          const updatedUsers = new Set(prevUsers); // Copy existing users
+                          selectedKeys.forEach((user) =>
+                            updatedUsers.add(user as string),
+                          ); // Add new selections
+                          return updatedUsers; // Update the state with the new set of selected users
+                        });
+                      }}
+                      multiple
+                    >
+                      {/* Replace with actual users fetched from your DB */}
+                      {users.map((user) => (
+                        <SelectItem
+                          key={user.id}
+                          textValue={user.name?.toString()}
+                        >
+                          <Chip>{user.name}</Chip>
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  </>
+                )}
                 <Input
                   isInvalid={!!formState?.errors.name}
                   errorMessage={formState?.errors.name?.join(', ')}
                   name="name"
+                  defaultValue={`${user?.companies[0].name} bug bounty campaign`}
                   label="Name"
                   isRequired
                   placeholder="My company bug bounty campaign"

@@ -3,9 +3,10 @@
 import React from 'react';
 
 import db from '@/db';
+import { ReportWithTags } from '@/types';
 import { Chip, Input, Textarea } from '@nextui-org/react';
 
-import { ReportWithTags } from '@/types';
+import CampaignPreview from '@/components/campaigns/campaign-preview';
 import CommentCreateForm from '@/components/comments/comment-create-form';
 import CommentList from '@/components/comments/comment-list';
 import { Category } from '@/components/common/category';
@@ -43,12 +44,12 @@ export default async function ViewReportForm({
   return (
     <div className="text-foreground">
       <form className="" id={FORM_ID}>
-        <div className="flex flex-col md:m-4">
+        <div className="flex flex-col m-4">
           <div className="grid grid-cols-12 ">
             <div className="col-span-12 md:col-span-6">
-              <div className="flex flex-col gap-4 m-4">
-                <div className="grid grid-cols-12">
-                  <div className="col-span-9">
+              <div className="flex flex-col gap-4 mx-4">
+                <div className="grid grid-cols-12 gap-4">
+                  <div className="col-span-12 md:col-span-9">
                     <Input
                       {...viewModeProps}
                       defaultValue={report?.title}
@@ -57,8 +58,8 @@ export default async function ViewReportForm({
                       placeholder="Wrong user information in profile"
                     />
                   </div>
-                  <div className="col-span-3">
-                    <div className="flex flex-col items-center gap-2">
+                  <div className="col-span-12 md:col-span-3">
+                    <div className="flex justify-between md:flex-col items-center ">
                       <Chip className="text-foreground bg-background">
                         Status
                       </Chip>
@@ -67,11 +68,16 @@ export default async function ViewReportForm({
                   </div>
                 </div>
                 <div className="grid grid-cols-12 gap-4">
-                  <div className="col-span-9">
+                  {report.campaign && (
+                    <div className="col-span-12">
+                      <CampaignPreview campaign={report.campaign} />
+                    </div>
+                  )}
+                  <div className="col-span-12 md:col-span-9">
                     <CompanySelector report={report} mode={'view'} />
                   </div>
-                  <div className="col-span-3">
-                    <div className="flex flex-col items-center gap-2">
+                  <div className="col-span-12 md:col-span-3">
+                  <div className="flex justify-between p-2 md:flex-col items-center md:gap-2">
                       <Chip className="text-foreground bg-background">
                         Category
                       </Chip>
@@ -171,7 +177,7 @@ export default async function ViewReportForm({
           </div>
         </div>
       </form>
-      <div className="space-y-3 max-h-[400px] overflow-auto">
+      <div className="space-y-3 max-h-[400px] overflow-auto mx-4">
         <h1 className="text-lg font-bold">
           All comments ({report?.comments?.length})
         </h1>

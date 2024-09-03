@@ -1,6 +1,6 @@
 import { fetchUser } from '@/actions';
 import db from '@/db';
-import { CampaignWithCompany, UserWithCompanies } from '@/types';
+import { CampaignWithInvitations, UserWithCompanies } from '@/types';
 import { CampaignStatus } from '@prisma/client';
 
 import { ViewCampaignForm } from '@/components/campaigns/forms/view-campaign-form';
@@ -12,9 +12,13 @@ export default async function ViewCampaign({
   params: { campaignId: string };
 }) {
   const user: UserWithCompanies | null = await fetchUser();
-  const campaign: CampaignWithCompany | null = await db.campaign.findFirst({
+  const campaign: CampaignWithInvitations | null = await db.campaign.findFirst({
     where: { id: campaignId },
-    include: { User: true, company: true },
+    include: {
+      User: true,
+      company: true,
+      invitations: { include: { invitee: true, invitor: true } },
+    },
   });
 
   if (!user) {
