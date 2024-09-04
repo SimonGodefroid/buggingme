@@ -4,7 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import db from '@/db';
 import { authMiddleware, validationMiddleware } from '@/middlewares';
-import { Campaign, CampaignStatus, CampaignType } from '@prisma/client';
+import {  CampaignStatus, CampaignType, InvitationStatus } from '@prisma/client';
 
 const createCampaignSchema = z.object({
   name: z.string().min(10),
@@ -31,7 +31,6 @@ export async function createCampaign(
   formState: CreateCampaignFormState,
   formData: FormData
 ): Promise<CreateCampaignFormState> {
-
   const result = createCampaignSchema.safeParse({
     name: formData.get('name'),
     description: formData.get('description'),
@@ -55,51 +54,76 @@ export async function createCampaign(
   }
 
   const company = await db.company.findFirst({ where: { users: { some: { id: auth.session.user?.id } } } });
-
-  console.log('company', company)
   if (!company) {
     return {
       success: false,
       errors: {
         _form: ['You must be part of a company to create a campaign.']
       }
-    }
+    };
   }
-  console.log('CampaignStatus.Created', CampaignStatus.Created)
-  let campaign: Campaign;
+
+  const invitedUsersId = formData.get('invitedUsers')?.toString().split(',') || [];
+  const invitedUsers = await db.user.findMany({
+    where: { id: { in: invitedUsersId } },
+  });
+
+
   try {
-    campaign = await db.campaign.create({
-      data: {
-        name: result.data!.name,
-        description: result.data!.description,
-        rules: result.data!.rules,
-        startDate: result.data!.startDate,
-        endDate: result.data!.endDate,
-        type: result.data!.type,
-        status: CampaignStatus.Created,
+    await db.$transaction(async (transaction) => {
+      // 1. Create the campaign
+      const campaign = await transaction.campaign.create({
+        data: {
+          name: result.data!.name,
+          description: result.data!.description,
+          rules: result.data!.rules,
+          startDate: result.data!.startDate,
+          endDate: result.data!.endDate,
+          type: result.data!.type,
+          status: CampaignStatus.Created,
+          companyId: company.id,
+          userId: auth.session.user?.id, // Assign the creator
+        },
+      });
+
+      // 2. Create invitations
+      const invitationsData = invitedUsers.map((user) => ({
+        status: InvitationStatus.Pending,
+        userId: user.id,
+        campaignId: campaign.id,
         companyId: company.id,
-      }
+        invitorId: auth.session.user?.id!,
+        inviteeId: user.id
+      }));
+
+      await transaction.invitation.createMany({
+        data: invitationsData,
+      });
     });
   } catch (err: unknown) {
-    console.error('error' + '>'.repeat(200), err)
+
     if (err instanceof Error) {
+      console.error('err', err.message)
+
       return {
+        success: false,
         errors: {
           _form: [err.message],
         },
       };
     } else {
+      console.error('err', err)
       return {
+        success: false,
         errors: {
           _form: ['Something went wrong'],
         },
       };
     }
-  } finally {
-    // revalidatePath('/reports');
-    return {
-      errors: {},
-      success: true,
-    };
   }
+  revalidatePath('/campaigns');
+  return {
+    success: true,
+    errors: {},
+  };
 }

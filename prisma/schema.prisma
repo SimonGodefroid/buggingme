@@ -56,6 +56,9 @@ model User {
   companies               Company[]    @relation("UserCompanies")
   attachments             Attachment[]
   Campaign                Campaign[]
+  invitationsReceived     Invitation[] @relation("ReceivedInvitations") // Opposite field for invitee
+  invitationsSent         Invitation[] @relation("SentInvitations") // Opposite field for invitor
+  Invitation              Invitation[]
 }
 
 model VerificationToken {
@@ -162,6 +165,8 @@ model Report {
   impact           Impact           @default(SingleUser)
   company          Company?         @relation(fields: [companyId], references: [id])
   attachments      Attachment[] // Attachments related to the report
+  campaignId       String? // Foreign key to link to a campaign
+  campaign         Campaign?        @relation(fields: [campaignId], references: [id], onDelete: SetNull)
 }
 
 model Comment {
@@ -180,15 +185,16 @@ model Comment {
 }
 
 model Company {
-  id        String     @id @default(cuid())
-  name      String     @unique
-  domain    String?
-  logo      String?
-  reports   Report[]
-  users     User[]     @relation("UserCompanies")
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
-  Campaigns Campaign[] @relation("CompanyCampaigns")
+  id          String       @id @default(cuid())
+  name        String       @unique
+  domain      String?
+  logo        String?
+  reports     Report[]
+  users       User[]       @relation("UserCompanies")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  Campaigns   Campaign[]   @relation("CompanyCampaigns")
+  invitations Invitation[] // Invitations associated with the company
 }
 
 model Attachment {
@@ -216,7 +222,7 @@ enum CampaignStatus {
 
 model Campaign {
   id          String         @id @default(cuid())
-  name        String
+  name        String         @unique
   description String
   startDate   DateTime
   endDate     DateTime
@@ -229,4 +235,33 @@ model Campaign {
   User        User?          @relation(fields: [userId], references: [id])
   userId      String?
   company     Company        @relation("CompanyCampaigns", fields: [companyId], references: [id], onDelete: Cascade)
+  invitations Invitation[] // Invitations related to this campaign
+  Report      Report[]
+}
+
+enum InvitationStatus {
+  Pending
+  Accepted
+  Cancelled
+  Rejected
+  Revoked
+}
+
+model Invitation {
+  id         String           @id @default(cuid())
+  status     InvitationStatus @default(Pending)
+  inviteeId  String? // Linked after the user accepts the invitation
+  invitee    User?            @relation("ReceivedInvitations", fields: [inviteeId], references: [id])
+  invitorId  String // The user who sends the invitation
+  invitor    User             @relation("SentInvitations", fields: [invitorId], references: [id])
+  campaignId String
+  campaign   Campaign         @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  companyId  String
+  company    Company          @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  createdAt  DateTime         @default(now())
+  updatedAt  DateTime         @default(now()) @updatedAt
+  User       User?            @relation(fields: [userId], references: [id])
+  userId     String?
+  // FIXME: let's think this through
+  // @@unique([campaignId, inviteeId]) // Added unique constraint
 }

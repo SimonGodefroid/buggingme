@@ -33,7 +33,7 @@ export const EditorClient = ({
       <Editor
         className="py-4 bg-[rgb(28,28,28)] rounded-lg"
         wrapperProps={{ className: '' }}
-        height="30vh"
+        height="20vh"
         theme="vs-dark"
         defaultValue={code}
         language={language}

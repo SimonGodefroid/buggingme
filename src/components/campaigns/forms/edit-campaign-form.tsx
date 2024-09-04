@@ -15,6 +15,7 @@ import {
   Chip,
   DateRangePicker,
   Input,
+  Link,
   Select,
   SelectItem,
   Textarea,
@@ -22,6 +23,9 @@ import {
 import { CampaignStatus, CampaignType } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
+
+import { InvitationWithUser } from '@/types/invitations';
+import Icon from '@/components/common/Icon';
 
 export const EditCampaignForm = ({
   campaign,
@@ -59,7 +63,7 @@ export const EditCampaignForm = ({
               <div className="flex flex-col gap-4">
                 <Card className="text-small bg-blue-300 text-background">
                   <CardHeader className="gap-2">
-                    <Chip color="primary" variant="faded" className="">
+                    <Chip color="secondary" variant="faded" className="">
                       i
                     </Chip>
                     {campaign.status === CampaignStatus.Created
@@ -71,8 +75,8 @@ export const EditCampaignForm = ({
                       <>
                         We do not allow &nbsp;
                         <span className="font-bold">type, dates or rules</span>
-                        &nbsp;to be edited in order to prevent contributor being
-                        disadvantaged.
+                        &nbsp;to be edited to prevent contributors being taken
+                        advantage of.
                         <br />
                         NB: If you need to change these, please archive this
                         campaign and create a new one.
@@ -99,13 +103,48 @@ export const EditCampaignForm = ({
                     </SelectItem>
                   ))}
                 </Select>
+                {campaign.type === CampaignType.InvitationOnly && (
+                  <>
+                    <Select
+                      label="Invited users"
+                      name="invitedUsers"
+                      isDisabled
+                      placeholder="Select users"
+                      selectionMode="multiple"
+                      selectedKeys={
+                        campaign.invitations.map(
+                          (invitation) => invitation.user?.id,
+                        ) as string[]
+                      }
+                      multiple
+                      isMultiline
+                    >
+                      {campaign.invitations.map(
+                        (invitation: InvitationWithUser) => (
+                          <SelectItem
+                            key={`${invitation.user?.id.toString()}`}
+                            textValue={`${invitation.user?.name}`}
+                          >
+                            <Chip>{invitation.user?.name}</Chip>
+                          </SelectItem>
+                        ),
+                      )}
+                    </Select>
+                    <p className="text-small text-default-500">
+                      Invitations can be sent and revoked from the{' '}
+                      <Link href={`/invitations?campaignId=${campaign.id}`}>
+                        Invitations module&nbsp;
+                        <Icon name="link-external" size="small" />
+                      </Link>
+                    </p>
+                  </>
+                )}
                 <Input
                   isInvalid={!!formState?.errors.name}
                   errorMessage={formState?.errors.name?.join(', ')}
                   defaultValue={campaign.name}
                   isDisabled={campaign.status === CampaignStatus.Archived}
                   name="name"
-                  
                   label="Name"
                   isRequired
                   placeholder="My company bug bounty campaign"

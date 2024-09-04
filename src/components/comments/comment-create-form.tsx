@@ -53,7 +53,7 @@ export default function CommentCreateForm({
             </div>
           )}
 
-          <div className="flex gap-4">
+          <div className="flex gap-4 justify-between md:justify-start">
             <Button variant="light" onPress={() => setOpen(false)}>
               Cancel
             </Button>

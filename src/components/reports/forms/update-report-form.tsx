@@ -1,25 +1,16 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 
 import { redirect, useRouter } from 'next/navigation';
 
 import { updateReport } from '@/actions/reports/update';
-import {
-  Button,
-  Chip,
-  Input,
-  Select,
-  Selection,
-  SelectItem,
-  Textarea,
-} from '@nextui-org/react';
+import { ReportWithTags, UserWithCompanies } from '@/types';
+import { Button, Chip, Input, Textarea } from '@nextui-org/react';
 import { Tag } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
-import { ReportWithTags } from '@/types';
-import { UserWithCompanies } from '@/types';
 import { Category } from '@/components/common/category';
 import { DragNDropFileUpload } from '@/components/common/drag-n-drop-file-upload';
 import { EditorClient } from '@/components/common/editor';
@@ -78,12 +69,12 @@ export const UpdateReportForm = ({
       <form className="" id={FORM_ID} action={action}>
         <div className="flex flex-col m-4">
           {/* Upper */}
-          <div className="grid grid-cols-12 ">
+          <div className="grid grid-cols-12">
             {/* Left */}
             <div className="col-span-12 md:col-span-6">
-              <div className="flex flex-col gap-4 m-4">
+              <div className="flex flex-col gap-4 mx-4">
                 <div className="grid grid-cols-12 gap-4">
-                  <div className="col-span-12 md:col-span-10">
+                  <div className="col-span-12 md:col-span-9">
                     <Input
                       isInvalid={!!formState?.errors.title}
                       errorMessage={formState?.errors.title?.join(', ')}
@@ -93,16 +84,16 @@ export const UpdateReportForm = ({
                       placeholder="Wrong user information in profile"
                     />
                   </div>
-                  <div className="col-span-12 md:col-span-2">
+                  <div className="col-span-12 md:col-span-3">
                     <StatusSelector report={report} />
                   </div>
                 </div>
                 <div className="grid grid-cols-12 gap-4">
-                  <div className="col-span-12 md:col-span-10">
+                  <div className="col-span-12 md:col-span-9">
                     <CompanySelector mode={'update'} report={report} />
                   </div>
-                  <div className="col-span-12 md:col-span-2">
-                    <div className="flex flex-col items-center gap-2">
+                  <div className="col-span-12 md:col-span-3">
+                    <div className="flex justify-between md:flex-col items-center gap-2">
                       <Chip className="text-foreground bg-background">
                         Category
                       </Chip>

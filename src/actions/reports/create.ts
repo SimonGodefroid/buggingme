@@ -120,7 +120,11 @@ export async function createReport(
       }
 
       let companyId = validation.data?.companyId;
+
       if (!companyId) {
+        if (!validation.data?.companyName) {
+          throw (new Error('Please select a company'));
+        }
         const company = await tx.company.create({
           data: {
             name: validation.data?.companyName!,
@@ -130,6 +134,18 @@ export async function createReport(
         });
         companyId = company.id;
       }
+
+      const campaignId = formData.get('campaignId') as string;
+      if (campaignId) {
+        const campaign = await db.campaign.findFirst({ where: { id: campaignId }, include: { company: true } });
+        if (!campaign) {
+          throw new Error('The campaign does not exist');
+        }
+        if (campaign.company.id !== companyId) {
+          throw new Error('The campaign does not belong to the selected company.');
+        }
+      }
+
 
       const newReport = await tx.report.create({
         data: {
@@ -149,7 +165,8 @@ export async function createReport(
             connect: tagIds,
           },
           visibility: validation.data?.visibility || ReportVisibility.Public,
-          category: validation.data?.category || ReportCategory.New
+          category: validation.data?.category || ReportCategory.New,
+          campaignId: campaignId || undefined,
         }
       });
 
@@ -174,6 +191,12 @@ export async function createReport(
 
       return newReport;
     });
+
+    revalidatePath('/reports');
+    return {
+      errors: {},
+      success: true,
+    };
   } catch (err: unknown) {
     console.error('error' + '>'.repeat(200), err)
     if (err instanceof Error) {
@@ -181,19 +204,15 @@ export async function createReport(
         errors: {
           _form: [err.message],
         },
+        success: false
       };
     } else {
       return {
         errors: {
           _form: ['Something went wrong'],
         },
+        success: false
       };
     }
-  } finally {
-    revalidatePath('/reports');
-    return {
-      errors: {},
-      success: true,
-    };
   }
 }

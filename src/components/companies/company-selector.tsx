@@ -3,18 +3,17 @@
 import React, { Key, useEffect, useState } from 'react';
 
 import { fetchAllCompanies } from '@/actions';
+import { ReportWithTags } from '@/types';
 import {
   Autocomplete,
   AutocompleteItem,
   AutocompleteSection,
   Avatar,
 } from '@nextui-org/react';
-import { Company } from '@prisma/client';
+import { Campaign, Company } from '@prisma/client';
 import debounce from 'lodash.debounce';
 import differenceby from 'lodash.differenceby';
 import { toast } from 'react-toastify';
-
-import { ReportWithTags } from '@/types';
 
 const noop = () => {};
 
@@ -40,10 +39,14 @@ export default function CompanySelector({
   mode,
   report,
   errors,
+  selectedCompanyId,
+  selectedCampaign,
 }: {
   mode: 'view' | 'update' | 'creation';
   report?: ReportWithTags;
   errors?: string[];
+  selectedCompanyId?: string;
+  selectedCampaign?: Campaign;
 }) {
   const [companies, setCompanies] = useState<Company[] | []>([]);
   useEffect(() => {
@@ -67,6 +70,11 @@ export default function CompanySelector({
   const [loading, setIsLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<CompanySuggestion[] | []>([]);
   const [inputValue, setInputValue] = useState<string>('');
+  useEffect(() => {
+    if (selectedCompanyId) {
+      setCompanyData({ id: selectedCompanyId });
+    }
+  }, [selectedCompanyId]);
   const handleSelectionChange = (selectedKey: Key | null) => {
     if (!selectedKey) {
       setCompanyData({ name: inputValue, domain: '', logo: '' });
@@ -152,6 +160,7 @@ export default function CompanySelector({
       <Autocomplete
         name="company"
         isRequired
+        isDisabled={!!selectedCampaign || !!selectedCompanyId}
         isInvalid={!!errors?.length}
         errorMessage={errors?.join(', ')}
         isLoading={loading}
@@ -168,8 +177,16 @@ export default function CompanySelector({
         }}
         variant="bordered"
         allowsCustomValue
+        description={
+          selectedCampaign
+            ? 'You selected a Campaign so the company is set automtically'
+            : ''
+        }
         onSelectionChange={handleSelectionChange}
         items={suggestions}
+        selectedKey={
+          selectedCompanyId ? `company#${selectedCompanyId}` : undefined
+        }
         label="Pick a company"
         placeholder="Select a company"
         onInputChange={handleInputChange}
@@ -185,14 +202,16 @@ export default function CompanySelector({
           ))}
         </AutocompleteSection>
         <AutocompleteSection title="suggestions">
-          {suggestions.map((suggestion) => (
-            <AutocompleteItem
-              key={`${suggestion.name}`}
-              textValue={suggestion.name}
-            >
-              {renderOption(suggestion)}
-            </AutocompleteItem>
-          ))}
+          {suggestions.map((suggestion) => {
+            return (
+              <AutocompleteItem
+                key={`${suggestion.name}-${suggestion.domain}`}
+                textValue={suggestion.name}
+              >
+                {renderOption(suggestion)}
+              </AutocompleteItem>
+            );
+          })}
         </AutocompleteSection>
       </Autocomplete>
       {companyData && 'id' in companyData ? (
