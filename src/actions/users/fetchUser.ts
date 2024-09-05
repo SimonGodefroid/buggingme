@@ -9,7 +9,7 @@ export const fetchUser = cache(async () => {
   if (!id) {
     return null;
   } else {
-    const user = await db.user.findUnique({ where: { id }, include: { companies: true } });
+    const user = await db.user.findUnique({ where: { id }, include: { companies: true, } });
     return user;
   }
 });

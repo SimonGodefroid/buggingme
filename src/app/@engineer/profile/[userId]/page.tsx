@@ -1,13 +1,14 @@
 import { auth } from '@/auth';
 import db from '@/db';
-import { UserType } from '@prisma/client';
 
-import LeaderboardTable from '@/components/leaderboard/leaderboard-table';
+import Debug from '@/components/common/debug';
+import UserStats from '@/components/users/user-stats';
 
-export default async function Leaderboard() {
-  const users = await db.user.findMany({
-    where: { userTypes: { hasSome: [UserType.ENGINEER] } },
-    take: 5,
+export default async function Profile() {
+  const authenticatedUser = await auth();
+  const id = authenticatedUser?.user?.id;
+  const user = await db.user.findUnique({
+    where: { id },
     include: {
       companies: true,
       Report: {
@@ -26,7 +27,7 @@ export default async function Leaderboard() {
   const tags = await db.tag.findMany({});
   return (
     <div className="flex flex-col gap-4 p-4">
-      <LeaderboardTable users={users} tags={tags} />
+      <UserStats user={user} tags={tags} />
     </div>
   );
 }

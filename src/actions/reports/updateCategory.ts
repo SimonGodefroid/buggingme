@@ -1,6 +1,6 @@
 'use server';
 
-import { ReportCategory, } from '@prisma/client';
+import { ReportCategory } from '@prisma/client';
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import db from '@/db';
@@ -14,16 +14,60 @@ const updateReportCategorySchema = z.object({
 
 interface UpdateReportCategoryFormState {
   errors: {
-    category?: string[]
-    _form?: string[],
+    category?: string[];
+    _form?: string[];
   };
-  success?: boolean
+  success?: boolean;
+}
+
+async function updateUserReputation(
+  userId: string,
+  newCategory: ReportCategory,
+  oldCategory: ReportCategory
+) {
+  let reputationChange = 0;
+
+  // Calculate the reputation change based on the new category
+  switch (newCategory) {
+    case 'Resolved':
+      reputationChange += 10;
+      break;
+    case 'Informative':
+      reputationChange += 5;
+      break;
+    case 'Spam':
+      reputationChange -= 5;
+      break;
+    default:
+      break;
+  }
+
+  // Revert the reputation impact of the old category, if applicable
+  switch (oldCategory) {
+    case 'Resolved':
+      reputationChange -= 10;
+      break;
+    case 'Informative':
+      reputationChange -= 5;
+      break;
+    case 'Spam':
+      reputationChange += 5;
+      break;
+    default:
+      break;
+  }
+
+  // Update the user's reputation in the database
+  await db.user.update({
+    where: { id: userId },
+    data: { reputation: { increment: reputationChange } },
+  });
 }
 
 export async function updateReportCategory(
   { id }: { id: string },
   formState: UpdateReportCategoryFormState = { errors: {} },
-  formData: FormData,
+  formData: FormData
 ): Promise<UpdateReportCategoryFormState> {
   const result = updateReportCategorySchema.safeParse({
     id,
@@ -40,10 +84,10 @@ export async function updateReportCategory(
   }
 
   if (!result.success) {
-    const errors = Object.entries(result.error.flatten().fieldErrors).map(([k, v]) => `${k}: ${v}`).join(', ');
-    throw new Error(
-      errors
-    )
+    const errors = Object.entries(result.error.flatten().fieldErrors)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(', ');
+    throw new Error(errors);
   }
 
   /* assert authn */
@@ -65,14 +109,13 @@ export async function updateReportCategory(
 
   /* assert ownership */
   const reportToUpdate = await db.report.findUnique({ where: { id } });
-  if (!reportToUpdate || !(user.companies.map(c => c.id).includes(reportToUpdate.companyId))) {
+  if (!reportToUpdate || !user.companies.map(c => c.id).includes(reportToUpdate.companyId)) {
     return {
       errors: {
         _form: ["Report not found"],
       },
     };
   }
-
   /* assert category transition */
   // if (!assertCategoryTransition(reportToUpdate.category, result.data.category, user.userTypes[0])) {
   //   return {
@@ -82,10 +125,8 @@ export async function updateReportCategory(
   //     }
   //   }
   // }
-
   try {
-    const [report] = await db.$transaction([
-      // const [report, statusHistory] = await db.$transaction([
+    const [updatedReport] = await db.$transaction([
       db.report.update({
         where: { id },
         data: {
@@ -101,21 +142,22 @@ export async function updateReportCategory(
           oldCategory: reportToUpdate.category,
           newCategory: result.data.category,
           changedAt: new Date(),
-          changedBy: session?.user?.id!
+          changedBy: session?.user?.id!,
         },
       }),
-      // db.statusHistory.create({
-      //   data: {
-      //     reportId: id,
-      //     oldCategory: result.data.oldCategory,
-      //     newCategory: result.data.newCategory,
-      //     changedAt: new Date(),
-      //     changedBy: session?.user?.id!
-      //   },
-      // }),
     ]);
+
+    // Update the user's reputation based on the category change
+    await updateUserReputation(reportToUpdate.userId, result.data.category, reportToUpdate.category);
+
+    revalidatePath(`/reports/${id}`); // Update cached reports
+    revalidatePath(`/reports`); // Update cached reports
+    return {
+      errors: {},
+      success: true,
+    };
   } catch (err: unknown) {
-    console.error('>'.repeat(200), err)
+    console.error('>'.repeat(200), err);
     if (err instanceof Error) {
       return {
         errors: {
@@ -123,21 +165,11 @@ export async function updateReportCategory(
         },
       };
     } else {
-      console.error('lol'.repeat(200))
       return {
         errors: {
           _form: ['Something went wrong'],
         },
       };
     }
-  } finally {
-    revalidatePath(`/reports/${id}`); // Update cached reports
-    revalidatePath(`/reports`); // Update cached reports
-    return {
-      errors: {},
-      success: true,
-    };
   }
 }
-
-

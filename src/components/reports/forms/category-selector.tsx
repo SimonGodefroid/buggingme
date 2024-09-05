@@ -74,7 +74,8 @@ export default function CategorySelector({
           aria-label="Update report category"
         >
           <DropdownSection title="Open categories">
-            {OPEN_CATEGORIES.filter((cat) => ReportCategory.New !== cat).map(
+            {OPEN_CATEGORIES.map(
+            // {OPEN_CATEGORIES.filter((cat) => ReportCategory.New !== cat).map(
               (category) => (
                 <DropdownItem
                   key={category!}
