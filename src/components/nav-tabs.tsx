@@ -195,8 +195,11 @@ export default function NavTabs({
                 {user ? (
                   <div className="flex flex-col items-center gap-4 p-4 xs:hidden">
                     <span>{user?.email}</span>
+                    <Button as={Link} href={`/profile/${user.id}}`} startContent={<Icon name="user" />}>Profile</Button>
                     <form action={signOut}>
-                      <Button type="submit">Logout</Button>
+                      <Button color="danger" type="submit" startContent={<Icon name="log-out" />}>
+                        Logout
+                      </Button>
                     </form>
                   </div>
                 ) : (

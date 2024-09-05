@@ -59,6 +59,7 @@ model User {
   invitationsReceived     Invitation[] @relation("ReceivedInvitations") // Opposite field for invitee
   invitationsSent         Invitation[] @relation("SentInvitations") // Opposite field for invitor
   Invitation              Invitation[]
+  reputation              Int          @default(0)
 }
 
 model VerificationToken {
