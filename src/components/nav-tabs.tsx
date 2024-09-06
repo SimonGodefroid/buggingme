@@ -1,10 +1,12 @@
 'use client';
 
-import React from 'react';
+import React, { FC } from 'react';
 
 import { usePathname } from 'next/navigation';
 
 import { signIn, signInAuth0, signOut } from '@/actions';
+import { isCompany } from '@/helpers';
+import { UserWithCompanies } from '@/types';
 import {
   Avatar,
   Button,
@@ -22,7 +24,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@nextui-org/react';
-import { User } from 'next-auth';
+import { IconProps } from 'react-toastify';
 
 import Icon from './common/Icon';
 import SignInAuth0Button from './common/sign-in-auth0-button';
@@ -41,7 +43,7 @@ export default function NavTabs({
   user,
   count,
 }: {
-  user: User | null;
+  user: UserWithCompanies | null;
   count: Count;
 }) {
   const [isMenuOpen, setIsMenuOpen] = React.useState(false);
@@ -74,6 +76,13 @@ export default function NavTabs({
         color?: LinkProps['color'] | undefined;
       }[];
 
+  type NavItem = {
+    emoji: string | React.ReactNode;
+    label: string;
+    href: string;
+    count?: number;
+  };
+
   const navItems = [
     {
       emoji: <Icon name="bug" />,
@@ -89,13 +98,15 @@ export default function NavTabs({
       href: '/contributors',
       count: count.contributors,
     },
-    {
-      emoji: <Icon name="buildings" />,
-      // emoji: '🏢',
-      label: 'Companies',
-      href: '/companies',
-      count: count.companies,
-    },
+    isCompany(user!)
+      ? null
+      : {
+          emoji: <Icon name="buildings" />,
+          // emoji: '🏢',
+          label: 'Companies',
+          href: '/companies',
+          count: count.companies,
+        },
     {
       emoji: (
         <div className="flex">
@@ -119,7 +130,7 @@ export default function NavTabs({
       label: 'Leaderboard',
       href: '/leaderboard',
     },
-  ];
+  ].filter(Boolean) as NavItem[];
   const noop = () => {};
 
   return (
@@ -184,7 +195,7 @@ export default function NavTabs({
         ))}
       </NavbarContent>
 
-      <NavbarContent className="md:p-10 flex flex-row-reverse justify-between">
+      <NavbarContent className="flex flex-row-reverse justify-between">
         <NavbarItem className="xl:hidden">
           <Popover>
             <PopoverTrigger>
@@ -195,9 +206,19 @@ export default function NavTabs({
                 {user ? (
                   <div className="flex flex-col items-center gap-4 p-4 xs:hidden">
                     <span>{user?.email}</span>
-                    <Button as={Link} href={`/profile/${user.id}}`} startContent={<Icon name="user" />}>Profile</Button>
+                    <Button
+                      as={Link}
+                      href={`/profile/${user.id}}`}
+                      startContent={<Icon name="user" />}
+                    >
+                      Profile
+                    </Button>
                     <form action={signOut}>
-                      <Button color="danger" type="submit" startContent={<Icon name="log-out" />}>
+                      <Button
+                        color="danger"
+                        type="submit"
+                        startContent={<Icon name="log-out" />}
+                      >
                         Logout
                       </Button>
                     </form>

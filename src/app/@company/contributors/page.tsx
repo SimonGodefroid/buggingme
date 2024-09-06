@@ -5,14 +5,13 @@ import { Prisma, UserType } from '@prisma/client';
 
 import PageHeader from '@/components/common/page-header';
 import ContributorsTable from '@/components/contributors/contributors-table';
+import { ContributorWithReports } from '@/types';
 
 export const metadata: Metadata = {
   title: 'Contributors - Engineers raising the bar',
   description: 'Folks finding problems and fixing them',
 };
-export type ContributorWithReports = Prisma.UserGetPayload<{
-  include: { Report: true; attachments: true };
-}>;
+
 export default async function Contributors({ ...args }) {
   const contributors: ContributorWithReports[] = (await db.user.findMany({
     where: { userTypes: { has: UserType.ENGINEER } },

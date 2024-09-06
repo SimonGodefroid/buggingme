@@ -20,12 +20,15 @@ export default function CampaignCard({ item }: { item: CampaignWithCompany }) {
           width="100%"
           alt={item?.name}
           className="w-full object-cover h-[140px]"
-          src={`https://placehold.co/200x200?text=${item.name}`}
+          src={
+            item.company?.logo ||
+            `https://placehold.co/200x200?text=${item.name}`
+          }
         />
       </CardBody>
       <CardFooter className="text-small justify-between">
         <b>{item.name}</b>
-        <p className="text-default-500">{item.startDate?.toISOString()}</p>
+        <p className="text-default-500">{item.startDate?.toDateString()}</p>
       </CardFooter>
     </Card>
   );

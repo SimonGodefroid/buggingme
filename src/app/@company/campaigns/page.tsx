@@ -25,6 +25,7 @@ export default async function Campaigns() {
     <div className="flex flex-col gap-4">
       <PageHeader crumbs={[{ href: '/campaigns', text: 'Campaigns' }]} />
       <CampaignsTable campaigns={campaigns} user={user} />
+      
     </div>
   );
 }

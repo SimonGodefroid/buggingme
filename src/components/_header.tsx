@@ -16,7 +16,7 @@ import ThemeSwitch from './common/theme-switch';
 
 // import SearchInput from './search-input';
 export default async function Header() {
-  const session = await auth();
+  // const session = await auth();
   return (
     <Navbar className="shadow mb-6">
       <NavbarBrand>
@@ -26,7 +26,7 @@ export default async function Header() {
       </NavbarBrand>
       <NavbarContent justify="center"></NavbarContent>
       <NavbarContent justify="end">
-        <HeaderAuth user={session?.user} />
+        {/* <HeaderAuth user={user} /> */}
         <ThemeSwitch />
       </NavbarContent>
     </Navbar>

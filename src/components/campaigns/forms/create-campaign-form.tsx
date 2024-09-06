@@ -23,6 +23,8 @@ import { CampaignType, User } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
+import CampaignTypeChip from '../campaign-type-chip';
+
 export const CreateCampaignForm = ({
   user,
   users,
@@ -58,7 +60,7 @@ export const CreateCampaignForm = ({
   return (
     <div>
       <form className="" id={FORM_ID} action={action}>
-        <div className="flex flex-col m-4 gap-4">
+        <div className="flex flex-col m-4">
           <div className="grid grid-cols-12">
             <div className="col-span-12 md:col-span-6">
               <div className="flex flex-col gap-4">
@@ -66,6 +68,9 @@ export const CreateCampaignForm = ({
                   label="Type"
                   name="type"
                   placeholder="Select a campaign type"
+                  renderValue={(selected) => (
+                    <CampaignTypeChip type={selected[0].key as CampaignType} />
+                  )}
                   onSelectionChange={(keys: Selection) => {
                     const selectedType = Array.from(keys)[0] as CampaignType;
                     setType(selectedType);
@@ -74,7 +79,7 @@ export const CreateCampaignForm = ({
                 >
                   {Object.values(CampaignType).map((type) => (
                     <SelectItem key={type} textValue={type}>
-                      <Chip>{type}</Chip>
+                      <CampaignTypeChip type={type} />
                     </SelectItem>
                   ))}
                 </Select>

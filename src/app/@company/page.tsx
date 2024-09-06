@@ -1,20 +1,25 @@
-import { fetchUser } from '@/actions/users';
-import { auth } from '@/auth';
-import { Card, CardBody, CardHeader } from '@nextui-org/react';
+import {  fetchUser } from '@/actions';
+import { fetchCompanyDashboardData } from '@/actions/dashboard/fetchCompanyDashboardData';
+
+import PageHeader from '@/components/common/page-header';
+import Dashboard from '@/components/dashboard/company-dashboard';
 
 export default async function Home() {
   const user = await fetchUser();
+  if (!user) {
+    return <div>Not authorized</div>;
+  }
+  const { comments, reports, campaigns, invitations } =
+    await fetchCompanyDashboardData(user?.id);
   return (
     <div className="flex flex-col gap-4">
-      <h1>Home</h1>
-      <div className="flex flex-col gap-4 max-w-fit ">
-        <Card>
-          <CardHeader className="text-xl">{`${user?.email}`}</CardHeader>
-          <CardBody>
-            <p>{`This is the home of your companies ${user?.companies.map((c) => c.name).join(',')}`}</p>
-          </CardBody>
-        </Card>
-      </div>
+      <PageHeader crumbs={[{ href: '/reports', text: 'Reports' }]} />
+      <Dashboard
+        comments={comments}
+        reports={reports}
+        campaigns={campaigns}
+        invitations={invitations}
+      />
     </div>
   );
 }

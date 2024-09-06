@@ -4,6 +4,7 @@ const columns = [
   { name: "REPORTS", uid: "reports", sortable: true },
   { name: "CREATED AT", uid: "createdAt", sortable: true },
   { name: "UPDATED AT", uid: "updatedAt", sortable: true },
+  { name: "REPUTATION", uid: "reputation", sortable: true },
   { name: "ACTIONS", uid: "actions" },
 ];
 
