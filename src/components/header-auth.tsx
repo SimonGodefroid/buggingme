@@ -1,4 +1,5 @@
 import * as actions from '@/actions';
+import { UserWithCompanies } from '@/types';
 import {
   Button,
   Link,
@@ -11,10 +12,15 @@ import { Session } from 'next-auth';
 
 import SignInAuth0Button from './common/sign-in-auth0-button';
 import SignInGitHubButton from './common/sign-in-github-button';
+import { isCompany } from '@/helpers';
 
 // import { useSession } from 'next-auth/react';
 
-export default function HeaderAuth({ user }: { user: Session['user'] | null }) {
+export default function HeaderAuth({
+  user,
+}: {
+  user: UserWithCompanies | null;
+}) {
   let authContent: React.ReactNode;
   if (!user) {
     authContent = (
@@ -30,14 +36,17 @@ export default function HeaderAuth({ user }: { user: Session['user'] | null }) {
     authContent = (
       <Popover placement="bottom">
         <PopoverTrigger>
-            <User
-              className="cursor-pointer"
-              avatarProps={{ radius: 'lg', src: `${user?.image}` }}
-              description={<span className="">{user.email}</span>}
-              name={user?.name}
-            >
-              {user?.name}
-            </User>
+          <User
+            // break-words max-w-[174px]
+            className="cursor-pointer"
+            avatarProps={{ radius: 'lg', src: `${user?.image}` }}
+            description={
+              <span className="break-words max-w-[10px]">{user.email}</span>
+            }
+            name={isCompany(user) ? user?.companies?.[0]?.name : user?.name}
+          >
+            {user?.name}
+          </User>
         </PopoverTrigger>
         <PopoverContent>
           <div className="flex flex-col gap-4 p-4">

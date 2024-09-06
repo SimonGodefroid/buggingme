@@ -1,8 +1,7 @@
 import { fetchUser } from '@/actions';
 import db from '@/db';
-import { UserWithCompanies } from '@/types';
+import { ReportWithTags, UserWithCompanies } from '@/types';
 
-import { ReportWithTags } from '@/types';
 import PageHeader from '@/components/common/page-header';
 import ReportsTable from '@/components/reports/reports-table';
 
@@ -10,7 +9,15 @@ export default async function Reports() {
   const user: UserWithCompanies | null = await fetchUser();
   const reports: ReportWithTags[] = await db.report.findMany({
     // where: { companyId: { in: user?.companies.map((company) => company.id) } },
-    include: { company: true, tags: true, user: true, StatusHistory: true , attachments: true, comments: true },
+    include: {
+      company: true,
+      tags: true,
+      user: true,
+      StatusHistory: true,
+      attachments: true,
+      comments: true,
+      campaign: true,
+    },
   });
 
   if (!user) {

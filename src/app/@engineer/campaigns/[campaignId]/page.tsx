@@ -1,5 +1,7 @@
 import db from '@/db';
+import { CampaignWithCompany } from '@/types';
 
+import CampaignDetails from '@/components/campaigns/campaign-details';
 import PageHeader from '@/components/common/page-header';
 
 export default async function ViewCampaign({
@@ -7,11 +9,11 @@ export default async function ViewCampaign({
 }: {
   params: { campaignId: string };
 }) {
-  const campaign = await db.campaign.findFirst({
+  const campaign: CampaignWithCompany | null = await db.campaign.findFirst({
     where: {
       id: campaignId,
     },
-    include: { User: true },
+    include: { company: true },
   });
   return (
     <div className="flex flex-col gap-4">
@@ -21,7 +23,7 @@ export default async function ViewCampaign({
           { href: '/campaigns', text: `${campaign?.name}` },
         ]}
       />
-      <pre>{JSON.stringify(campaign, null, '\t')}</pre>
+      <CampaignDetails item={campaign} />
     </div>
   );
 }

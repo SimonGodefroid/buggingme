@@ -1,5 +1,6 @@
 import { fetchUser } from '@/actions';
 import db from '@/db';
+import { isPastDate } from '@/helpers/dates';
 import { CampaignWithInvitations, UserWithCompanies } from '@/types';
 import { CampaignStatus } from '@prisma/client';
 
@@ -36,9 +37,10 @@ export default async function ViewCampaign({
         ]}
         buttonProps={{
           primary:
-            campaign.status !== CampaignStatus.Archived
-              ? { text: 'Edit', href: `/campaigns/${campaignId}/edit` }
-              : undefined,
+            isPastDate(campaign.endDate) ||
+            campaign.status === CampaignStatus.Archived
+              ? undefined
+              : { text: 'Edit', href: `/campaigns/${campaignId}/edit` },
           secondary: { text: 'Back to campaigns', href: '/campaigns' },
         }}
       />

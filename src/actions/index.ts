@@ -4,3 +4,5 @@ export * from './users';
 export * from './companies';
 export * from './reports';
 export * from './attachments';
+export * from './dashboard';
+export * from './count';

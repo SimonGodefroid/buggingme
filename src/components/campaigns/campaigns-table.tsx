@@ -5,6 +5,7 @@ import React from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
+import { CampaignWithInvitations } from '@/types';
 import {
   Button,
   Dropdown,
@@ -26,15 +27,16 @@ import { Campaign, User, UserType } from '@prisma/client';
 import { Key } from '@react-types/shared';
 
 import CampaignCard from './campaign-card';
+import CampaignStatusChip from './campaign-status-chip';
+import CampaignTypeChip from './campaign-type-chip';
 import { columns } from './columns';
-import { CampaignWithInvitations } from '@/types';
 
 const INITIAL_VISIBLE_COLUMNS = [
   'name',
   'startDate',
   'endDate',
   'type',
-  'company',
+  // 'company',
   'status',
 ];
 
@@ -112,7 +114,10 @@ export default function CampaignsTable({
   }, [sortDescriptor, items]);
 
   const renderCell = React.useCallback(
-    (campaign: CampaignWithInvitations, columnKey: keyof CampaignWithInvitations) => {
+    (
+      campaign: CampaignWithInvitations,
+      columnKey: keyof CampaignWithInvitations,
+    ) => {
       columnKey === 'status' && console.log('status', campaign.status);
       switch (columnKey) {
         case 'startDate':
@@ -124,6 +129,10 @@ export default function CampaignsTable({
           );
         case 'company':
           return <span>{String(campaign.company.name)}</span>;
+        case 'type':
+          return <CampaignTypeChip type={campaign.type} />;
+        case 'status':
+          return <CampaignStatusChip campaign={campaign} />;
         default:
           return <span>{String(campaign?.[columnKey])}</span>;
       }

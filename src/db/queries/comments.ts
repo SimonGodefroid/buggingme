@@ -2,7 +2,7 @@ import { Prisma, } from '@prisma/client';
 import db from "@/db";
 import { cache } from "react";
 
-export type CommentWithAuthor = Prisma.CommentGetPayload<{ include: { user: true } }>;
+export type CommentWithAuthor = Prisma.CommentGetPayload<{ include: { user: true, report: { include: { company: true } } } }>;
 
 
 
@@ -10,7 +10,10 @@ export const fetchCommentsByReportId = cache((reportId: string): Promise<Comment
   return db.comment.findMany({
     where: { reportId },
     include: {
-      user: true
+      user: true,
+      report: {
+        include: { company: true }
+      }
     }
   })
 });

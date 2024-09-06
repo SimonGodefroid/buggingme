@@ -4,6 +4,7 @@ import React from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { ContributorWithReports } from '@/types';
 import {
   Button,
   Dropdown,
@@ -24,12 +25,10 @@ import {
 } from '@nextui-org/react';
 import { Key } from '@react-types/shared';
 
-import { ContributorWithReports } from '@/types';
-
 import { columns } from '../contributors/data';
 import ContributorCard from './contributor-card';
 
-const INITIAL_VISIBLE_COLUMNS = ['name', 'reports', 'actions'];
+const INITIAL_VISIBLE_COLUMNS = ['name', 'reports', 'reputation'];
 
 export default function ContributorsTable({
   contributors,
@@ -116,10 +115,20 @@ export default function ContributorsTable({
               {contributor?.name}
             </User>
           );
+        case 'reputation':
+          return <span>{contributor?.reputation} </span>;
         case 'reports':
           return <span>{contributor?.Report?.length} </span>;
-        // default:
-        //   return <>{cellValue}</>;
+        default:
+          return (
+            <>
+              {typeof contributor?.[
+                columnKey as keyof ContributorWithReports
+              ] === 'string'
+                ? contributor?.[columnKey as keyof ContributorWithReports]
+                : '-'}
+            </>
+          );
       }
     },
     [],
@@ -311,7 +320,7 @@ export default function ContributorsTable({
       <div className="md:hidden flex flex-col gap-4 m-2">
         {topContent}
         {sortedItems.map((contributor) => (
-          <ContributorCard key={contributor.id} contributor={contributor} />
+          <ContributorCard key={contributor.id} item={contributor} />
         ))}
       </div>
     </div>

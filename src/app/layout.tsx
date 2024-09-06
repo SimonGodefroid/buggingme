@@ -11,6 +11,7 @@ import NavTabs from '@/components/nav-tabs';
 import Providers from '@/app/providers';
 
 import NotFound from './not-found';
+import { UserWithCompanies } from '@/types';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -31,7 +32,7 @@ export default async function RootLayout({
   engineer: React.ReactNode;
 }) {
   const counts = await fetchAllCounts();
-  const user = await fetchUser();
+  const user :UserWithCompanies | null = await fetchUser();
 
   const rendered = () => {
     if (!user) {

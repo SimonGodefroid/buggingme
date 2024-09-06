@@ -1,6 +1,6 @@
 'use client';
 
-import { CampaignWithCompany, UserWithCompanies } from '@/types';
+import { CampaignWithInvitations, UserWithCompanies } from '@/types';
 import { parseDate } from '@internationalized/date';
 import {
   Chip,
@@ -12,13 +12,10 @@ import {
 } from '@nextui-org/react';
 import { CampaignType } from '@prisma/client';
 
-import { InvitationWithUser } from '@/types/invitations';
-
 export const ViewCampaignForm = ({
   campaign,
-  user,
 }: {
-  campaign: CampaignWithCompany;
+  campaign: CampaignWithInvitations;
   user?: UserWithCompanies | null;
 }) => {
   return (
@@ -54,7 +51,9 @@ export const ViewCampaignForm = ({
                     selectionMode="multiple"
                     selectedKeys={
                       campaign.invitations.map(
-                        (invitation) => invitation.user?.id,
+                        (
+                          invitation: CampaignWithInvitations['invitations'][number],
+                        ) => invitation?.invitee?.id,
                       ) as string[]
                     }
                     multiple
@@ -62,12 +61,14 @@ export const ViewCampaignForm = ({
                   >
                     {/* Replace with actual users fetched from your DB */}
                     {campaign.invitations.map(
-                      (invitation: InvitationWithUser) => (
+                      (
+                        invitation: CampaignWithInvitations['invitations'][number],
+                      ) => (
                         <SelectItem
-                          key={`${invitation.user?.id.toString()}`}
-                          textValue={`${invitation.user?.name}`}
+                          key={`${invitation?.invitee?.id.toString()}`}
+                          textValue={`${invitation?.invitee?.name}`}
                         >
-                          <Chip>{invitation.user?.name}</Chip>
+                          <Chip>{invitation.invitee?.name}</Chip>
                         </SelectItem>
                       ),
                     )}
