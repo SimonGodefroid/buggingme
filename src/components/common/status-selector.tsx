@@ -61,7 +61,7 @@ export default function StatusSelector({
       >
         {(
           REPORT_STATUS_STATE_MACHINE?.[
-            report?.user.userTypes?.[0] as UserType
+            report?.user?.userTypes?.[0] as UserType
           ][report?.status as ReportStatus] || []
         ).map((status) => (
           <DropdownItem className="w-full" key={status} textValue={status}>
