@@ -4,7 +4,6 @@ import React, { useEffect, useState } from 'react';
 
 import { redirect, useRouter } from 'next/navigation';
 
-import { createCampaign } from '@/actions/campaigns';
 import { sendInvitations } from '@/actions/invitations/send-invitation';
 import { CampaignWithInvitations, UserWithCompanies } from '@/types';
 import { Button, Chip, Select, Selection, SelectItem } from '@nextui-org/react';
@@ -12,7 +11,7 @@ import { User } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
-export const SendInvitationsForm = ({
+export function SendInvitationsForm({
   user,
   users,
   campaigns,
@@ -21,7 +20,7 @@ export const SendInvitationsForm = ({
   // users: { user: User }[];
   users: User[];
   campaigns: CampaignWithInvitations[] | null;
-}) => {
+}) {
   const FORM_ID = `send-invitations`;
   const router = useRouter();
   const [formState, action] = useFormState(sendInvitations, {
@@ -110,4 +109,4 @@ export const SendInvitationsForm = ({
       </form>
     </div>
   );
-};
+}

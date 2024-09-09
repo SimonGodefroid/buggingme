@@ -23,8 +23,8 @@ export default function Contributors() {
         <CardBody className="text-center">
           <p className="text-lg font-bold mt-4">Join us</p>
           <p className="text-lg mt-2">
-            If you're a developer, a designer, a tester, or a tech enthusiast,
-            you can contribute to this platform by submitting bugs you've
+            If you&apos;re a developer, a designer, a tester, or a tech enthusiast,
+            you can contribute to this platform by submitting bugs you&apos;ve
             encountered with popular websites.
           </p>
         </CardBody>

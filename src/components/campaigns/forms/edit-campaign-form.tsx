@@ -5,7 +5,11 @@ import React, { useEffect } from 'react';
 import { redirect, useRouter } from 'next/navigation';
 
 import { editCampaign } from '@/actions/campaigns';
-import { CampaignWithCompany, UserWithCompanies } from '@/types';
+import {
+  CampaignWithCompany,
+  CampaignWithInvitations,
+  UserWithCompanies,
+} from '@/types';
 import { getLocalTimeZone, parseDate, today } from '@internationalized/date';
 import {
   Button,
@@ -24,14 +28,13 @@ import { CampaignStatus, CampaignType } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
-import { InvitationWithUser } from '@/types/invitations';
 import Icon from '@/components/common/Icon';
 
 export const EditCampaignForm = ({
   campaign,
   user,
 }: {
-  campaign: CampaignWithCompany;
+  campaign: CampaignWithInvitations;
   user?: UserWithCompanies | null;
 }) => {
   const FORM_ID = `create-campaign`;
@@ -113,19 +116,21 @@ export const EditCampaignForm = ({
                       selectionMode="multiple"
                       selectedKeys={
                         campaign.invitations.map(
-                          (invitation) => invitation.user?.id,
+                          (invitation) => invitation.invitee?.id,
                         ) as string[]
                       }
                       multiple
                       isMultiline
                     >
                       {campaign.invitations.map(
-                        (invitation: InvitationWithUser) => (
+                        (
+                          invitation: CampaignWithInvitations['invitations'][number],
+                        ) => (
                           <SelectItem
-                            key={`${invitation.user?.id.toString()}`}
-                            textValue={`${invitation.user?.name}`}
+                            key={`${invitation?.id.toString()}`}
+                            textValue={`${invitation.invitee?.name}`}
                           >
-                            <Chip>{invitation.user?.name}</Chip>
+                            <Chip>{invitation.invitee?.name}</Chip>
                           </SelectItem>
                         ),
                       )}

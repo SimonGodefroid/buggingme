@@ -12,7 +12,7 @@ import { InvitationWithUser } from '@/types/invitations';
 export default function InvitationCard({ item }: { item: InvitationWithUser }) {
   return (
     <Card className="p-4" as={Link} href={`/invitation/${item.id}`}>
-      <CardHeader>{item.user?.name}</CardHeader>
+      <CardHeader>{item?.invitor?.name}</CardHeader>
       <CardBody className="flex flex-col p-4 gap-4">
         <pre>{JSON.stringify(item, null, '\t')}</pre>
       </CardBody>

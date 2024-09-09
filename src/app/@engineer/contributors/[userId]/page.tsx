@@ -1,14 +1,10 @@
 import { notFound } from 'next/navigation';
 
 import db from '@/db';
-import { Button, Link } from '@nextui-org/react';
-import type { Prisma } from '@prisma/client';
+import { ContributorWithReports } from '@/types';
 
-import { BreadCrumbsClient } from '@/components/breadcrumbs';
 import PageHeader from '@/components/common/page-header';
 import ContributorStats from '@/components/contributors/contributor-stats';
-
-import { ContributorWithReports } from '../page';
 
 export default async function ViewContributor({
   params,

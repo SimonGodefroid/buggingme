@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect } from 'react';
+import React from 'react';
 
 import { useRouter } from 'next/navigation';
 
@@ -25,11 +25,11 @@ import {
   TableHeader,
   TableRow,
 } from '@nextui-org/react';
-import { InvitationStatus, User, UserType } from '@prisma/client';
+import { InvitationStatus, User } from '@prisma/client';
 import { Key } from '@react-types/shared';
 
 import { columns } from './columns';
-import UpdateInvitationStatusForm from './forms/update-invitation-status-form';
+import { UpdateInvitationStatusForm } from './forms/update-invitation-status-form';
 import InvitationCard from './invitation-card';
 import { Status } from './status';
 

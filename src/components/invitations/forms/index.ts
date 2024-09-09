@@ -1,2 +1,2 @@
-export * from './send-invitations-form';
-export * from './update-invitation-status-form';
+export { SendInvitationsForm } from './send-invitations-form';
+export { UpdateInvitationStatusForm } from './update-invitation-status-form';
