@@ -16,6 +16,7 @@ export async function POST(request: Request) {
       region: process.env.AWS_REGION,
     });
 
+
     const { url, fields } = await createPresignedPost(client, {
       Bucket: process.env.AWS_BUCKET_NAME!,
       Key: uuidv4(),
@@ -32,6 +33,10 @@ export async function POST(request: Request) {
 
     return Response.json({ url, fields })
   } catch (error: unknown) {
+
+    console.log('error', JSON.stringify(error, null, '\t'));
+    console.log('process.env.AWS_BUCKET_NAME', process.env.AWS_BUCKET_NAME)
+    console.log('process.env.AWS_SECRET_ACCESS_KEY', process.env.AWS_SECRET_ACCESS_KEY)
     if (error instanceof Error)
       return Response.json({ error: error.message })
     else
