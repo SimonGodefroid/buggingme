@@ -38,13 +38,13 @@ export default async function RootLayout({
     if (!user) {
       return children;
     } else {
-      if (user?.userTypes.includes(UserType.GOD)) {
+      if (user?.userTypes?.includes(UserType.GOD)) {
         return admin || <NotFound />;
       }
-      if (user?.userTypes.includes(UserType.ENGINEER)) {
+      if (user?.userTypes?.includes(UserType.ENGINEER)) {
         return engineer || <NotFound />;
       }
-      if (user?.userTypes.includes(UserType.COMPANY)) {
+      if (user?.userTypes?.includes(UserType.COMPANY)) {
         return company || <NotFound />;
       }
     }
