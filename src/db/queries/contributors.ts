@@ -13,6 +13,8 @@ export async function countContributors() {
 export const getContributors: () => Promise<ContributorWithReports[]> = cache(async () => {
   return await db.user.findMany({
     where: { userTypes: { has: UserType.ENGINEER } },
-    include: { Report: true },
+    include: {
+      Report: { include: { attachments: true } },
+    }
   });
 })

@@ -353,7 +353,7 @@ export default function CampaignsTable({
       <div className="md:hidden flex flex-col gap-4 m-2">
         {topContent}
         {sortedItems.map((campaign) => (
-          <CampaignCard item={campaign} />
+          <CampaignCard key={campaign.id} item={campaign} />
         ))}
       </div>
     </div>

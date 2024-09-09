@@ -2,8 +2,8 @@ import { notFound } from 'next/navigation';
 
 import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
 import db from '@/db';
-
 import { ReportWithTags } from '@/types';
+
 import PageHeader from '@/components/common/page-header';
 import { UpdateReportForm } from '@/components/reports/forms/update-report-form';
 
@@ -34,7 +34,7 @@ export default async function EditReport({
           secondary: { href: `/reports/${reportId}`, text: 'Back' },
         }}
       />
-      <UpdateReportForm tags={tags} mode={'update'} report={report} />
+      <UpdateReportForm tags={tags} report={report} />
     </div>
   );
 }

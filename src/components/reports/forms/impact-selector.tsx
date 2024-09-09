@@ -6,7 +6,7 @@ import { Impact } from '@prisma/client';
 
 import { ImpactChip } from '../impact';
 
-export default function ({
+export default function ImpactSelector ({
   viewModeProps,
   report,
 }: {

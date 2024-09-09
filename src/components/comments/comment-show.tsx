@@ -31,7 +31,7 @@ export default function CommentShow({
   }
   const [formName, setForm] = useState<FormName | undefined>(FormName.CREATE);
   const comment = comments.find((c) => c.id === commentId);
-
+  const session = useSession();
   if (!comment) return null;
 
   const children = comments.filter((c) => c.parentId === commentId);
@@ -44,7 +44,7 @@ export default function CommentShow({
     />
   ));
 
-  const session = useSession();
+  
   return (
     <div className="p-4 border mt-2 mb-1 relative rounded-md">
       {session?.data?.user?.id === comment.userId && (

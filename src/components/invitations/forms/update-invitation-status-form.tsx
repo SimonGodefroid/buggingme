@@ -10,7 +10,7 @@ import { toast } from 'react-toastify';
 
 import { statusColorMap } from '../status';
 
-export default function UpdateInvitationStatusForm({
+export function UpdateInvitationStatusForm({
   id,
   status,
   disabled,

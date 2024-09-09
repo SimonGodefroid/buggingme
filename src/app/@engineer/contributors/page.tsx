@@ -2,7 +2,6 @@ import { Metadata } from 'next';
 
 import db from '@/db';
 import { getContributors } from '@/db/queries';
-import { Prisma, UserType } from '@prisma/client';
 
 import PageHeader from '@/components/common/page-header';
 import ContributorsTable from '@/components/contributors/contributors-table';
