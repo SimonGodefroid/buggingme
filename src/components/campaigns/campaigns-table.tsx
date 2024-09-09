@@ -230,7 +230,7 @@ export default function CampaignsTable({
                 ))}
               </DropdownMenu>
             </Dropdown>
-            {user?.userTypes.includes(UserType.COMPANY) && (
+            {user?.userTypes?.includes(UserType.COMPANY) && (
               <Button
                 as={Link}
                 color="primary"

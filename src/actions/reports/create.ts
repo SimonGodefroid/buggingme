@@ -108,8 +108,8 @@ export async function createReport(
       }
 
       const isEngineer =
-        user?.userTypes.includes(UserType.ENGINEER) ||
-        user?.userTypes.includes(UserType.GOD);
+        user?.userTypes?.includes(UserType.ENGINEER) ||
+        user?.userTypes?.includes(UserType.GOD);
 
       if (!isEngineer) {
         throw new Error('Only engineers can report bugs.');

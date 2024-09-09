@@ -56,7 +56,7 @@ export default function ReportsTable({
     'impact',
     'category',
     'createdAt',
-    user?.userTypes.includes(UserType.ENGINEER) ? 'actions' : undefined,
+    user?.userTypes?.includes(UserType.ENGINEER) ? 'actions' : undefined,
   ];
   const router = useRouter();
   const [filterValue, setFilterValue] = React.useState('');
@@ -332,7 +332,7 @@ export default function ReportsTable({
                 })}
               </DropdownMenu>
             </Dropdown>
-            {user?.userTypes.includes(UserType.ENGINEER) && (
+            {user?.userTypes?.includes(UserType.ENGINEER) && (
               <Button
                 as={Link}
                 color="primary"
