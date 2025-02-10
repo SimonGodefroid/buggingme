@@ -12,7 +12,7 @@ export default async function Home() {
     await fetchEngineerDashboardData(user?.id);
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader crumbs={[{ href: '/reports', text: 'Reports' }]} />
+      <PageHeader crumbs={[]} />
       <Dashboard
         comments={comments}
         reports={reports}

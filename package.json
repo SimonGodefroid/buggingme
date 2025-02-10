@@ -16,6 +16,8 @@
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
     "prisma:generate": "prisma generate",
     "prisma:seed": "ts-node --compiler-options '{\"module\":\"commonjs\"}' prisma/seeds.ts",
+    "test": "dotenv -e .env.test npx prisma db push && concurrently \" NODE_ENV=test next dev\" \"dotenv -e .env.test cypress run\"",
+    "test:open": "dotenv -e .env.test npx prisma db push && concurrently \"NODE_ENV=test next dev\" \"dotenv -e .env.test cypress open\"",
     "postinstall": "prisma generate",
     "prepare": "husky"
   },
@@ -31,6 +33,7 @@
     "@prisma/adapter-pg": "^5.19.1",
     "@prisma/client": "^5.19.1",
     "boxicons": "^2.1.4",
+    "dotenv-cli": "^7.4.2",
     "framer-motion": "^11.1.7",
     "lodash.debounce": "^4.0.8",
     "lodash.differenceby": "^4.8.0",
@@ -46,11 +49,16 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
+    "@cypress/webpack-batteries-included-preprocessor": "^3.0.5",
+    "@cypress/webpack-preprocessor": "^5.17.1",
     "@types/lodash.differenceby": "^4.8.9",
     "@types/node": "^20.14.12",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/uuid": "^10.0.0",
+    "concurrently": "^9.0.1",
+    "cross-env": "^7.0.3",
+    "cypress": "^13.15.0",
     "eslint": "^8.57.1",
     "eslint-config-next": "14.2.3",
     "eslint-plugin-unicorn": "^55.0.0",

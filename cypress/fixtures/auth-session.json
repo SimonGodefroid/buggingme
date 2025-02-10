@@ -1,0 +1,20 @@
+{
+  "id": "cm1rkorxr00057rwdzr7798xo",
+  "sessionToken": "trilili",
+  "userId": "0318a201-4eb8-49c5-8067-9fa725b75f9d",
+  "expires": "2024-11-01T07:55:27.470Z",
+  "user": {
+      "id": "0318a201-4eb8-49c5-8067-9fa725b75f9d",
+      "name": "SimonGodefroid",
+      "email": "simon.godefroid@gmail.com",
+      "emailVerified": null,
+      "image": "https://avatars.githubusercontent.com/u/17337190?v=4",
+      "validPublicReportsCount": 0,
+      "userTypes": [
+          "ENGINEER"
+      ],
+      "createdAt": "2024-08-29T19:42:19.286Z",
+      "updatedAt": "2024-09-05T08:27:35.784Z",
+      "reputation": 0
+  }
+}

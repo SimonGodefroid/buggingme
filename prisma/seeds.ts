@@ -1,35 +1,18 @@
 // prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
+import { tags } from '../cypress/data';
 
 const prisma = new PrismaClient();
 
 async function main() {
-  const tags = [
-    { name: 'Visual Problem' },
-    { name: 'Accessibility (a11y) Issue' },
-    { name: 'Data Issue' },
-    { name: 'Performance Issue' },
-    { name: 'Security Vulnerability' },
-    { name: 'Functional Bug' },
-    { name: 'Usability Issue' },
-    { name: 'Compatibility Issue' },
-    { name: 'Content Issue' },
-    { name: 'Code Issue' },
-    { name: 'Integration Issue' },
-    { name: 'Responsive Design Issue' },
-  ];
-
+  console.log('Seeding...');
+  await prisma.tag.deleteMany({});
 
   for (const tag of tags) {
     await prisma.tag.create({
       data: tag,
     });
   }
-  // for (const company of companies) {
-  //   await prisma.company.create({
-  //     data: company,
-  //   });
-  // }
 }
 
 main()
