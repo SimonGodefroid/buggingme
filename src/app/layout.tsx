@@ -5,13 +5,13 @@ import './globals.css';
 
 import { fetchAllCounts } from '@/actions/count/fetchAllCounts';
 import { fetchUser } from '@/actions/users/fetchUser';
+import { UserWithCompanies } from '@/types';
 import { UserType } from '@prisma/client';
 
 import NavTabs from '@/components/nav-tabs';
 import Providers from '@/app/providers';
 
 import NotFound from './not-found';
-import { UserWithCompanies } from '@/types';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -32,7 +32,7 @@ export default async function RootLayout({
   engineer: React.ReactNode;
 }) {
   const counts = await fetchAllCounts();
-  const user :UserWithCompanies | null = await fetchUser();
+  const user: UserWithCompanies | null = await fetchUser();
 
   const rendered = () => {
     if (!user) {
@@ -51,8 +51,8 @@ export default async function RootLayout({
   };
 
   return (
-    <html lang="en">
-      <body>
+    <html suppressHydrationWarning={true} lang="en">
+      <body >
         <Providers>
           {/* Wrap main content with ThemeProvider */}
           <NavTabs count={counts} user={user} />

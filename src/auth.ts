@@ -28,6 +28,8 @@ export const {
       clientId: process.env.AUTH0_CLIENT_ID,
       clientSecret: process.env.AUTH0_CLIENT_SECRET,
       issuer: process.env.AUTH0_DOMAIN,
+      checks: ['none'] // https://github.com/nextauthjs/next-auth/discussions/7491
+      // also consider https://github.com/nextauthjs/next-auth/discussions/6898
       // allowDangerousEmailAccountLinking: true
     }),
   ],

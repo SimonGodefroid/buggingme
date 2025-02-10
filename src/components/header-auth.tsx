@@ -1,4 +1,5 @@
 import * as actions from '@/actions';
+import { isCompany } from '@/helpers';
 import { UserWithCompanies } from '@/types';
 import {
   Button,
@@ -12,7 +13,6 @@ import { Session } from 'next-auth';
 
 import SignInAuth0Button from './common/sign-in-auth0-button';
 import SignInGitHubButton from './common/sign-in-github-button';
-import { isCompany } from '@/helpers';
 
 // import { useSession } from 'next-auth/react';
 

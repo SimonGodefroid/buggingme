@@ -16,8 +16,6 @@ export default function ContributorStats({
 }) {
   const list = [
     ...contributor.Report.map((report) => {
-      console.log('chier', report?.attachments?.[0]?.url);
-      console.log('contributor', contributor);
       return {
         title: report.title,
         img: report?.attachments?.[0]?.url,

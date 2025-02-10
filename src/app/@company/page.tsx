@@ -1,4 +1,4 @@
-import {  fetchUser } from '@/actions';
+import { fetchUser } from '@/actions';
 import { fetchCompanyDashboardData } from '@/actions/dashboard/fetchCompanyDashboardData';
 
 import PageHeader from '@/components/common/page-header';
@@ -13,7 +13,7 @@ export default async function Home() {
     await fetchCompanyDashboardData(user?.id);
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader crumbs={[{ href: '/reports', text: 'Reports' }]} />
+      <PageHeader crumbs={[]} />
       <Dashboard
         comments={comments}
         reports={reports}
