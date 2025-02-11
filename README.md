@@ -37,8 +37,7 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 
 ## Deploy schema migrations
 
-1. add prod env var to .env
+1. add prod env var to .env add `POSTGRES_URL_NON_POOLING`,`POSTGRES_PRISMA_URL`
 2. run `npx prisma migrate deploy`
-
 
 ##

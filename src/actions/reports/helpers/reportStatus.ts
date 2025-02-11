@@ -7,6 +7,12 @@ export const REPORT_STATUS_STATE_MACHINE = {
     [ReportStatus.Cancelled]: [ReportStatus.Open],
     [ReportStatus.Deleted]: []
   },
+  [UserType.ADMIN]: {
+    [ReportStatus.Open]: [ReportStatus.Cancelled],
+    [ReportStatus.Closed]: [],
+    [ReportStatus.Cancelled]: [ReportStatus.Open],
+    [ReportStatus.Deleted]: []
+  },
   [UserType.ENGINEER]: {
     [ReportStatus.Open]: [ReportStatus.Cancelled],
     [ReportStatus.Closed]: [],
