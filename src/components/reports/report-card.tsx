@@ -23,7 +23,11 @@ export default function ReportCard({ report }: { report: ReportWithTags }) {
         </div>
       </CardHeader>
       <CardBody className="flex flex-col p-4 gap-4">
-        <img src={report.attachments[0].url} alt={report.title} />
+        {report.attachments?.[0].url ? (
+          <img src={report.attachments?.[0].url} alt={report.title} />
+        ) : (
+          ''
+        )}
       </CardBody>
       <CardFooter className="flex justify-between items-center gap-2">
         <Status status={report.status} />
