@@ -25,14 +25,9 @@ export async function linkReport(
   formData: FormData
 ): Promise<LinkReportFormState> {
 
-  console.log('cul'.repeat(200), id)
-
-
   const result = linkReportSchema.safeParse({
     companyId: formData.get('companyId'),
   });
-
-  console.log('chatte'.repeat(200), result.data?.companyId)
 
   if (!result.success) {
     const errors = result.error.flatten().fieldErrors;
