@@ -46,10 +46,9 @@ export async function linkReport(
     };
   }
 
-  let report: Report;
 
   try {
-    report = await db.$transaction(async (tx) => {
+    await db.$transaction(async (tx) => {
       const user = await tx.user.findUnique({
         where: { id: session.user?.id! },
       });
