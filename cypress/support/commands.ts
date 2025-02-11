@@ -1,7 +1,7 @@
 /// <reference types="cypress" />
 // import type Chainable from 'cypress'
 import "./auth-provider-commands/auth0";
-import { UserType } from '@prisma/client';
+import { User, UserType } from '@prisma/client';
 // import cypress = require('cypress');
 import { sessions, users } from '../data';
 // ***********************************************
@@ -52,7 +52,7 @@ Cypress.on('uncaught:exception', (err) => {
 
 Cypress.Commands.add('setSession', (userType: UserType) => {
   const getUserSessionByType = (userType: UserType) => {
-    const user = users.find(user => user.userTypes.includes(userType));
+    const user = (users as User[]).find(user => user.userTypes.includes(userType));
     cy.log(`User type ${userType} found:`, user);
     if (!user) {
       throw new Error(`User type ${userType} not found`);
