@@ -26,7 +26,6 @@ export default async function ViewSite({
     include: { reports: { include: { tags: true } } },
   })) as CompanyWithReports | null;
 
-  console.log('company'.repeat(200), company);
   if (!company) {
     notFound();
   }

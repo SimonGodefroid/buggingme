@@ -32,7 +32,6 @@ export default async function ViewReport({
     },
   })) as ReportWithTags;
 
-  console.log('report'.repeat(200), report);
   if (!report) {
     notFound();
   }

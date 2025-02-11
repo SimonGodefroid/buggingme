@@ -68,12 +68,9 @@ export function CreateCompanyForm() {
   const [inputValue, setInputValue] = useState('');
 
   const handleSelectionChange = (selectedKey: Key | null) => {
-    console.log('selectedKey', selectedKey);
-    console.log('suggestions', suggestions);
     const selectedSuggestion = suggestions.find(
       (suggestion) => `${suggestion.name}-${suggestion.domain}` === selectedKey,
     );
-    console.log('selected', selectedSuggestion);
     if (selectedSuggestion) setCompanyData(selectedSuggestion);
   };
 

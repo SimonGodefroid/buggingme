@@ -21,7 +21,6 @@ import { Status } from './status';
 
 export default function ReportSummary({ report }: { report: ReportWithTags }) {
   const router = useRouter();
-  console.log('report', report);
   return (
     <Card
       isHoverable

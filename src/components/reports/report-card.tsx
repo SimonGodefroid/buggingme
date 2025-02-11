@@ -14,7 +14,6 @@ import SiteBadge from '../sites/site-badge';
 import { Status } from './status';
 
 export default function ReportCard({ report }: { report: ReportWithTags }) {
-  console.log('report', report);
   return (
     <Card className="p-4" as={Link} href={`/reports/${report.id}`}>
       <CardHeader className="flex flex-col gap-4">

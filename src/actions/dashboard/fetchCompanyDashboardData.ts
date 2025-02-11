@@ -6,7 +6,6 @@ import { CampaignWithCompany, InvitationWithCampaignAndParties, ReportWithTags }
 
 export async function fetchCompanyDashboardData(userId: string) {
   const user = await db.user.findUnique({ where: { id: userId }, include: { companies: true } });
-  console.log('user', user)
 
   const comments: CommentWithAuthor[] = await db.comment.findMany({
     where: { userId },
@@ -34,7 +33,6 @@ export async function fetchCompanyDashboardData(userId: string) {
     },
   });
 
-  console.log('userId', userId)
   const campaigns: CampaignWithCompany[] = await db.campaign.findMany({
     where: { userId },
     take: 5,
