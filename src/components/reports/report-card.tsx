@@ -1,3 +1,4 @@
+import { ReportWithTags } from '@/types';
 import {
   Button,
   Card,
@@ -6,22 +7,28 @@ import {
   CardHeader,
   Link,
 } from '@nextui-org/react';
-
-import { ReportWithTags } from '@/types';
+import { Company } from '@prisma/client';
 
 import { Category } from '../common/category';
+import SiteBadge from '../sites/site-badge';
 import { Status } from './status';
 
 export default function ReportCard({ report }: { report: ReportWithTags }) {
+  console.log('report', report);
   return (
     <Card className="p-4" as={Link} href={`/reports/${report.id}`}>
-      <CardHeader>{report.title}</CardHeader>
+      <CardHeader className="flex flex-col gap-4">
+        <div>{report.title}</div>
+        <div>
+          <SiteBadge company={report.company as Company} />
+        </div>
+      </CardHeader>
       <CardBody className="flex flex-col p-4 gap-4">
+        <img src={report.attachments[0].url} alt={report.title} />
+      </CardBody>
+      <CardFooter className="flex justify-between items-center gap-2">
         <Status status={report.status} />
         <Category category={report.category} />
-      </CardBody>
-      <CardFooter className="justify-end">
-        <Button>Edit</Button>
       </CardFooter>
     </Card>
   );

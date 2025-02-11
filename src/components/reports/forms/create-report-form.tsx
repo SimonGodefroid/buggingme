@@ -52,17 +52,17 @@ export const CreateReportForm = ({
   }, [formState]);
 
   const [url, setUrl] = useState<string>('');
-  const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
+  // const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
   const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
 
-  const handleCampaignChange = (campaign: any | null) => {
-    setSelectedCampaign(campaign);
-    if (campaign) {
-      setSelectedCompany(campaign.companyId); // Force the company selector to the campaign's company
-    } else {
-      setSelectedCompany(null); // Allow free selection if no campaign is selected
-    }
-  };
+  // const handleCampaignChange = (campaign: any | null) => {
+  //   setSelectedCampaign(campaign);
+  //   if (campaign) {
+  //     setSelectedCompany(campaign.companyId); // Force the company selector to the campaign's company
+  //   } else {
+  //     setSelectedCompany(null); // Allow free selection if no campaign is selected
+  //   }
+  // };
 
   return (
     <div>
@@ -79,25 +79,26 @@ export const CreateReportForm = ({
                     errorMessage={formState?.errors.title?.join(', ')}
                     defaultValue={report?.title}
                     name="title"
+                    isRequired
                     label="Title"
                     placeholder="Wrong user information in profile"
                   />
                 </div>
-                <div className="col-span-12">
+                {/* <div className="col-span-12">
                   <CampaignSelector
                     user={user!}
                     onCampaignChange={handleCampaignChange}
                   />
-                </div>
-                <div className="col-span-12">
+                </div> */}
+                {/* <div className="col-span-12">
                   <CompanySelector
                     mode={'creation'}
                     report={report}
-                    selectedCampaign={selectedCampaign}
+                    // selectedCampaign={selectedCampaign}
                     selectedCompanyId={selectedCompany || undefined} // Pass selected company ID
                     errors={formState?.errors?.companyId}
                   />
-                </div>
+                </div> */}
                 <div className="gap-4">
                   <Input
                     label="url"
@@ -167,15 +168,15 @@ export const CreateReportForm = ({
             <div className="col-span-12 md:col-span-6">
               <div className="flex flex-col gap-4 mx-4">
                 <Textarea
-                  label="Steps to reproduce"
+                  label="Description"
                   minRows={4}
                   name="steps"
                   isRequired
                   isInvalid={!!formState?.errors.steps}
                   errorMessage={formState?.errors.steps?.join(', ')}
-                  placeholder={`1. Go to Settings\n2. Click on Personal information\n...`}
+                  placeholder={`Steps to reproduce \n1. Go to Settings\n2. Click on Personal information\n...`}
                 />
-                <Textarea
+                {/* <Textarea
                   label="Current Behavior"
                   minRows={4}
                   isRequired
@@ -194,18 +195,18 @@ export const CreateReportForm = ({
                   isInvalid={!!formState?.errors.expectedBehavior}
                   errorMessage={formState?.errors.expectedBehavior?.join(', ')}
                   placeholder="Displayed information under my profile should be mine"
-                />
-              </div>
-            </div>
-            {/* Right */}
-            <div className="col-span-12 md:col-span-6">
-              <div className="flex flex-col gap-4 m-4 md:mx-4 md:my-0">
+                /> */}
                 <Textarea
                   label="Suggestions"
                   name="suggestions"
                   defaultValue={report?.suggestions?.toString()}
                   placeholder="You should check around the API call being made to Identité Numérique you are likely not doing what's needed"
                 />
+              </div>
+            </div>
+            {/* Right */}
+            <div className="col-span-12 md:col-span-6">
+              <div className="flex flex-col gap-4 m-4 md:mx-4 md:my-0">
                 <EditorClient />
               </div>
             </div>

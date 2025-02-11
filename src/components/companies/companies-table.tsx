@@ -24,10 +24,10 @@ import {
 } from '@nextui-org/react';
 import { Key } from '@react-types/shared';
 
-import { CompanyWithReports } from '@/app/@engineer/companies/page';
 
 import CompanyCard from './company-card';
 import { columns } from './columns';
+import { CompanyWithReports } from '@/types';
 
 const INITIAL_VISIBLE_COLUMNS = ['name', 'reports'];
 
@@ -81,7 +81,7 @@ export default function CompaniesTable({
     }
 
     return filteredCompanies;
-  }, [companies, filterValue, statusFilter]);
+  }, [companies, filterValue, statusFilter, hasSearchFilter]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -242,6 +242,7 @@ export default function CompaniesTable({
     onRowsPerPageChange,
     companies.length,
     hasSearchFilter,
+    onClear
   ]);
 
   const bottomContent = React.useMemo(() => {
@@ -277,7 +278,7 @@ export default function CompaniesTable({
         </div>
       </div>
     );
-  }, [selectedKeys, items.length, page, pages, hasSearchFilter]);
+  }, [selectedKeys, items.length, page, pages, hasSearchFilter, onPreviousPage, onNextPage]);
 
   return (
     <div className="md:mx-4">

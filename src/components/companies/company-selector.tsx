@@ -145,7 +145,7 @@ export default function CompanySelector({
     return (
       <div className="flex border-2 bg-foreground-100 rounded-xl p-4 w-full">
         <a
-          href={`https://${report?.company?.domain || `example.com`}`}
+          href={`${report?.company?.domain || `example.com`}`}
           target="_blank"
           rel="noopener noreferrer"
         >

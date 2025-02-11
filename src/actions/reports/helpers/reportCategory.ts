@@ -16,6 +16,20 @@ ReportCategory.Resolved
 
 /* keeping as backup... but shouldn't be too precious about the category state machine */
 export const REPORT_CATEGORY_STATE_MACHINE: Record<UserType, Record<ReportCategory, ReportCategory[]>> = {
+  [UserType.ADMIN]: {
+    // open
+    [ReportCategory.New]: [],
+    [ReportCategory.Valid]: [],
+    [ReportCategory.InformationNeeded]: [],
+    [ReportCategory.PendingCompanyReview]: [],
+    [ReportCategory.Testing]: [],
+    // closed
+    [ReportCategory.Spam]: [],
+    [ReportCategory.Duplicate]: [],
+    [ReportCategory.Informative]: [],
+    [ReportCategory.NotApplicable]: [],
+    [ReportCategory.Resolved]: [],
+  },
   [UserType.GOD]: {
     // open
     [ReportCategory.New]: [],

@@ -11,7 +11,7 @@ import {
 } from '@nextui-org/react';
 import { Session } from 'next-auth';
 
-import SignInAuth0Button from './common/sign-in-auth0-button';
+// import SignInAuth0Button from './common/sign-in-auth0-button';
 import SignInGitHubButton from './common/sign-in-github-button';
 
 // import { useSession } from 'next-auth/react';
@@ -25,8 +25,8 @@ export default function HeaderAuth({
   if (!user) {
     authContent = (
       <div className="flex gap-4">
-        <SignInGitHubButton />
-        <SignInAuth0Button />
+        <SignInGitHubButton label="Sign In | Sign Up" />
+        {/* <SignInAuth0Button /> */}
       </div>
     );
   } else {

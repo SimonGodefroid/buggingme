@@ -1,12 +1,17 @@
-import { Card, CardBody, CardHeader, Divider } from '@nextui-org/react';
+import db from '@/db';
+import { ReportWithTags } from '@/types';
+import { Card, CardBody, CardHeader } from '@nextui-org/react';
 
-import SignInAuth0Button from '@/components/common/sign-in-auth0-button';
 import SignInGitHubButton from '@/components/common/sign-in-github-button';
+import ReportSummary from '@/components/reports/report-summary';
 
-export default function Home() {
+export default async function Home() {
+  const reports = (await db.report.findMany({
+    include: { tags: true, attachments: true, company: true },
+  })) as ReportWithTags[];
   return (
     <div className="flex flex-col gap-8 justify-center p-4">
-      <div className="grid grid-cols-12 gap-4">
+      {/* <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12 md:col-span-6">
           <Card className="max-w-lg p-6 my-auto mx-auto shadow-lg">
             <CardHeader className="justify-center md:justify-start">
@@ -39,21 +44,24 @@ export default function Home() {
             </CardBody>
           </Card>
         </div>
-      </div>
+      </div> */}
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12">
-          <Card className="max-w-6xl p-6 my-auto mx-auto shadow-lg">
-            <CardHeader className="text-center">
-              <h1 className="text-4xl font-bold">Meet halfway</h1>
+          <Card className="max-w-6xl p-6 my-auto mx-auto shadow-lg" >
+            <CardHeader className="justify-center text-center">
+              <h1 className="text-4xl font-bold">Stand out now!</h1>
             </CardHeader>
-            <CardBody className="text-center md:text-left">
+            {/* <CardHeader className="text-center">
+              <h1 className="text-4xl font-bold">Meet halfway</h1>
+            </CardHeader> */}
+            <CardBody className="justify-center text-center">
               <p className="text-lg">
-                It could be visual, it could be a 500, an a11y issue, a security
+                It can be visual, it can be a 500, an a11y issue, a security
                 concern... <br />
-                A. An Engineer has already noticed it and reported it. <br />
-                B. The company can get their team to investigate and fix it.{' '}
+                Report it. <br />
+                Get noticed. <br />
+                Get hired.
                 <br />
-                C. The users will have a better experience. <br />
               </p>
             </CardBody>
           </Card>
@@ -61,10 +69,19 @@ export default function Home() {
       </div>
       <div className="flex justify-center">
         <div className="flex items-center flex-col gap-4 md:flex-row md:justify-center">
-          <SignInGitHubButton label="Start now | Engineer" />
+          <SignInGitHubButton label="Start Now | Join Us" />
+          {/* <Divider /> */}
+          {/* <SignInAuth0Button label="Start now | Company" /> */}
+          {/* <SignInGitHubButton label="Start now | Engineer" />
           <Divider />
-          <SignInAuth0Button label="Start now | Company" />
+          <SignInAuth0Button label="Start now | Company" /> */}
         </div>
+      </div>
+      <div className="flex flex-col w-full gap-4">
+        <h2>Browse latest reports:</h2>
+        {reports.map((r) => (
+          <ReportSummary key={r.id} report={r} />
+        ))}
       </div>
     </div>
   );

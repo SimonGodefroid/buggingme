@@ -53,9 +53,10 @@ export default function NavTabs({
     { label: 'Home', href: '/' },
     { label: 'Reports', href: '/reports' },
     { label: 'Contributors', href: '/contributors' },
-    { label: 'Companies', href: '/companies' },
-    { label: 'Campaigns', href: '/campaigns' },
-    { label: 'Invitations', href: '/invitations' },
+    { label: 'Sites', href: '/sites' },
+    // { label: 'Companies', href: '/companies' },
+    // { label: 'Campaigns', href: '/campaigns' },
+    // { label: 'Invitations', href: '/invitations' },
     { label: 'Leaderboard', href: '/leaderboard' },
     user
       ? { label: 'Log Out', onPress: () => signOut(), color: 'danger' }
@@ -98,31 +99,37 @@ export default function NavTabs({
       href: '/contributors',
       count: count.contributors,
     },
-    isCompany(user!)
-      ? null
-      : {
-          emoji: <Icon name="buildings" />,
-          // emoji: '🏢',
-          label: 'Companies',
-          href: '/companies',
-          count: count.companies,
-        },
+    // isCompany(user!)
+    //   ? null
+    //   : {
+    //       emoji: <Icon name="buildings" />,
+    //       // emoji: '🏢',
+    //       label: 'Companies',
+    //       href: '/companies',
+    //       count: count.companies,
+    //     },
+    // {
+    //   emoji: (
+    //     <div className="flex">
+    //       <i className="bx bxs-megaphone bx-sm"></i>
+    //     </div>
+    //   ),
+    //   // emoji: '📢',
+    //   label: 'Campaigns',
+    //   href: '/campaigns',
+    //   count: count.campaigns,
+    // },
+    // {
+    //   emoji: <Icon name="envelope" />,
+    //   // emoji: '✉️',
+    //   label: 'Invitations',
+    //   href: '/invitations',
+    // },
     {
-      emoji: (
-        <div className="flex">
-          <i className="bx bxs-megaphone bx-sm"></i>
-        </div>
-      ),
-      // emoji: '📢',
-      label: 'Campaigns',
-      href: '/campaigns',
-      count: count.campaigns,
-    },
-    {
-      emoji: <Icon name="envelope" />,
-      // emoji: '✉️',
-      label: 'Invitations',
-      href: '/invitations',
+      // emoji: '🏆',
+      emoji: <Icon name="globe" />,
+      label: 'Sites',
+      href: '/sites',
     },
     {
       // emoji: '🏆',
@@ -136,7 +143,8 @@ export default function NavTabs({
   return (
     <Navbar
       classNames={{
-        base: 'justify-start md:justify-between md:max-w-8xl sm:bg-orange-800 md:bg-green-800 lg:bg-pink-800',
+        base: 'justify-start md:justify-between md:max-w-8xl',
+        // base: 'justify-start md:justify-between md:max-w-8xl sm:bg-orange-800 md:bg-green-800 lg:bg-pink-800',
         wrapper: 'flex max-w-8xl justify-end',
       }}
       isBordered
@@ -151,7 +159,7 @@ export default function NavTabs({
 
       <NavbarContent className="sm:hidden pr-3" justify="center">
         <NavbarBrand>
-          <p className="font-bold text-inherit">BugBusters</p>
+          <p className="font-bold text-inherit ">BugBusters</p>
         </NavbarBrand>
       </NavbarContent>
 
@@ -161,7 +169,7 @@ export default function NavTabs({
       >
         <NavbarBrand className="cursor-pointer">
           <Link color="foreground" href="/">
-            <p className="font-bold text-inherit">BugBusters</p>
+            <p className="font-bold text-inherit ">BugBusters</p>
           </Link>
         </NavbarBrand>
 
@@ -225,8 +233,8 @@ export default function NavTabs({
                   </div>
                 ) : (
                   <div className="flex flex-col items-center gap-4 p-4 xs:hidden">
-                    <SignInGitHubButton />
-                    <SignInAuth0Button />
+                    <SignInGitHubButton label="Sign In | Sign Up" />
+                    {/* <SignInAuth0Button /> */}
                   </div>
                 )}
               </div>

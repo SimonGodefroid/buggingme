@@ -33,7 +33,7 @@ export default function DeleteAttachmentForm({
     if (formState.errors._form?.length) {
       toast.error(formState.errors._form.join(', '));
     }
-  }, [formState]);
+  }, [formState,onDelete]);
   return (
     <form action={action} id={FORM_ID}>
       <Button color='danger' type="submit" form={FORM_ID} startContent={<Icon name='trash'/>}>

@@ -4,7 +4,7 @@ import React from 'react';
 
 import db from '@/db';
 import { ReportWithTags } from '@/types';
-import { Chip, Input, Textarea } from '@nextui-org/react';
+import { Chip, Input, Link, Textarea } from '@nextui-org/react';
 
 import CampaignPreview from '@/components/campaigns/campaign-preview';
 import CommentCreateForm from '@/components/comments/comment-create-form';
@@ -77,7 +77,7 @@ export default async function ViewReportForm({
                     <CompanySelector report={report} mode={'view'} />
                   </div>
                   <div className="col-span-12 md:col-span-3">
-                  <div className="flex justify-between p-2 md:flex-col items-center md:gap-2">
+                    <div className="flex justify-between p-2 md:flex-col items-center md:gap-2">
                       <Chip className="text-foreground bg-background">
                         Category
                       </Chip>
@@ -85,7 +85,7 @@ export default async function ViewReportForm({
                     </div>
                   </div>
                 </div>
-                <div className="gap-4">
+                <div className="flex gap-4 ">
                   <Input
                     {...viewModeProps}
                     label="url"
@@ -99,7 +99,19 @@ export default async function ViewReportForm({
                         </span>
                       </div>
                     }
+                    endContent={
+                      // <div className="pointer-events-none flex items-center">
+                      <span className="text-default-400 text-small"></span>
+                      // </div>
+                    }
                   />
+                  <Link
+                    className="border-1 border-blue-600 rounded-lg p-4"
+                    isBlock
+                    showAnchorIcon
+                    href={`https://${report.url}`}
+                    target="_blank"
+                  ></Link>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <ImpactSelector
@@ -116,12 +128,12 @@ export default async function ViewReportForm({
                 </div>
               </div>
             </div>
-            <div className="col-span-12 md:col-span-6">
+            <div className="col-span-12 md:col-span-6 p-4">
               {images?.length > 0 && (
                 <div className="flex flex-col gap-4 w-full">
                   <div className="flex justify-center md:justify-start flex-wrap">
                     <div
-                      className={`grid grid-cols-${Math.min(Math.max(images.length - 1, 4), 2)}`}
+                      className={`grid md:grid-cols-${Math.min(Math.max(images.length - 1, 4), 2)} sm:grid-cols-2 gap-2`}
                     >
                       {images?.map((image) => (
                         <ImageTooltip
@@ -141,12 +153,12 @@ export default async function ViewReportForm({
               <div className="flex flex-col gap-4 m-4">
                 <Textarea
                   {...viewModeProps}
-                  label="Steps to reproduce"
+                  label="Description"
                   name="steps"
                   defaultValue={report?.steps?.toString()}
                   placeholder={`1. Go to Settings\n2. Click on Personal information\n...`}
                 />
-                <Textarea
+                {/* <Textarea
                   {...viewModeProps}
                   label="Current Behavior"
                   defaultValue={report?.currentBehavior?.toString()}
@@ -159,11 +171,7 @@ export default async function ViewReportForm({
                   defaultValue={report?.expectedBehavior?.toString()}
                   name="expectedBehavior"
                   placeholder="Displayed information under my profile should be mine"
-                />
-              </div>
-            </div>
-            <div className="col-span-12 md:col-span-6">
-              <div className="flex flex-col gap-4 m-4">
+                /> */}
                 <Textarea
                   {...viewModeProps}
                   label="Suggestions"
@@ -171,6 +179,10 @@ export default async function ViewReportForm({
                   defaultValue={report?.suggestions?.toString()}
                   placeholder="You should check around the API call being made to Identité Numérique you are likely not doing what's needed"
                 />
+              </div>
+            </div>
+            <div className="col-span-12 md:col-span-6">
+              <div className="flex flex-col gap-4 m-4">
                 <EditorClient snippets={report.snippets} readOnly />
               </div>
             </div>
