@@ -63,7 +63,7 @@ Cypress.Commands.add('setSession', (userType: UserType) => {
   cy.log('loggedInUser'.repeat(200) + JSON.stringify(loggedInUser));
   const sessionToLog = sessions.find(session => session.userId === loggedInUser.id);
   cy.log('sessionToLog'.repeat(200) + JSON.stringify(sessionToLog));
-  cy.setCookie('authjs.session-token', sessions?.find(session => session.userId === loggedInUser.id)?.sessionToken)
+  cy.setCookie('authjs.session-token', sessions?.find(session => session.userId === loggedInUser.id)?.sessionToken || '')
   // cy.setCookie(
   //   'next-auth.session-token',
   //   'a valid cookie from your browser session',
