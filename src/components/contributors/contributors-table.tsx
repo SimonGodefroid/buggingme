@@ -73,7 +73,7 @@ export default function ContributorsTable({
     }
 
     return filteredContributors;
-  }, [contributors, filterValue]);
+  }, [contributors, filterValue, hasSearchFilter]);
 
   const pages = Math.ceil(filteredItems.length / rowsPerPage);
 
@@ -235,6 +235,7 @@ export default function ContributorsTable({
     onRowsPerPageChange,
     contributors.length,
     hasSearchFilter,
+    onClear
   ]);
 
   const bottomContent = React.useMemo(() => {

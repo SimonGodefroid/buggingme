@@ -111,7 +111,7 @@ export default function CampaignsTable({
 
       return sortDescriptor.direction === 'descending' ? -cmp : cmp;
     });
-  }, [sortDescriptor, items]);
+  }, [sortDescriptor, items, hasSearchFilter]);
 
   const renderCell = React.useCallback(
     (

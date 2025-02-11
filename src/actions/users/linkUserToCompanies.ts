@@ -24,12 +24,13 @@ export async function linkUserToCompanies(
   formState: LinkUserToCompaniesFormState,
   formData: FormData
 ): Promise<LinkUserToCompaniesFormState> {
-
+  console.log('lol'.repeat(2000))
   const result = linkUserToCompaniesSchema.safeParse({
     id: formData.get('id'),
     companyIds: formData.getAll('companyIds'),
   });
-
+  console.log('lol'.repeat(2000))
+  
   if (!result.success) {
     const errors = result.error.flatten().fieldErrors;
     console.error('Validation error', errors);

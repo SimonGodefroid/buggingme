@@ -2,7 +2,7 @@
 // import type Chainable from 'cypress'
 import "./auth-provider-commands/auth0";
 import { UserType } from '@prisma/client';
-import cypress = require('cypress');
+// import cypress = require('cypress');
 import { sessions, users } from '../data';
 // ***********************************************
 // This example commands.ts shows you how to

@@ -8,7 +8,7 @@ import ReportsTable from '@/components/reports/reports-table';
 export default async function Reports() {
   const user: UserWithCompanies | null = await fetchUser();
   const reports: ReportWithTags[] = await db.report.findMany({
-    // where: { companyId: { in: user?.companies.map((company) => company.id) } },
+    where: { companyId: { notIn: [`${process.env.BUG_BUSTERS_COMPANY_ID}`] } },
     include: {
       company: true,
       tags: true,

@@ -52,15 +52,38 @@ export default async function RootLayout({
 
   return (
     <html suppressHydrationWarning={true} lang="en">
-      <body >
+      <body>
         <Providers>
           {/* Wrap main content with ThemeProvider */}
           <NavTabs count={counts} user={user} />
           {/* overflow-auto  */}
-          <main className="flex flex-col m-4 md:m-4 min-h-[80vh] my-4 mb-10">
+          <main className="flex flex-col m-4 md:m-4 my-4 mb-10 pb-60">
             {rendered()}
           </main>
-          <footer className="border-t-1 py-2">
+          <footer className="border-t-1 py-1 text-xs fixed bottom-0 w-full bg-background text-foreground z-10 opacity-75">
+            <div className="flex flex-wrap justify-center text-xs gap-x-4 gap-y-1 md:text-sm items-center">
+              <span>&copy; {new Date().getFullYear()} &nbsp;BugBusters</span>
+              {[
+                { href: '/privacy-policy.html', label: 'Privacy Policy' },
+                {
+                  href: '/terms-and-conditions.html',
+                  label: 'Terms and Conditions',
+                },
+                { href: '/cookie-policy.html', label: 'Cookie Policy' },
+                { href: '/contact.html', label: 'Contact' },
+                { href: '/github.html', label: 'Github' },
+              ].map(({ href, label }) => (
+                <a
+                  key={href}
+                  className="hover:text-background p-1 rounded bg-gradient-to-r hover:from-teal-400 hover:to-blue-500"
+                  href={href}
+                >
+                  {label}
+                </a>
+              ))}
+            </div>
+          </footer>
+          {/* <footer className="border-t-1 py-2 fixed bottom-0 w-full bg-foreground text-background z-10 ">
             <div
               className="flex flex-col items-center
             text-small gap-1 md:flex-row md:gap-4 md:justify-center"
@@ -98,7 +121,7 @@ export default async function RootLayout({
                 Github
               </a>
             </div>
-          </footer>
+          </footer> */}
         </Providers>
       </body>
     </html>

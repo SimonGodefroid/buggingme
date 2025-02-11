@@ -3,12 +3,11 @@
 import { useEffect } from 'react';
 
 import { linkUserToCompanies } from '@/actions';
+import { UserWithCompanies } from '@/types';
 import { Button, Select, SelectItem, Tooltip } from '@nextui-org/react';
 import { Company } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
-import { UserWithCompanies } from '@/types';
-
 
 const LINK_FORM_ID = 'link-user';
 export function LinkUserForm({
@@ -32,7 +31,6 @@ export function LinkUserForm({
 
   return (
     <div className="flex flex-col gap-4 max-w-sm">
-      <h1>Link user to company</h1>
       <form id={LINK_FORM_ID} action={linkAction}>
         <div className="flex flex-col gap-4 justify-center">
           <Select
@@ -45,7 +43,7 @@ export function LinkUserForm({
                 (user) => user.id === value[0].key,
               );
               return (
-                <div className="flex  justify-between items-center">
+                <div className="flex justify-between items-center">
                   {selectedUser?.email}{' '}
                   {(selectedUser?.companies || []).length > 0 && (
                     <Tooltip

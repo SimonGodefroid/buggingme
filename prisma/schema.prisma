@@ -12,6 +12,7 @@ enum UserType {
   ENGINEER
   COMPANY
   GOD
+  ADMIN
 }
 
 model Account {
@@ -147,8 +148,6 @@ model Report {
   companyId        String
   url              String?
   steps            String?
-  currentBehavior  String?
-  expectedBehavior String?
   suggestions      String?
   snippets         String?
   language         String?

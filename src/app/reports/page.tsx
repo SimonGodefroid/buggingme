@@ -1,9 +1,25 @@
-import { signIn } from '@/actions';
+// import { signIn } from '@/actions';
+
+import db from '@/db';
+import { ReportWithTags } from '@/types';
 import { Button, Card, CardBody, CardHeader } from '@nextui-org/react';
 
 import SignInGitHubButton from '@/components/common/sign-in-github-button';
+import ReportsTable from '@/components/reports/reports-table';
 
-export default function Reports() {
+export default async function Reports() {
+  const reports: ReportWithTags[] = await db.report.findMany({
+    where: { companyId: { notIn: [`${process.env.BUG_BUSTERS_COMPANY_ID}`] } },
+    include: {
+      company: true,
+      tags: true,
+      user: true,
+      StatusHistory: true,
+      attachments: true,
+      comments: true,
+      campaign: true,
+    },
+  });
   return (
     <div className="flex flex-col gap-8 items-center justify-center p-8">
       <Card className="max-w-xs items-center justify-center p-6 my-auto mx-auto shadow-lg">
@@ -29,6 +45,9 @@ export default function Reports() {
       </Card>
       <div className="flex justify-center">
         <SignInGitHubButton />
+      </div>
+      <div className="w-full">
+        <ReportsTable reports={reports} />
       </div>
     </div>
   );

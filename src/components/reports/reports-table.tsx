@@ -5,6 +5,7 @@ import React from 'react';
 import { useRouter } from 'next/navigation';
 
 import { pascalToSentenceCase } from '@/helpers/strings/pascalToSentenceCase';
+import { ReportWithTags, UserWithCompanies } from '@/types';
 import {
   Button,
   Dropdown,
@@ -28,9 +29,6 @@ import {
 import { ReportStatus, UserType } from '@prisma/client';
 import { Key } from '@react-types/shared';
 
-import { ReportWithTags } from '@/types';
-import { UserWithCompanies } from '@/types';
-
 import { Category } from '../common/category';
 import { columns } from '../reports/data';
 import { ImpactChip } from './impact';
@@ -40,7 +38,7 @@ import { Status } from './status';
 import { TagChip } from './tag';
 
 export default function ReportsTable({
-  reports,
+  reports = [],
   user,
 }: {
   reports: ReportWithTags[];
@@ -88,7 +86,7 @@ export default function ReportsTable({
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredReports = [...reports];
+    let filteredReports = [...(reports || [])];
 
     if (hasSearchFilter) {
       filteredReports = filteredReports.filter((report) =>

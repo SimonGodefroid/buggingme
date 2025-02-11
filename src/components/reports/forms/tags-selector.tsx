@@ -4,6 +4,8 @@ import { ReportWithTags } from '@/types';
 import { Chip, Select, SelectItem } from '@nextui-org/react';
 import { Tag } from '@prisma/client';
 
+import { TagChip } from '../tag';
+
 export default function TagsSelector({
   report,
   tags,
@@ -21,13 +23,18 @@ export default function TagsSelector({
       selectionMode="multiple"
       selectedKeys={report?.tags.map((tag) => tag.id)}
       renderValue={(values) => {
-        return [
-          ...values.map((value) => (
-            <Chip color="primary" isCloseable key={value.key} className="m-1">
-              {value.textValue}
-            </Chip>
-          )),
-        ].filter(Boolean);
+        return (
+          <div className="flex flex-wrap gap-2">
+            {[
+              ...values.map((value) => (
+                <TagChip
+                  tag={{ name: value.textValue } as Tag}
+                  key={value.key}
+                />
+              )),
+            ].filter(Boolean)}
+          </div>
+        );
       }}
       isMultiline
       placeholder="Select tags"

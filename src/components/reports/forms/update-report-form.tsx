@@ -127,7 +127,7 @@ export const UpdateReportForm = ({
                   </div>
                 </div>
                 <div className="gap-4">
-                  <TagsSelector mode={'creation'} tags={tags} />
+                  <TagsSelector mode={'update'} report={report} tags={tags} />
                 </div>
               </div>
             </div>
@@ -174,7 +174,7 @@ export const UpdateReportForm = ({
                   errorMessage={formState?.errors.steps?.join(', ')}
                   placeholder={`1. Go to Settings\n2. Click on Personal information\n...`}
                 />
-                <Textarea
+                {/* <Textarea
                   label="Current Behavior"
                   minRows={4}
                   isRequired
@@ -183,8 +183,8 @@ export const UpdateReportForm = ({
                   defaultValue={report?.currentBehavior?.toString()}
                   name="currentBehavior"
                   placeholder="Displayed information is related to a different user than me"
-                />
-                <Textarea
+                /> */}
+                {/* <Textarea
                   label="Expected Behavior"
                   minRows={4}
                   defaultValue={report?.expectedBehavior?.toString()}
@@ -193,18 +193,18 @@ export const UpdateReportForm = ({
                   isInvalid={!!formState?.errors.expectedBehavior}
                   errorMessage={formState?.errors.expectedBehavior?.join(', ')}
                   placeholder="Displayed information under my profile should be mine"
-                />
-              </div>
-            </div>
-            {/* Right */}
-            <div className="col-span-12 md:col-span-6">
-              <div className="flex flex-col gap-4 m-4">
+                /> */}
                 <Textarea
                   label="Suggestions"
                   name="suggestions"
                   defaultValue={report?.suggestions?.toString()}
                   placeholder="You should check around the API call being made to Identité Numérique you are likely not doing what's needed"
                 />
+              </div>
+            </div>
+            {/* Right */}
+            <div className="col-span-12 md:col-span-6">
+              <div className="flex flex-col gap-4 m-4">
                 <EditorClient snippets={report?.snippets} />
               </div>
             </div>

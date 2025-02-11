@@ -98,7 +98,7 @@ export default function ImageTooltip({
       }
     >
       <img
-        className={`max-h-1/4 border-1 border-white cursor-pointer `}
+        className={`max-h-1/4 border-1 rounded-lg border-white cursor-pointer `}
         src={image.url}
         onClick={() => {
           window.open(image.url, '_blank');

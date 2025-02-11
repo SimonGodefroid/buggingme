@@ -12,27 +12,28 @@ const createReportSchema = z.object({
     message: "Please provide a valid URL without the protocol",
   }),
   steps: z.string().min(10),
-  currentBehavior: z.string().min(10),
-  expectedBehavior: z.string().min(10),
+  // currentBehavior: z.string().min(10),
+  // expectedBehavior: z.string().min(10),
   suggestions: z.string().optional().nullable(),
   snippets: z.string().optional().nullable(),
   language: z.string().optional().nullable(),
   impact: z.nativeEnum(Impact).optional().nullable(),
   severity: z.nativeEnum(Severity).optional().nullable(),
   companyId: z.string().optional().nullable(),
-  companyName: z.string().optional().nullable(),
-  companyLogo: z.string().optional().nullable(),
-  companyDomain: z.string().optional().nullable(),
+  // companyName: z.string().optional().nullable(),
+  // companyLogo: z.string().optional().nullable(),
+  // companyDomain: z.string().optional().nullable(),
   tags: z.string().array(),
   visibility: z.nativeEnum(ReportVisibility).optional().nullable(),
   category: z.nativeEnum(ReportCategory).optional().nullable(),
 })
   .refine((data) => {
-    if (data.companyId) {
-      return !data.companyName && !data.companyLogo && !data.companyDomain;
-    } else {
-      return data.companyName;
-    }
+    return true;
+    // if (data.companyId) {
+    //   // return !data.companyName && !data.companyLogo && !data.companyDomain;
+    // } else {
+    //   // return data.companyName;
+    // }
   }, {
     message: "Please select a company from the list of existing companies or provide a new company name.",
     path: ["companyId", "companyName", "companyDomain", "companyLogo"],
@@ -41,12 +42,12 @@ const createReportSchema = z.object({
 interface CreateReportFormState {
   errors: {
     title?: string[],
-    company?: string[],
+    // company?: string[],
     companyId?: string[],
     url?: string[],
     steps?: string[],
-    currentBehavior?: string[],
-    expectedBehavior?: string[],
+    // currentBehavior?: string[],
+    // expectedBehavior?: string[],
     suggestions?: string[],
     snippets?: string[],
     language?: string[],
@@ -65,16 +66,16 @@ export async function createReport(
     companyId: formData.get('companyId'),
     url: formData.get('url'),
     steps: formData.get('steps'),
-    currentBehavior: formData.get('currentBehavior'),
-    expectedBehavior: formData.get('expectedBehavior'),
+    // currentBehavior: formData.get('currentBehavior'),
+    // expectedBehavior: formData.get('expectedBehavior'),
     suggestions: formData.get('suggestions'),
     snippets: formData.get('snippets'),
     language: formData.get('language'),
     impact: formData.get('impact'),
     severity: formData.get('severity'),
-    companyName: formData.get('companyName'),
-    companyLogo: formData.get('companyLogo'),
-    companyDomain: formData.get('companyDomain'),
+    // companyName: formData.get('companyName'),
+    // companyLogo: formData.get('companyLogo'),
+    // companyDomain: formData.get('companyDomain'),
     tags: formData.getAll('tags'),
     visibility: formData.get('visibility') || ReportVisibility.Public,
     category: formData.get('category') || ReportCategory.New,
@@ -119,42 +120,43 @@ export async function createReport(
         throw new Error('You must have at least 5 valid public reports to submit private reports.');
       }
 
-      let companyId = validation.data?.companyId;
+      // let companyId = validation.data?.companyId;
 
-      if (!companyId) {
-        if (!validation.data?.companyName) {
-          throw (new Error('Please select a company'));
-        }
-        const company = await tx.company.create({
-          data: {
-            name: validation.data?.companyName!,
-            logo: validation.data?.companyLogo,
-            domain: validation.data?.companyDomain,
-          },
-        });
-        companyId = company.id;
-      }
+      // if (!companyId) {
+      //   // if (!validation.data?.companyName) {
+      //   //   throw (new Error('Please select a company'));
+      //   // }
+      //   const company = await tx.company.create({
+      //     data: {
+      //       name: validation.data?.companyName!,
+      //       logo: validation.data?.companyLogo,
+      //       domain: validation.data?.companyDomain,
+      //     },
+      //   });
+      //   companyId = company.id;
+      // }
 
-      const campaignId = formData.get('campaignId') as string;
-      if (campaignId) {
-        const campaign = await db.campaign.findFirst({ where: { id: campaignId }, include: { company: true } });
-        if (!campaign) {
-          throw new Error('The campaign does not exist');
-        }
-        if (campaign.company.id !== companyId) {
-          throw new Error('The campaign does not belong to the selected company.');
-        }
-      }
+      // const campaignId = formData.get('campaignId') as string;
+      // if (campaignId) {
+      //   const campaign = await db.campaign.findFirst({ where: { id: campaignId }, include: { company: true } });
+      //   if (!campaign) {
+      //     throw new Error('The campaign does not exist');
+      //   }
+      //   if (campaign.company.id !== companyId) {
+      //     throw new Error('The campaign does not belong to the selected company.');
+      //   }
+      // }
 
 
       const newReport = await tx.report.create({
         data: {
           title: validation.data?.title ?? '',
-          companyId: `${companyId}`,
+          companyId: `${process.env.BUG_BUSTERS_COMPANY_ID}`,
+          // companyId: `${companyId}`,
           url: validation.data?.url,
           steps: validation.data?.steps,
-          currentBehavior: validation.data?.currentBehavior,
-          expectedBehavior: validation.data?.expectedBehavior,
+          // currentBehavior: validation.data?.currentBehavior,
+          // expectedBehavior: validation.data?.expectedBehavior,
           suggestions: validation.data?.suggestions,
           userId: session?.user?.id!,
           snippets: validation.data?.snippets,
@@ -166,7 +168,7 @@ export async function createReport(
           },
           visibility: validation.data?.visibility || ReportVisibility.Public,
           category: validation.data?.category || ReportCategory.New,
-          campaignId: campaignId || undefined,
+          // campaignId: campaignId || undefined,
         }
       });
 
