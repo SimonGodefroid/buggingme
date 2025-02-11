@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
+import { CompanyWithReports } from '@/types';
 import {
   Avatar,
   Card,
@@ -10,7 +11,16 @@ import {
   CardHeader,
   Link,
 } from '@nextui-org/react';
-import { CompanyWithReports } from '@/types';
+
+const getHost = (domain?: string): string => {
+  if (!domain) return ''; // Handle undefined/null case early
+
+  try {
+    return new URL(domain).host;
+  } catch {
+    return ''; // Fallback in case of an invalid URL
+  }
+};
 
 export default function SitesList({
   companies,
@@ -19,7 +29,7 @@ export default function SitesList({
 }) {
   const router = useRouter();
   return (companies || []).map((c) => {
-    const link = new URL(`${c.domain}`).host;
+    const link = getHost(c.domain ?? undefined);
 
     return (
       <Card
