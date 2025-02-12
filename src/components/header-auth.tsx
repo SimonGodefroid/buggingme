@@ -3,6 +3,7 @@ import { isCompany } from '@/helpers';
 import { UserWithCompanies } from '@/types';
 import {
   Button,
+  Chip,
   Link,
   Popover,
   PopoverContent,
@@ -43,7 +44,12 @@ export default function HeaderAuth({
             description={
               <span className="break-words max-w-[10px]">{user.email}</span>
             }
-            name={isCompany(user) ? user?.companies?.[0]?.name : user?.name}
+            name={
+              <div className="flex items-center gap-2">
+                {isCompany(user) ? user?.companies?.[0]?.name : user?.name}
+                <Chip className='capitalize'>{user?.userTypes[0].toLowerCase()}</Chip>
+              </div>
+            }
           >
             {user?.name}
           </User>
