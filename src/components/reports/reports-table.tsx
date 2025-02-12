@@ -130,7 +130,6 @@ export default function ReportsTable({
       columnKey: React.Key,
       user?: UserWithCompanies | null,
     ) => {
-      console.log('report.attachments', report.attachments);
       const cellValue = report[columnKey as keyof ReportWithTags];
       switch (columnKey) {
         case 'company':
