@@ -43,7 +43,9 @@ export const CreateReportForm = ({
 
   useEffect(() => {
     if (formState.success) {
-      toast.success(`Report creation successful !`);
+      toast.success(
+        `The report has been created it will be reviewed by an admin before publication !`,
+      );
       redirect(`/reports`);
     }
     if (formState.errors._form?.length) {
