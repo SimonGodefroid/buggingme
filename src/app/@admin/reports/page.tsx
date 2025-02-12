@@ -7,7 +7,13 @@ import ReportsTable from '@/components/reports/reports-table';
 
 export default async function Reports() {
   const reports = (await db.report.findMany({
-    include: { company: true, tags: true, user: true, StatusHistory: true },
+    include: {
+      company: true,
+      tags: true,
+      user: true,
+      StatusHistory: true,
+      attachments: true,
+    },
   })) as ReportWithTags[];
   const user = await fetchUser();
   return (

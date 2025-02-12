@@ -6,6 +6,8 @@ import db from '@/db';
 import { ReportWithTags } from '@/types';
 
 import PageHeader from '@/components/common/page-header';
+import StatusSelector from '@/components/common/status-selector';
+import CategorySelector from '@/components/reports/forms/category-selector';
 import ViewReportForm from '@/components/reports/forms/view-report-form';
 
 export default async function ViewReport({
@@ -45,6 +47,12 @@ export default async function ViewReport({
         buttonProps={{
           primary: { href: `/reports/${reportId}/edit`, text: 'Edit' },
           secondary: { href: `/reports`, text: 'Back to reports' },
+          custom: (
+            <>
+              <CategorySelector report={report} />
+              <StatusSelector report={report} />
+            </>
+          ),
         }}
       />
       <ViewReportForm report={report} />

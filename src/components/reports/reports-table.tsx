@@ -130,14 +130,20 @@ export default function ReportsTable({
       columnKey: React.Key,
       user?: UserWithCompanies | null,
     ) => {
+      console.log('report.attachments', report.attachments);
       const cellValue = report[columnKey as keyof ReportWithTags];
       switch (columnKey) {
         case 'company':
           return (
             <User
+              classNames={{
+                base: 'gap-4 p-4',
+              }}
               avatarProps={{
                 radius: 'lg',
                 src: `${report?.company?.logo}` || '',
+                size: 'md',
+                className: 'shrink-0',
               }}
               description={report.company?.domain}
               name={report?.company?.name}

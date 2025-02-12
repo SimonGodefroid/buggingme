@@ -6,6 +6,7 @@ import { z } from 'zod';
 import db from '@/db';
 import { authMiddleware, validationMiddleware } from '@/middlewares';
 import { CATEGORY_STATUS_MAPPER } from './helpers';
+import { isAdmin } from '@/helpers';
 
 const updateReportCategorySchema = z.object({
   id: z.string(),
@@ -109,10 +110,10 @@ export async function updateReportCategory(
 
   /* assert ownership */
   const reportToUpdate = await db.report.findUnique({ where: { id } });
-  if (!reportToUpdate || !user.companies.map(c => c.id).includes(reportToUpdate.companyId)) {
+  if (!reportToUpdate || (!isAdmin(user) && !user.companies.map(c => c.id).includes(reportToUpdate.companyId))) {
     return {
       errors: {
-        _form: ["Report not found"],
+        _form: ["Report not found or unauthorized"],
       },
     };
   }
