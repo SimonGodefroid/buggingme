@@ -15,6 +15,7 @@ import {
 import { Company } from '@prisma/client';
 
 import { Category } from '../common/category';
+import CompanyBadge from '../companies/company-badge';
 import CompanyCard from '../companies/company-card';
 import SiteBadge from '../sites/site-badge';
 import { Status } from './status';
@@ -46,7 +47,8 @@ export default function ReportSummary({ report }: { report: ReportWithTags }) {
 
             {/* Middle: SiteBadge + Title (Now centered) */}
             <div className="flex flex-col md:flex-row md:items-start flex-wrap xl:flex-nowrap w-full p-4 gap-4 tems-center sm:items-start ">
-              <div className="flex md:w-1/5 justify-center gap-4">
+              <div className="flex md:w-1/5 justify-start gap-4 mx-4">
+                {/* <CompanyBadge company={report.company as Company} /> */}
                 <SiteBadge company={report.company as Company} />
               </div>
               <div className="w-full md:w-4/5">
