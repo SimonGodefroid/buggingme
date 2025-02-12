@@ -40,4 +40,11 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 1. add prod env var to .env add `POSTGRES_URL_NON_POOLING`,`POSTGRES_PRISMA_URL`
 2. run `npx prisma migrate deploy`
 
-##
+## Accounts for DEV
+
+| email          | provider | role   | company         |
+| -------------- | -------- | ------ | --------------- |
+| +god_dev       | GOD      | Auth0  | N.A.            |
+| +bugbusters    | COMPANY  | Auth0  | BugBusters      |
+| +simonscompany | COMPANY  | Auth0  | Simon's Company |
+| SimonGodefroid | ENGINEER | GitHUb | N.A.            |

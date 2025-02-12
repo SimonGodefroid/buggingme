@@ -25,7 +25,7 @@ export default function PageHeader({
   return (
     <div className="flex flex-col items-center md:flex-row md:justify-between gap-4 mx-8">
       <BreadCrumbsClient crumbs={crumbs} />
-      <div className="flex justify-center md:justify-end gap-4">
+      <div className="flex justify-center md:justify-end gap-4 flex-col md:flex-row">
         {buttonProps?.secondary && (
           <Button
             href={

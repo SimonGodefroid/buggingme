@@ -4,6 +4,7 @@ import { Key, startTransition, useCallback } from 'react';
 
 import { updateReportStatus } from '@/actions/reports';
 import { REPORT_STATUS_STATE_MACHINE } from '@/actions/reports/helpers/reportStatus';
+import { ReportWithTags } from '@/types';
 import {
   Button,
   Dropdown,
@@ -14,7 +15,6 @@ import {
 import { ReportStatus, UserType } from '@prisma/client';
 import { toast } from 'react-toastify';
 
-import { ReportWithTags } from '@/types';
 import { Status } from '@/components/reports/status';
 
 export default function StatusSelector({
@@ -51,7 +51,7 @@ export default function StatusSelector({
     <Dropdown>
       <DropdownTrigger>
         <Button size="sm" className="text-background bg-foreground ">
-          Status
+          Update status
         </Button>
       </DropdownTrigger>
       <DropdownMenu
