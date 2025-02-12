@@ -44,9 +44,8 @@ export default function CommentShow({
     />
   ));
 
-  
   return (
-    <div className="p-4 border mt-2 mb-1 relative rounded-md">
+    <div className="p-4 border mt-2 mb-1 relative rounded-md" id={comment.id}>
       {session?.data?.user?.id === comment.userId && (
         <div className="absolute top-4 right-4 flex gap-4">
           <Button

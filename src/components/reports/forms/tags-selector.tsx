@@ -21,7 +21,7 @@ export default function TagsSelector({
       name="tags"
       isDisabled={mode === 'view'}
       selectionMode="multiple"
-      selectedKeys={report?.tags.map((tag) => tag.id)}
+      defaultSelectedKeys={report?.tags.map((tag) => tag.id)}
       renderValue={(values) => {
         return (
           <div className="flex flex-wrap gap-2">

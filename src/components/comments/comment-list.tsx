@@ -32,5 +32,5 @@ export default async function CommentList({
     );
   });
 
-  return <div>{renderedComments}</div>;
+  return <div className='max-h-[400px] overflow-auto'>{renderedComments}</div>;
 }

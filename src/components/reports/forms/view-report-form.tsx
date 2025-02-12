@@ -189,7 +189,8 @@ export default async function ViewReportForm({
           </div>
         </div>
       </form>
-      <div className="space-y-3 max-h-[400px] overflow-auto mx-4">
+      <div className="space-y-3 mx-4">
+      {/* <div className="space-y-3 max-h-[400px] overflow-auto mx-4"> */}
         <h1 className="text-lg font-bold">
           All comments ({report?.comments?.length})
         </h1>

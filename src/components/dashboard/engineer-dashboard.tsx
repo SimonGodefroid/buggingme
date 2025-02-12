@@ -203,7 +203,11 @@ export default function Dashboard({
 
             <TableBody emptyContent={'No report found'}>
               {reports.map((report) => (
-                <TableRow key={report.id}>
+                <TableRow
+                  key={report.id}
+                  className="cursor-pointer"
+                  onClick={() => router.push(`/reports/${report.id}`)}
+                >
                   <TableCell>{report.title}</TableCell>
                   <TableCell>{report.company?.name}</TableCell>
                   <TableCell>
@@ -243,7 +247,9 @@ export default function Dashboard({
 
             <TableBody emptyContent={'No comment found'}>
               {comments.map((comment) => (
-                <TableRow key={comment.id}>
+                <TableRow key={comment.id}
+                className="cursor-pointer"
+                  onClick={() => router.push(`/reports/${comment.report.id}#${comment.id}`)}>
                   <TableCell>{comment.report.title}</TableCell>
                   <TableCell>{comment?.report?.company?.name}</TableCell>
                   <TableCell>{comment.content}</TableCell>
