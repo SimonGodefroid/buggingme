@@ -23,7 +23,7 @@ export default async function ViewSite({
       id: { notIn: [`${process.env.BUG_BUSTERS_COMPANY_ID}`] },
       // Ensure ID exclusion
     },
-    include: { reports: { include: { tags: true } } },
+    include: { reports: { include: { tags: true, company: true } } },
   })) as CompanyWithReports | null;
 
   if (!company) {
