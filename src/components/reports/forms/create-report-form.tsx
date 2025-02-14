@@ -5,7 +5,6 @@ import React, { useEffect, useState } from 'react';
 import { redirect, useRouter } from 'next/navigation';
 
 import { createReport } from '@/actions/reports/create';
-import { createReportGuest } from '@/actions/reports/createGuest';
 import { ReportWithTags, UserWithCompanies } from '@/types';
 import { Button, Input, Selection, Textarea, Tooltip } from '@nextui-org/react';
 import { Tag } from '@prisma/client';
