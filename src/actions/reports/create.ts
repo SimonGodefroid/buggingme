@@ -116,9 +116,9 @@ export async function createReport(
         throw new Error('Only engineers can report bugs.');
       }
 
-      if (validation.data?.visibility === ReportVisibility.Private && user.validPublicReportsCount < 5) {
-        throw new Error('You must have at least 5 valid public reports to submit private reports.');
-      }
+      // if (validation.data?.visibility === ReportVisibility.Private && user.validPublicReportsCount < 5) {
+      //   throw new Error('You must have at least 5 valid public reports to submit private reports.');
+      // }
 
       // let companyId = validation.data?.companyId;
 
