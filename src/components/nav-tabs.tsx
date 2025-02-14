@@ -137,6 +137,11 @@ export default function NavTabs({
       label: 'Leaderboard',
       href: '/leaderboard',
     },
+    {
+      emoji: <Icon name="help-circle" />,
+      label: 'How It Works',
+      href: '/how-it-works',
+    },
   ].filter(Boolean) as NavItem[];
   const noop = () => {};
 

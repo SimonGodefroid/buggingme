@@ -8,6 +8,7 @@ import ReportSummary from '@/components/reports/report-summary';
 export default async function Home() {
   const reports = (await db.report.findMany({
     include: { tags: true, attachments: true, company: true, user: true },
+    where: { companyId: { notIn: [`${process.env.BUG_BUSTERS_COMPANY_ID}`] } },
     orderBy: { createdAt: 'desc' },
   })) as ReportWithTags[];
   return (
