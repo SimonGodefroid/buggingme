@@ -242,8 +242,8 @@ export const CreateReportForm = ({
         </Button>
         {!user ? (
           <Tooltip content="Reporting as guest is not available yet">
-            <Button color="primary" type="submit" form={FORM_ID} disabled>
-              Submit as guest
+            <Button color="primary" type="submit" form={FORM_ID} isDisabled>
+              Report as guest
             </Button>
           </Tooltip>
         ) : (
