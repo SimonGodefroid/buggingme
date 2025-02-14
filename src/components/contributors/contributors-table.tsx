@@ -32,8 +32,10 @@ const INITIAL_VISIBLE_COLUMNS = ['name', 'reports', 'reputation'];
 
 export default function ContributorsTable({
   contributors,
+  withEmail = false,
 }: {
   contributors: ContributorWithReports[];
+  withEmail?: boolean;
 }) {
   const router = useRouter();
   const [filterValue, setFilterValue] = React.useState('');
@@ -109,7 +111,7 @@ export default function ContributorsTable({
                 radius: 'lg',
                 src: `${contributor?.image}` || '',
               }}
-              description={contributor.email}
+              description={withEmail ? contributor.email : undefined}
               name={contributor?.name}
             >
               {contributor?.name}
@@ -235,7 +237,7 @@ export default function ContributorsTable({
     onRowsPerPageChange,
     contributors.length,
     hasSearchFilter,
-    onClear
+    onClear,
   ]);
 
   const bottomContent = React.useMemo(() => {
