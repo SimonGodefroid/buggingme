@@ -7,7 +7,7 @@ import ReportSummary from '@/components/reports/report-summary';
 
 export default async function Home() {
   const reports = (await db.report.findMany({
-    include: { tags: true, attachments: true, company: true },
+    include: { tags: true, attachments: true, company: true, user: true },
   })) as ReportWithTags[];
   return (
     <div className="flex flex-col gap-8 justify-center p-4">
@@ -47,7 +47,7 @@ export default async function Home() {
       </div> */}
       <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12">
-          <Card className="max-w-6xl p-6 my-auto mx-auto shadow-lg" >
+          <Card className="max-w-6xl p-6 my-auto mx-auto shadow-lg">
             <CardHeader className="justify-center text-center">
               <h1 className="text-4xl font-bold">Stand out now!</h1>
             </CardHeader>

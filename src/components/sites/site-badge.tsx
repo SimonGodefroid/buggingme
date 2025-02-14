@@ -3,7 +3,7 @@ import { Company } from '@prisma/client';
 
 export default function SiteBadge({ company }: { company: Company }) {
   return (
-    <div className="flex gap-4 items-start flex-wrap justify-center md:justify-start md:flex-nowrap">
+    <div className="flex flex-col md:flex-row items-center gap-4 flex-wrap justify-center md:justify-start md:flex-nowrap ">
       {/* <div className="flex gap-2 items-center flex-wrap justify-center"> */}
       <Avatar
         alt={company?.name}
