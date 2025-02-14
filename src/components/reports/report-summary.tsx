@@ -14,7 +14,7 @@ import {
   Link,
   Tooltip,
 } from '@nextui-org/react';
-import { Company } from '@prisma/client';
+import { Company, ReportStatus } from '@prisma/client';
 
 import { Category } from '../common/category';
 import UserCard from '../common/user-card';
@@ -61,14 +61,16 @@ export default function ReportSummary({ report }: { report: ReportWithTags }) {
               <div className="flex flex-col gap-4 items-center md:items-start">
                 <h4 className="text-foreground text-tiny">Reported by:</h4>
                 <UserCard user={report.user} />
-                <Tooltip content={`Reported on ${report.createdAt}`}>
-                  <h5
-                    suppressHydrationWarning
-                    className="text-foreground text-tiny"
-                  >
-                    {`${reportTimeAgo.days} days, ${reportTimeAgo.hours} hours, ${reportTimeAgo.minutes} minutes ago`}
-                  </h5>
-                </Tooltip>
+                {report.status === ReportStatus.Open && (
+                  <Tooltip content={`Reported on ${report.createdAt}`}>
+                    <h5
+                      suppressHydrationWarning
+                      className="text-foreground text-tiny"
+                    >
+                      {`${reportTimeAgo.days} days, ${reportTimeAgo.hours} hours, ${reportTimeAgo.minutes} minutes ago`}
+                    </h5>
+                  </Tooltip>
+                )}
               </div>
             </div>
 

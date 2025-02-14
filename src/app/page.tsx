@@ -8,6 +8,7 @@ import ReportSummary from '@/components/reports/report-summary';
 export default async function Home() {
   const reports = (await db.report.findMany({
     include: { tags: true, attachments: true, company: true, user: true },
+    orderBy: { createdAt: 'desc' },
   })) as ReportWithTags[];
   return (
     <div className="flex flex-col gap-8 justify-center p-4">
