@@ -2,12 +2,14 @@ import { Suspense } from 'react';
 
 import { notFound } from 'next/navigation';
 
+import { fetchUser } from '@/actions';
+import { fetchAllTags } from '@/actions/reports/tags/fetchAllTags';
 import db from '@/db';
 import { CompanyWithReports, ReportWithTags } from '@/types';
 import { ReportStatus } from '@prisma/client';
 
 import PageHeader from '@/components/common/page-header';
-import ViewReportForm from '@/components/reports/forms/view-report-form';
+import { CreateReportForm } from '@/components/reports/forms/create-report-form';
 import SiteInformation from '@/components/sites/site-information';
 
 export default async function ViewSite({
@@ -16,6 +18,8 @@ export default async function ViewSite({
   params: { url: string };
 }) {
   const { url } = params;
+  const user = await fetchUser();
+  const tags = await fetchAllTags();
 
   const company = (await db.company.findFirst({
     where: {
@@ -36,16 +40,19 @@ export default async function ViewSite({
         crumbs={[
           { href: '/sites', text: 'Sites' },
           { href: `/sites/${url}`, text: `${company.domain}` },
+          {
+            href: `/sites/${url}/report`,
+            text: `Create report for ${new URL(`${company.domain}`).host}`,
+          },
         ]}
         buttonProps={{
-          primary: {
-            href: `/sites/${url}/report`,
-            text: `Report problem on ${new URL(`${company.domain}`).host}`,
+          secondary: {
+            href: `/sites`,
+            text: `Back to ${new URL(`${company.domain}`).host} reports`,
           },
-          secondary: { href: `/sites`, text: 'Back to sites' },
         }}
       />
-      <SiteInformation company={company} />
+      <CreateReportForm user={user} tags={tags} />
     </div>
   );
 }
