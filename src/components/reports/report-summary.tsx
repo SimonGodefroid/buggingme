@@ -62,7 +62,10 @@ export default function ReportSummary({ report }: { report: ReportWithTags }) {
                 <h4 className="text-foreground text-tiny">Reported by:</h4>
                 <UserCard user={report.user} />
                 <Tooltip content={`Reported on ${report.createdAt}`}>
-                  <h5 className="text-foreground text-tiny">
+                  <h5
+                    suppressHydrationWarning
+                    className="text-foreground text-tiny"
+                  >
                     {`${reportTimeAgo.days} days, ${reportTimeAgo.hours} hours, ${reportTimeAgo.minutes} minutes ago`}
                   </h5>
                 </Tooltip>
