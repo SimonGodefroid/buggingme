@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
+import { timeAgo } from '@/helpers/dates';
 import { ReportWithTags } from '@/types';
 import {
   Avatar,
@@ -11,6 +12,7 @@ import {
   CardFooter,
   CardHeader,
   Link,
+  Tooltip,
 } from '@nextui-org/react';
 import { Company } from '@prisma/client';
 
@@ -21,6 +23,7 @@ import { Status } from './status';
 
 export default function ReportSummary({ report }: { report: ReportWithTags }) {
   const router = useRouter();
+  const reportTimeAgo = timeAgo(report.createdAt);
   return (
     <Card
       isHoverable
@@ -58,6 +61,11 @@ export default function ReportSummary({ report }: { report: ReportWithTags }) {
               <div className="flex flex-col gap-4 items-center md:items-start">
                 <h4 className="text-foreground text-tiny">Reported by:</h4>
                 <UserCard user={report.user} />
+                <Tooltip content={`Reported on ${report.createdAt}`}>
+                  <h5 className="text-foreground text-tiny">
+                    {`${reportTimeAgo.days} days, ${reportTimeAgo.hours} hours, ${reportTimeAgo.minutes} minutes ago`}
+                  </h5>
+                </Tooltip>
               </div>
             </div>
 
