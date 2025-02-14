@@ -5,8 +5,9 @@ import React, { useEffect, useState } from 'react';
 import { redirect, useRouter } from 'next/navigation';
 
 import { createReport } from '@/actions/reports/create';
+import { createReportGuest } from '@/actions/reports/createGuest';
 import { ReportWithTags, UserWithCompanies } from '@/types';
-import { Button, Input, Selection, Textarea } from '@nextui-org/react';
+import { Button, Input, Selection, Textarea, Tooltip } from '@nextui-org/react';
 import { Tag } from '@prisma/client';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
@@ -33,29 +34,33 @@ export const CreateReportForm = ({
   const FORM_ID = `create-report`;
   const router = useRouter();
 
-  const [formState, action] = useFormState(createReport, {
-    errors: {},
-  });
+  const [formState, action] = useFormState(
+    // user ? createReport : createReportGuest,
+    createReport,
+    {
+      errors: {},
+    },
+  );
 
   const [images, setImages] = React.useState<
     { url: string; filename: string }[]
   >([]);
 
   useEffect(() => {
-    if (formState.success) {
+    if (formState?.success) {
       toast.success(
         `The report has been created it will be reviewed by an admin before publication !`,
       );
       redirect(`/reports`);
     }
-    if (formState.errors._form?.length) {
+    if (formState?.errors._form?.length) {
       toast.error(formState.errors._form.join(', '));
     }
   }, [formState]);
 
   const [url, setUrl] = useState<string>('');
   // const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
-  const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
+  // const [selectedCompany, setSelectedCompany] = useState<string | null>(null);
 
   // const handleCampaignChange = (campaign: any | null) => {
   //   setSelectedCampaign(campaign);
@@ -210,6 +215,21 @@ export const CreateReportForm = ({
             <div className="col-span-12 md:col-span-6">
               <div className="flex flex-col gap-4 m-4 md:mx-4 md:my-0">
                 <EditorClient />
+                {/* {!user && (
+                  <Input
+                    isInvalid={!!formState?.errors.email}
+                    errorMessage={formState?.errors.email?.join(', ')}
+                    name="email"
+                    isRequired
+                    label="Email"
+                    placeholder="john@example.com"
+                    endContent={
+                      <span className="text-tiny">
+                        Required for non-existing users
+                      </span>
+                    }
+                  />
+                )} */}
               </div>
             </div>
           </div>
@@ -220,10 +240,17 @@ export const CreateReportForm = ({
         <Button color="danger" variant="flat" onClick={router.back}>
           Cancel
         </Button>
-
-        <Button color="primary" type="submit" form={FORM_ID}>
-          Submit
-        </Button>
+        {!user ? (
+          <Tooltip content="Reporting as guest is not available yet">
+            <Button color="primary" type="submit" form={FORM_ID} disabled>
+              Submit as guest
+            </Button>
+          </Tooltip>
+        ) : (
+          <Button color="primary" type="submit" form={FORM_ID}>
+            Submit
+          </Button>
+        )}
       </div>
     </div>
   );

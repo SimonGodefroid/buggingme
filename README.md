@@ -48,3 +48,8 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/deploym
 | +bugbusters    | COMPANY  | Auth0  | BugBusters      |
 | +simonscompany | COMPANY  | Auth0  | Simon's Company |
 | SimonGodefroid | ENGINEER | GitHUb | N.A.            |
+
+
+## Run migration with specific .env
+
+`$ npx prisma migrate dev --env-file .env.local --name <migration_name>`
