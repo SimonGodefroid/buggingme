@@ -15,8 +15,7 @@ import {
 import { Company } from '@prisma/client';
 
 import { Category } from '../common/category';
-import CompanyBadge from '../companies/company-badge';
-import CompanyCard from '../companies/company-card';
+import UserCard from '../common/user-card';
 import SiteBadge from '../sites/site-badge';
 import { Status } from './status';
 
@@ -32,7 +31,7 @@ export default function ReportSummary({ report }: { report: ReportWithTags }) {
     >
       <CardBody className="flex">
         <div className="flex xs:flex-row">
-          <div className="flex flex-col items-center md:flex-row justify-between md:items-start w-full gap-10 xs:flex-wrap md:flex-nowrap 0">
+          <div className="flex flex-col items-center md:flex-row justify-between md:items-start w-full gap-10 xs:flex-wrap md:flex-nowrap ">
             {/* Left: Image */}
             <div className="w-48 h-32 flex-shrink-0 ">
               <img
@@ -46,7 +45,7 @@ export default function ReportSummary({ report }: { report: ReportWithTags }) {
             </div>
 
             {/* Middle: SiteBadge + Title (Now centered) */}
-            <div className="flex flex-col md:flex-row md:items-start flex-wrap xl:flex-nowrap w-full p-4 gap-4 tems-center sm:items-start ">
+            <div className="flex flex-col items-center md:flex-row md:items-start flex-wrap xl:flex-nowrap w-full p-4 gap-4">
               <div className="flex md:w-1/5 justify-start gap-4 mx-4">
                 {/* <CompanyBadge company={report.company as Company} /> */}
                 <SiteBadge company={report.company as Company} />
@@ -55,6 +54,10 @@ export default function ReportSummary({ report }: { report: ReportWithTags }) {
                 <p className="text-md text-center md:text-left w-full">
                   {report.title}
                 </p>
+              </div>
+              <div className="flex flex-col gap-4 items-center md:items-start">
+                <h4 className="text-foreground text-tiny">Reported by:</h4>
+                <UserCard user={report.user} />
               </div>
             </div>
 
