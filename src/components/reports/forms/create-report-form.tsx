@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useActionState, useEffect, useState } from 'react';
 
 import { redirect, useRouter } from 'next/navigation';
 
@@ -9,6 +9,7 @@ import { ReportWithTags, UserWithCompanies } from '@/types';
 import { Button, Input, Selection, Textarea, Tooltip } from '@nextui-org/react';
 import { Tag } from '@prisma/client';
 import { useFormState } from 'react-dom';
+// import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
 
 import CampaignSelector from '@/components/campaigns/campaign-selector';
@@ -44,7 +45,6 @@ export const CreateReportForm = ({
   const [images, setImages] = React.useState<
     { url: string; filename: string }[]
   >([]);
-
   useEffect(() => {
     if (formState?.success) {
       toast.success(
