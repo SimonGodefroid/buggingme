@@ -9,6 +9,7 @@ import PageHeader from '@/components/common/page-header';
 import StatusSelector from '@/components/common/status-selector';
 import CategorySelector from '@/components/reports/forms/category-selector';
 import ViewReportForm from '@/components/reports/forms/view-report-form';
+import NotifyReport from '@/components/reports/notify-report-button';
 
 export default async function ViewReport({
   params,
@@ -49,6 +50,7 @@ export default async function ViewReport({
           secondary: { href: `/reports`, text: 'Back to reports' },
           custom: (
             <>
+              <NotifyReport report={report} />
               <CategorySelector report={report} />
               <StatusSelector report={report} />
             </>

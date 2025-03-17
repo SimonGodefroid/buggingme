@@ -5,7 +5,7 @@ import React, { FC } from 'react';
 import { usePathname } from 'next/navigation';
 
 import { signIn, signInAuth0, signOut } from '@/actions';
-import { isCompany } from '@/helpers';
+import { isAdmin } from '@/helpers';
 import { UserWithCompanies } from '@/types';
 import {
   Avatar,
@@ -99,15 +99,15 @@ export default function NavTabs({
       href: '/contributors',
       count: count.contributors,
     },
-    // isCompany(user!)
-    //   ? null
-    //   : {
-    //       emoji: <Icon name="buildings" />,
-    //       // emoji: '🏢',
-    //       label: 'Companies',
-    //       href: '/companies',
-    //       count: count.companies,
-    //     },
+    isAdmin(user!)
+      ? {
+          emoji: <Icon name="buildings" />,
+          // emoji: '🏢',
+          label: 'Companies',
+          href: '/companies',
+          count: count.companies,
+        }
+      : null,
     // {
     //   emoji: (
     //     <div className="flex">
