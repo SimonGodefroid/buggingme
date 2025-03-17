@@ -3,8 +3,8 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
   directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
 }
 
@@ -143,31 +143,32 @@ model UpdateHistory {
 }
 
 model Report {
-  id               String           @id @default(cuid())
-  title            String
-  companyId        String
-  url              String?
-  steps            String?
-  suggestions      String?
-  snippets         String?
-  language         String?
-  userId           String
-  category         ReportCategory   @default(New)
-  createdAt        DateTime         @default(now())
-  updatedAt        DateTime         @updatedAt
-  user             User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  comments         Comment[]
-  visibility       ReportVisibility @default(Public)
-  status           ReportStatus     @default(Open)
-  StatusHistory    StatusHistory[]
-  UpdateHistory    UpdateHistory[]
-  tags             Tag[]            @relation("ReportTags")
-  severity         Severity         @default(Medium)
-  impact           Impact           @default(SingleUser)
-  company          Company?         @relation(fields: [companyId], references: [id])
-  attachments      Attachment[] // Attachments related to the report
-  campaignId       String? // Foreign key to link to a campaign
-  campaign         Campaign?        @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  id            String           @id @default(cuid())
+  title         String
+  companyId     String
+  url           String?
+  steps         String?
+  suggestions   String?
+  snippets      String?
+  language      String?
+  userId        String
+  category      ReportCategory   @default(New)
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments      Comment[]
+  visibility    ReportVisibility @default(Public)
+  status        ReportStatus     @default(Open)
+  StatusHistory StatusHistory[]
+  UpdateHistory UpdateHistory[]
+  tags          Tag[]            @relation("ReportTags")
+  severity      Severity         @default(Medium)
+  impact        Impact           @default(SingleUser)
+  company       Company?         @relation(fields: [companyId], references: [id])
+  attachments   Attachment[] // Attachments related to the report
+  campaignId    String? // Foreign key to link to a campaign
+  campaign      Campaign?        @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  notifiedAt    DateTime?
 }
 
 model Comment {
