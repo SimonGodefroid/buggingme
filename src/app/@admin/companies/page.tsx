@@ -23,7 +23,15 @@ export default async function Companies({ ...args }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <PageHeader crumbs={[{ href: '/companies', text: 'Companies' }]} />
+      <PageHeader
+        crumbs={[{ href: '/companies', text: 'Companies' }]}
+        buttonProps={{
+          primary: {
+            href: `/admin/companies/create`,
+            text: 'Create Company',
+          },
+        }}
+      />
       <CompaniesTable companies={companies} />
     </div>
   );

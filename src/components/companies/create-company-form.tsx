@@ -12,8 +12,10 @@ import {
   Avatar,
   Button,
   Input,
+  Select,
+  SelectItem,
 } from '@nextui-org/react';
-import { Company } from '@prisma/client';
+import { Company, IssueTracker } from '@prisma/client';
 import debounce from 'lodash.debounce';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
@@ -43,19 +45,20 @@ export function CreateCompanyForm() {
       toast.success(
         `Company ${createCompanyFormState?.company?.name} has been created`,
       );
-      router.push('/admin');
+      router.push('/companies');
     }
     if (createCompanyFormState.errors._form?.length) {
       toast.error(
         `Something went wrong while creating the company ${createCompanyFormState.errors._form?.join(',')}`,
       );
     }
-  }, [createCompanyFormState,router]);
+  }, [createCompanyFormState, router]);
 
   const [companyData, setCompanyData] = useState<{
     name: string;
     domain: string;
     logo: string;
+    issueTracker?: IssueTracker;
   }>({ name: '', domain: '', logo: '' });
   const [loading, setLoading] = useState(false);
   const [suggestions, setSuggestions] = useState<
@@ -71,7 +74,11 @@ export function CreateCompanyForm() {
     const selectedSuggestion = suggestions.find(
       (suggestion) => `${suggestion.name}-${suggestion.domain}` === selectedKey,
     );
-    if (selectedSuggestion) setCompanyData(selectedSuggestion);
+    if (selectedSuggestion)
+      setCompanyData({
+        ...selectedSuggestion,
+        domain: `https://${selectedSuggestion.domain}`,
+      });
   };
 
   const fetchSuggestions = async (term: string) => {
@@ -166,6 +173,27 @@ export function CreateCompanyForm() {
                   setCompanyData({ ...companyData, logo: value })
                 }
               />
+              <Select
+                label={<div className="mb-4">Issue Tracker</div>}
+                name="issueTracker"
+                isMultiline
+                placeholder="Select issue tracker"
+                // selectedKeys={new Set([companyData.issueTracker!])} // Ensure controlled state
+                onSelectionChange={(value) => {
+                  const selectedValue = Array.from(value)[0] as IssueTracker;
+                  setCompanyData({
+                    ...companyData,
+                    issueTracker: selectedValue,
+                  });
+                }}
+              >
+                {Object.values(IssueTracker).map((issueTracker) => (
+                  <SelectItem key={issueTracker} value={issueTracker}>
+                    {issueTracker}
+                  </SelectItem>
+                ))}
+              </Select>
+
               <div className="flex gap-2 items-center">
                 <Avatar
                   alt={companyData?.name}
@@ -186,9 +214,18 @@ export function CreateCompanyForm() {
               <code>{JSON.stringify(companyData)}</code>
             </div>
           </div>
-          <Button type="submit" color="success" form={CREATE_COMPANY_FORM_ID}>
-            Create company
-          </Button>
+          <div className="flex justify-between">
+            <Button
+              color="primary"
+              variant="bordered"
+              onClick={() => router.push(`/`)}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" color="success" form={CREATE_COMPANY_FORM_ID}>
+              Create company
+            </Button>
+          </div>
         </div>
       </form>
     </div>

@@ -1,12 +1,11 @@
 import { notFound } from 'next/navigation';
 
 import db from '@/db';
-import { Button } from '@nextui-org/react';
 
 import PageHeader from '@/components/common/page-header';
-import CompanyBadge from '@/components/companies/company-badge';
+import { UpdateCompanyForm } from '@/components/companies/update-company-form';
 
-export default async function ViewCompany({
+export default async function EditCompany({
   params: { companyId },
 }: {
   params: { companyId: string };
@@ -23,23 +22,13 @@ export default async function ViewCompany({
         crumbs={[
           { href: '/companies', text: 'Companies' },
           { href: `/companies/${company.id}`, text: `${company.name}` },
-          { href: `/companies/${company.id}`, text: `View` },
+          { href: `/companies/${company.id}`, text: `Edit` },
         ]}
-        buttonProps={{
-          primary: {
-            href: `/companies/${company.id}/edit`,
-            text: 'Edit Company',
-          },
-          secondary: {
-            href: `/companies`,
-            text: 'Back to Companies',
-          },
-        }}
       />
       <pre>
         <code>{JSON.stringify(company, null, '\t')}</code>
       </pre>
-      <CompanyBadge company={company} />
+      <UpdateCompanyForm company={company} />
     </div>
   );
 }

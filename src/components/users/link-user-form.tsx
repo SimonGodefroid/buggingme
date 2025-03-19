@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 
+import { useRouter } from 'next/navigation';
+
 import { linkUserToCompanies } from '@/actions';
 import { UserWithCompanies } from '@/types';
 import { Button, Select, SelectItem, Tooltip } from '@nextui-org/react';
@@ -20,7 +22,7 @@ export function LinkUserForm({
   const [linkFormState, linkAction] = useFormState(linkUserToCompanies, {
     errors: {},
   });
-
+  const router = useRouter();
   useEffect(() => {
     if (linkFormState.success) {
       toast.success(
@@ -89,9 +91,19 @@ export function LinkUserForm({
               <SelectItem key={company.id}>{company.name}</SelectItem>
             ))}
           </Select>
-          <Button type="submit" color="success" form={LINK_FORM_ID}>
-            Link user to company
-          </Button>
+          <div className="flex justify-between">
+            <Button
+              color="primary"
+              variant="bordered"
+              onClick={() => router.push(`/`)}
+            >
+              Cancel
+            </Button>
+
+            <Button type="submit" color="success" form={LINK_FORM_ID}>
+              Link user to company
+            </Button>
+          </div>
         </div>
       </form>
     </div>
