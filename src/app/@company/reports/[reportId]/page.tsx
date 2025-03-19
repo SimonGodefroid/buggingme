@@ -6,6 +6,7 @@ import db from '@/db';
 import { ReportWithTags } from '@/types';
 
 import PageHeader from '@/components/common/page-header';
+import { DispatchToIssueTracker } from '@/components/reports/dispatch-to-issue-tracker';
 import CategorySelector from '@/components/reports/forms/category-selector';
 import ViewReportForm from '@/components/reports/forms/view-report-form';
 
@@ -27,6 +28,7 @@ export default async function ViewReport({
       attachments: true,
       comments: true,
       campaign: true,
+      ReportDispatch: true,
     },
   })) as ReportWithTags;
 
@@ -49,7 +51,15 @@ export default async function ViewReport({
             href: `/reports`,
             text: 'Back to reports',
           },
-          custom: <CategorySelector report={report} />,
+          custom: (
+            <>
+              <CategorySelector report={report} />
+              <DispatchToIssueTracker
+                company={report.company!}
+                report={report}
+              />
+            </>
+          ),
         }}
       />
       <ViewReportForm report={report} />

@@ -3,14 +3,17 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { auth } from '@/auth';
 import db from '@/db';
-import { Company } from '@prisma/client';
+import { Company, IssueTracker } from '@prisma/client';
+import { isAdmin, } from '@/helpers';
 
-const createCompanySchema = z.object({
+const updateCompanySchema = z.object({
   name: z.string().min(3),
   domain: z.string().url(),
   logo: z.union([z.string().url(), z.literal('')]).optional(),
+  issueTracker: z.nativeEnum(IssueTracker),
 });
-interface CreateCompanyFormState {
+
+interface UpdateCompanyFormState {
   errors: {
     name?: string[],
     domain?: string[],
@@ -21,14 +24,16 @@ interface CreateCompanyFormState {
   company?: Company
 }
 
-export async function createCompany(
-  formState: CreateCompanyFormState,
+export async function updateCompany(
+  { companyId }: { companyId: string },
+  formState: UpdateCompanyFormState,
   formData: FormData
-): Promise<CreateCompanyFormState> {
-  const result = createCompanySchema.safeParse({
+): Promise<UpdateCompanyFormState> {
+  const result = updateCompanySchema.safeParse({
     name: formData.get('name'),
     domain: formData.get('domain'),
     logo: formData.get('logo'),
+    issueTracker: formData.get('issueTracker'),
   });
 
   if (!result.success) {
@@ -38,9 +43,9 @@ export async function createCompany(
       errors
     };
   }
-
   const session = await auth();
-  if (!session || !session.user) {
+  const user = await db.user.findUnique({ where: { id: session?.user?.id }, include: { companies: true } });
+  if (!session || !session.user || !user || user && !isAdmin(user)) {
     return {
       errors: {
         _form: ['You must be signed in to do this.'],
@@ -50,14 +55,16 @@ export async function createCompany(
 
   let company: Company;
   try {
-    company = await db.company.create({
+    company = await db.company.update({
       data: {
         name: result.data.name,
         logo: result.data.logo,
         domain: result.data.domain,
+        issueTracker: result.data.issueTracker, // Ensure this is updated
       },
+      where: { id: companyId },
     });
-    revalidatePath(`/companies/${company}/${company.id}`);
+    revalidatePath('/admin');
     return {
       success: true,
       company,

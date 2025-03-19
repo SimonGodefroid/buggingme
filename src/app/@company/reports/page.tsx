@@ -18,6 +18,7 @@ export default async function Reports() {
       attachments: true,
       campaign: true,
       comments: true,
+      ReportDispatch: true,
     },
   });
 

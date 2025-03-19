@@ -1,0 +1,2 @@
+-- CreateEnum
+CREATE TYPE "IssueTracker" AS ENUM ('GITHUB', 'JIRA', 'TRELLO', 'ASANA', 'LINEAR', 'CLICKUP', 'MONDAY');

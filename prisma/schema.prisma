@@ -42,26 +42,27 @@ model Session {
 }
 
 model User {
-  id                      String       @id @default(cuid())
+  id                      String           @id @default(cuid())
   name                    String?
-  email                   String?      @unique
+  email                   String?          @unique
   emailVerified           DateTime?
   image                   String?
-  validPublicReportsCount Int          @default(0)
+  validPublicReportsCount Int              @default(0)
   accounts                Account[]
   sessions                Session[]
   userTypes               UserType[]
   Report                  Report[]
   Comment                 Comment[]
-  createdAt               DateTime     @default(now())
-  updatedAt               DateTime?    @updatedAt
-  companies               Company[]    @relation("UserCompanies")
+  createdAt               DateTime         @default(now())
+  updatedAt               DateTime?        @updatedAt
+  companies               Company[]        @relation("UserCompanies")
   attachments             Attachment[]
   Campaign                Campaign[]
-  invitationsReceived     Invitation[] @relation("ReceivedInvitations") // Opposite field for invitee
-  invitationsSent         Invitation[] @relation("SentInvitations") // Opposite field for invitor
+  invitationsReceived     Invitation[]     @relation("ReceivedInvitations") // Opposite field for invitee
+  invitationsSent         Invitation[]     @relation("SentInvitations") // Opposite field for invitor
   Invitation              Invitation[]
-  reputation              Int          @default(0)
+  reputation              Int              @default(0)
+  ReportDispatch          ReportDispatch[]
 }
 
 model VerificationToken {
@@ -143,32 +144,33 @@ model UpdateHistory {
 }
 
 model Report {
-  id            String           @id @default(cuid())
-  title         String
-  companyId     String
-  url           String?
-  steps         String?
-  suggestions   String?
-  snippets      String?
-  language      String?
-  userId        String
-  category      ReportCategory   @default(New)
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  user          User             @relation(fields: [userId], references: [id], onDelete: Cascade)
-  comments      Comment[]
-  visibility    ReportVisibility @default(Public)
-  status        ReportStatus     @default(Open)
-  StatusHistory StatusHistory[]
-  UpdateHistory UpdateHistory[]
-  tags          Tag[]            @relation("ReportTags")
-  severity      Severity         @default(Medium)
-  impact        Impact           @default(SingleUser)
-  company       Company?         @relation(fields: [companyId], references: [id])
-  attachments   Attachment[] // Attachments related to the report
-  campaignId    String? // Foreign key to link to a campaign
-  campaign      Campaign?        @relation(fields: [campaignId], references: [id], onDelete: SetNull)
-  notifiedAt    DateTime?
+  id             String           @id @default(cuid())
+  title          String
+  companyId      String
+  url            String?
+  steps          String?
+  suggestions    String?
+  snippets       String?
+  language       String?
+  userId         String
+  category       ReportCategory   @default(New)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+  user           User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments       Comment[]
+  visibility     ReportVisibility @default(Public)
+  status         ReportStatus     @default(Open)
+  StatusHistory  StatusHistory[]
+  UpdateHistory  UpdateHistory[]
+  tags           Tag[]            @relation("ReportTags")
+  severity       Severity         @default(Medium)
+  impact         Impact           @default(SingleUser)
+  company        Company?         @relation(fields: [companyId], references: [id])
+  attachments    Attachment[] // Attachments related to the report
+  campaignId     String? // Foreign key to link to a campaign
+  campaign       Campaign?        @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  notifiedAt     DateTime?
+  ReportDispatch ReportDispatch[]
 }
 
 model Comment {
@@ -187,16 +189,17 @@ model Comment {
 }
 
 model Company {
-  id          String       @id @default(cuid())
-  name        String       @unique
-  domain      String?
-  logo        String?
-  reports     Report[]
-  users       User[]       @relation("UserCompanies")
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
-  Campaigns   Campaign[]   @relation("CompanyCampaigns")
-  invitations Invitation[] // Invitations associated with the company
+  id           String        @id @default(cuid())
+  name         String        @unique
+  domain       String?
+  logo         String?
+  reports      Report[]
+  users        User[]        @relation("UserCompanies")
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  Campaigns    Campaign[]    @relation("CompanyCampaigns")
+  invitations  Invitation[] // Invitations associated with the company
+  issueTracker IssueTracker?
 }
 
 model Attachment {
@@ -266,4 +269,28 @@ model Invitation {
   userId     String?
   // FIXME: let's think this through
   // @@unique([campaignId, inviteeId]) // Added unique constraint
+}
+
+enum IssueTracker {
+  GITHUB
+  JIRA
+  TRELLO
+  ASANA
+  LINEAR
+  CLICKUP
+  MONDAY
+}
+
+model ReportDispatch {
+  id           String       @id @default(cuid())
+  reportId     String
+  issueTracker IssueTracker
+  dispatchedBy String
+  dispatchedAt DateTime     @default(now())
+  externalId   String? // Issue ID in Trello
+  status       String // Updated status from Trello (e.g., "Done", "In Progress")
+  response     Json? // Last known response
+  user         User         @relation(fields: [dispatchedBy], references: [id])
+  report       Report       @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  updatedAt    DateTime?    @updatedAt
 }

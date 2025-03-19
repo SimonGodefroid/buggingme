@@ -37,7 +37,7 @@ export const EditCampaignForm = ({
   campaign: CampaignWithInvitations;
   user?: UserWithCompanies | null;
 }) => {
-  const FORM_ID = `create-campaign`;
+  const FORM_ID = `edit-campaign`;
   const router = useRouter();
   const min = today(getLocalTimeZone());
   const [formState, action] = useFormState(
