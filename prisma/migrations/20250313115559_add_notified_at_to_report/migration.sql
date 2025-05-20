@@ -5,4 +5,4 @@
 
 */
 -- AlterTable
-ALTER TABLE "Report" ADD COLUMN     "notifiedAt" TIMESTAMP(3);
+ALTER TABLE "Report" ADD COLUMN     "notifiedAt" TIMESTAMP(3) NOT NULL;
