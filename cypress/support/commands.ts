@@ -1,6 +1,8 @@
+/// <reference types="@testing-library/cypress" />
 /// <reference types="cypress" />
 // import type Chainable from 'cypress'
 import "./auth-provider-commands/auth0";
+import '@testing-library/cypress/add-commands'
 import { User, UserType } from '@prisma/client';
 // import cypress = require('cypress');
 import { sessions, users } from '../data';
@@ -59,16 +61,12 @@ Cypress.Commands.add('setSession', (userType: UserType) => {
     }
     return user;
   }
+
+
   const loggedInUser = getUserSessionByType(userType);
-  cy.log('loggedInUser'.repeat(200) + JSON.stringify(loggedInUser));
+  cy.log('loggedInUser'.repeat(10) + JSON.stringify(loggedInUser));
   const sessionToLog = sessions.find(session => session.userId === loggedInUser.id);
-  cy.log('sessionToLog'.repeat(200) + JSON.stringify(sessionToLog));
+  cy.log('sessionToLog'.repeat(10) + JSON.stringify(sessionToLog));
   cy.setCookie('authjs.session-token', sessions?.find(session => session.userId === loggedInUser.id)?.sessionToken || '')
-  // cy.setCookie(
-  //   'next-auth.session-token',
-  //   'a valid cookie from your browser session',
-  // )
-  // cy.preserveCookieOnce('next-auth.session-token') // works without this, for now
   cy.visit('/')
-  // cy.wait('@session')
 })
