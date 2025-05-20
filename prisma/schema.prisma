@@ -168,7 +168,7 @@ model Report {
   attachments   Attachment[] // Attachments related to the report
   campaignId    String? // Foreign key to link to a campaign
   campaign      Campaign?        @relation(fields: [campaignId], references: [id], onDelete: SetNull)
-  notifiedAt    DateTime?
+  notifiedAt    DateTime? // this made a mess
 }
 
 model Comment {
