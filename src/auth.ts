@@ -59,6 +59,7 @@ export const {
       }
     },
   },
+  trustHost: true, // ✅ Required for Coolify or any non-Vercel host
   // pages: {
   //   signIn: '/auth/signin',
   // },
