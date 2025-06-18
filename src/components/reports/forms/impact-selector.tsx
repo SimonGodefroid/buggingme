@@ -11,8 +11,8 @@ export default function ImpactSelector ({
   report,
 }: {
   viewModeProps?: {
-    isReadOnly: boolean;
-    isDisabled: boolean;
+    isReadOnly?: boolean;
+    isDisabled?: boolean;
   };
   report?: ReportWithTags;
 }) {
@@ -22,6 +22,7 @@ export default function ImpactSelector ({
       name="impact"
       {...viewModeProps}
       placeholder="Select an impact level"
+      isDisabled={viewModeProps?.isDisabled}
       defaultSelectedKeys={[report?.impact || Impact.SingleUser]}
       classNames={{ value: ['mt-1'] }}
       renderValue={(selected) => (
