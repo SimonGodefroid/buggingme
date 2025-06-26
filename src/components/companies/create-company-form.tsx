@@ -43,7 +43,7 @@ export function CreateCompanyForm() {
       toast.success(
         `Company ${createCompanyFormState?.company?.name} has been created`,
       );
-      router.push('/admin');
+      router.push('/');
     }
     if (createCompanyFormState.errors._form?.length) {
       toast.error(
