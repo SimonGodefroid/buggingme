@@ -10,7 +10,7 @@ export default function SeveritySelector({
   viewModeProps,
   report,
 }: {
-  viewModeProps?: { isReadOnly?: boolean; isDisabled?: boolean };
+  viewModeProps?: { isReadOnly: boolean; isDisabled: boolean };
   report?: ReportWithTags;
 }) {
   return (

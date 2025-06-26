@@ -26,7 +26,7 @@ export default function LinkReportForm({ report }: { report: ReportWithTags }) {
 
   useEffect(() => {
     if (formState.success) {
-      toast.success(`Linking report was successful !`);
+      toast.success(`Campaign creation successful !`);
       redirect(`/reports/link`);
     }
     if (formState.errors._form?.length) {
