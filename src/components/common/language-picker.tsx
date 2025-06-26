@@ -18,7 +18,7 @@ export const LanguagePicker = ({
   const LANGUAGES = useMemo(() => {
     return monaco?.languages
       .getLanguages()
-      .sort((a, b) => (a.id < b.id ? -1 : 1));
+      .sort((a:typeof monaco['language'], b:typeof monaco['language']) => (a.id < b.id ? -1 : 1));
   }, [monaco]);
 
   return (
@@ -34,7 +34,7 @@ export const LanguagePicker = ({
         setLanguage(value);
       }}
     >
-      {(LANGUAGES || []).map((lg) => (
+      {(LANGUAGES || []).map((lg:typeof monaco['language']) => (
         <AutocompleteItem key={lg.id} value={lg.id}>
           {lg.id}
         </AutocompleteItem>
