@@ -13,6 +13,7 @@ enum UserType {
   COMPANY
   GOD
   ADMIN
+  GUEST
 }
 
 model Account {
