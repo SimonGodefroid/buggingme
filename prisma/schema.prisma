@@ -15,6 +15,14 @@ enum UserType {
   ADMIN
 }
 
+enum UserStatus {
+  PendingVerification
+  Active
+  Blocked
+  Suspended
+  Deleted
+}
+
 model Account {
   id                String  @id @default(cuid())
   userId            String
@@ -62,6 +70,7 @@ model User {
   invitationsSent         Invitation[] @relation("SentInvitations") // Opposite field for invitor
   Invitation              Invitation[]
   reputation              Int          @default(0)
+  status                  UserStatus   @default(PendingVerification)
 }
 
 model VerificationToken {
