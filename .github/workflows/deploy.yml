@@ -1,0 +1,74 @@
+name: Lint, Test & deploy - sequential
+on: push
+
+jobs:
+ lint:
+   runs-on: ubuntu-latest
+   steps:
+     - name: Get code
+       uses: actions/checkout@v3
+     - name: Install dependencies
+       run: npm i
+     - name: Lint
+       run: npm run lint
+
+ test:
+   needs: lint
+   runs-on: ubuntu-latest
+   
+   services:
+     postgres:
+       image: postgres:15
+       env:
+         POSTGRES_PASSWORD: postgres
+         POSTGRES_DB: test_db
+       options: >-
+         --health-cmd pg_isready
+         --health-interval 10s
+         --health-timeout 5s
+         --health-retries 5
+       ports:
+         - 5432:5432
+   
+   steps:
+     - name: Get code
+       uses: actions/checkout@v3
+     - name: Install dependencies
+       run: npm i
+     - name: Generate Prisma client
+       run: npx prisma generate
+       env:
+         POSTGRES_PRISMA_URL: postgresql://postgres:postgres@localhost:5432/test_db
+         POSTGRES_URL_NON_POOLING: postgresql://postgres:postgres@localhost:5432/test_db
+     - name: Run database migrations
+       run: npx prisma migrate deploy
+       env:
+         POSTGRES_PRISMA_URL: postgresql://postgres:postgres@localhost:5432/test_db
+         POSTGRES_URL_NON_POOLING: postgresql://postgres:postgres@localhost:5432/test_db
+     - name: Test
+       run: npm test
+       env:
+         POSTGRES_PRISMA_URL: postgresql://postgres:postgres@localhost:5432/test_db
+         POSTGRES_URL_NON_POOLING: postgresql://postgres:postgres@localhost:5432/test_db
+         GITHUB_CLIENT_ID: fake-client-id
+         GITHUB_CLIENT_SECRET: fake-client-secret
+         NEXTAUTH_SECRET: fake-nextauth-secret-for-testing
+         NEXTAUTH_URL: http://localhost:3000
+         AUTH0_DOMAIN: https://dummy.auth0.com
+
+ build:
+   needs: test
+   runs-on: ubuntu-latest
+   steps:
+     - name: Get code
+       uses: actions/checkout@v3
+     - name: Install dependencies
+       run: npm i
+     - name: Build
+       run: npm run build
+       env:  
+        GITHUB_CLIENT_ID: fake-client-id
+        GITHUB_CLIENT_SECRET: fake-client-secret
+        NEXTAUTH_SECRET: fake-nextauth-secret-for-testing
+        NEXTAUTH_URL: http://localhost:3000
+        AUTH0_DOMAIN: https://dummy.auth0.com

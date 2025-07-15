@@ -16,7 +16,7 @@
     "vercel-build": "prisma generate && prisma migrate deploy && next build",
     "prisma:generate": "prisma generate",
     "prisma:seed": "ts-node --compiler-options '{\"module\":\"commonjs\"}' prisma/seeds.ts",
-    "test": "dotenv -e .env.test npx prisma db push && concurrently \" NODE_ENV=test next dev\" \"dotenv -e .env.test cypress run\"",
+    "test": "dotenv -e .env.test npx prisma db push && concurrently --kill-others --success first \" NODE_ENV=test next dev\" \"dotenv -e .env.test -- cypress run\"",
     "test:open": "dotenv -e .env.test npx prisma db push && concurrently \"NODE_ENV=test next dev\" \"dotenv -e .env.test cypress open\"",
     "postinstall": "prisma generate",
     "prepare": "husky"
