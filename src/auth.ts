@@ -1,9 +1,9 @@
-import NextAuth from 'next-auth';
-import Github from 'next-auth/providers/github';
-import Auth0 from 'next-auth/providers/auth0';
-import { PrismaAdapter } from '@auth/prisma-adapter';
 import db from '@/db';
+import { PrismaAdapter } from '@auth/prisma-adapter';
 import { UserType } from '@prisma/client';
+import NextAuth from 'next-auth';
+import Auth0 from 'next-auth/providers/auth0';
+import Github from 'next-auth/providers/github';
 
 const GITHUB_CLIENT_ID = process.env.GITHUB_CLIENT_ID;
 const GITHUB_CLIENT_SECRET = process.env.GITHUB_CLIENT_SECRET;
@@ -28,7 +28,7 @@ export const {
       clientId: process.env.AUTH0_CLIENT_ID,
       clientSecret: process.env.AUTH0_CLIENT_SECRET,
       issuer: process.env.AUTH0_DOMAIN,
-      checks: ['none'] // https://github.com/nextauthjs/next-auth/discussions/7491
+      checks: ['none'], // https://github.com/nextauthjs/next-auth/discussions/7491
       // also consider https://github.com/nextauthjs/next-auth/discussions/6898
       // allowDangerousEmailAccountLinking: true
     }),
@@ -54,7 +54,9 @@ export const {
       const { user, account, isNewUser } = message;
       if (isNewUser) {
         const provider = account?.provider;
-        const userTypes = [provider === 'github' ? UserType.ENGINEER : UserType.COMPANY];
+        const userTypes = [
+          provider === 'github' ? UserType.ENGINEER : UserType.COMPANY,
+        ];
         await db.user.update({ data: { userTypes }, where: { id: user.id } });
       }
     },
