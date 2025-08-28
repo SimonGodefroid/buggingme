@@ -51,16 +51,16 @@ export default async function Home() {
         <div className="col-span-12">
           <Card className="max-w-6xl p-6 my-auto mx-auto shadow-lg">
             <CardHeader className="justify-center text-center">
-              <h1 className="text-4xl font-bold">Stand out now!</h1>
+              <h1 className="text-4xl font-bold">Stand out now and get hired</h1>
             </CardHeader>
             {/* <CardHeader className="text-center">
               <h1 className="text-4xl font-bold">Meet halfway</h1>
             </CardHeader> */}
             <CardBody className="justify-center text-center">
               <p className="text-lg">
-                It can be visual, it can be a 500, an a11y issue, a security
-                concern... <br />
-                Report it. <br />
+                Report bugs (it can be visual, an improper 500 error, an a11y issue, a security
+                concern...)<br />
+                Talk about tech.<br/>
                 Get noticed. <br />
                 Get hired.
                 <br />

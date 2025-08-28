@@ -6,6 +6,7 @@ import './globals.css';
 import { fetchAllCounts } from '@/actions/count/fetchAllCounts';
 import { fetchUser } from '@/actions/users/fetchUser';
 import { UserWithCompanies } from '@/types';
+import { Card, CardBody } from '@nextui-org/react';
 import { UserType } from '@prisma/client';
 
 import NavTabs from '@/components/nav-tabs';
@@ -16,8 +17,8 @@ import NotFound from './not-found';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: 'BugBusters - Find glitches get money',
-  description: 'Submit bugs, get noticed, get paid',
+  title: "BugBusters - It's like Bravado but for Engineers",
+  description: 'Report bugs, get noticed, talk tech, stand out, get hired',
 };
 
 export default async function RootLayout({
@@ -58,6 +59,9 @@ export default async function RootLayout({
           <NavTabs count={counts} user={user} />
           {/* overflow-auto  */}
           <main className="flex flex-col m-4 md:m-4 my-4 mb-10 pb-60">
+            <Card>
+              <CardBody className='bg-green-400 text-foreground'>New release soon: Transforming reports into a war-room for both community topics and bug reports</CardBody>
+            </Card>
             {rendered()}
           </main>
           <footer className="border-t-1 py-1 text-xs fixed bottom-0 w-full bg-background text-foreground z-10 opacity-75">
