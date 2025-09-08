@@ -1,8 +1,11 @@
 'use client';
 
 import { Key, useEffect, useState } from 'react';
+
 import { useRouter } from 'next/navigation';
+
 import { createCompany } from '@/actions';
+import { getCompanyLogo } from '@/helpers/companies';
 import {
   Autocomplete,
   AutocompleteItem,
@@ -17,7 +20,12 @@ import { toast } from 'react-toastify';
 
 const renderOption = (company: any) => (
   <div className="flex gap-2 items-center">
-    <Avatar alt={company?.name} src={company?.logo} size="sm" isBordered />
+    <Avatar
+      alt={company?.name}
+      src={getCompanyLogo(company)}
+      size="sm"
+      isBordered
+    />
     <div className="flex flex-col">
       <span>{company?.name}</span>
       <span className="text-tiny text-default-400">{company?.domain}</span>

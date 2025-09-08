@@ -46,16 +46,17 @@ declare global {
 }
 
 Cypress.on('uncaught:exception', (err) => {
+  alert('err.message' + err.message);
+  console.log('err'.repeat(200), err);
   console.error('Uncaught exception in app:', err.stack || err.message || err);
-
   // ignore recoverable chunk load errors
-  if (/Loading chunk \d+ failed/.test(err.message)) {
-    window.location.reload();
-    return false;
-  }
+  // if (/Loading chunk \d+ failed/.test(err.message)) {
+  // window.location.reload();
+  // return false;
+  // }
 
   // let Cypress fail the test for all other errors
-  return true;
+  return false;
 });
 
 Cypress.Commands.add('setSession', (userType: UserType) => {
@@ -63,23 +64,28 @@ Cypress.Commands.add('setSession', (userType: UserType) => {
     const user = (users as User[]).find((user) =>
       user.userTypes.includes(userType),
     );
+
+    cy.log(`type ${userType} found`.repeat(299), user);
     cy.log(`User type ${userType} found:`, user);
     if (!user) {
+      cy.log(`User type ${userType} not found`);
+      console.log(`User type ${userType} not found`);
       throw new Error(`User type ${userType} not found`);
     }
+    cy.log(`Coucou user`.repeat(200), user);
+
     return user;
   };
 
-  const loggedInUser = getUserSessionByType(userType);
-  cy.log('loggedInUser'.repeat(10) + JSON.stringify(loggedInUser));
-  const sessionToLog = sessions.find(
-    (session) => session.userId === loggedInUser.id,
-  );
-  cy.log('sessionToLog'.repeat(10) + JSON.stringify(sessionToLog));
-  cy.setCookie(
-    'authjs.session-token',
-    sessions?.find((session) => session.userId === loggedInUser.id)
-      ?.sessionToken || '',
-  );
-  cy.visit('/');
+  // const loggedInUser = getUserSessionByType(userType);
+  // cy.log('loggedInUser'.repeat(10) + JSON.stringify(loggedInUser));
+  // const sessionToLog = sessions.find(
+  //   (session) => session.userId === loggedInUser.id,
+  // );
+  // cy.log('sessionToLog'.repeat(10) + JSON.stringify(sessionToLog));
+  // cy.setCookie(
+  //   'authjs.session-token',
+  //   sessions?.find((session) => session.userId === loggedInUser.id)
+  //     ?.sessionToken || '',
+  // );
 });

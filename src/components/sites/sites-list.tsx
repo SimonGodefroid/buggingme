@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 
+import { getCompanyLogo } from '@/helpers/companies';
 import { CompanyWithReports } from '@/types';
 import {
   Avatar,
@@ -28,13 +29,13 @@ export default function SitesList({
   companies: CompanyWithReports[];
 }) {
   const router = useRouter();
-  return (companies || []).map((c) => {
-    const link = getHost(c.domain ?? undefined);
+  return (companies || []).map((company) => {
+    const link = getHost(company.domain ?? undefined);
 
     return (
       <Card
         className="w-4/5 sm:w-2/3 md:w-1/2 lg:w-10/12"
-        key={c.id}
+        key={company.id}
         isPressable
         onPress={() => {
           router.push(`/sites/${link}`);
@@ -43,27 +44,29 @@ export default function SitesList({
         <CardHeader className="flex justify-between items-center bg-blue-400">
           <div className="flex gap-3 items-center">
             <Avatar
-              alt={c.name + ' logo'}
+              alt={company.name + ' logo'}
               radius="sm"
-              src={`${c.logo}`}
-              name={c.name}
+              src={getCompanyLogo(company)}
+              name={company.name}
             />
             <div className="flex flex-col">
-              <p className="text-md">{c.name}</p>
-              <p className="text-small text-foreground">{c.domain}</p>
+              <p className="text-md">{company.name}</p>
+              <p className="text-small text-foreground">{company.domain}</p>
             </div>
           </div>
-          <p className="text-md">{c.reports.length} reports</p>
+          <p className="text-md">{company.reports.length} reports</p>
         </CardHeader>
         <CardBody>
           <p>
             Categories:{' '}
-            {c.reports.map((r) => r.tags.map((tag) => tag.name).join(', '))}
+            {company.reports.map((r) =>
+              r.tags.map((tag) => tag.name).join(', '),
+            )}
           </p>
         </CardBody>
         <CardFooter className="flex justify-end">
-          <Link showAnchorIcon href={`${c.domain}`}>
-            {c.domain}
+          <Link showAnchorIcon href={`${company.domain}`}>
+            {company.domain}
           </Link>
         </CardFooter>
       </Card>
