@@ -137,7 +137,7 @@ export default function NavTabs({
       label: 'Leaderboard',
       href: '/leaderboard',
     },
-    {
+    !user && {
       emoji: <Icon name="help-circle" />,
       label: 'How It Works',
       href: '/how-it-works',

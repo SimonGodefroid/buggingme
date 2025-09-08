@@ -1,9 +1,7 @@
 'use client';
 
 import { Key, useEffect, useState } from 'react';
-
 import { useRouter } from 'next/navigation';
-
 import { createCompany } from '@/actions';
 import {
   Autocomplete,
@@ -13,7 +11,6 @@ import {
   Button,
   Input,
 } from '@nextui-org/react';
-import { Company } from '@prisma/client';
 import debounce from 'lodash.debounce';
 import { useFormState } from 'react-dom';
 import { toast } from 'react-toastify';
@@ -50,7 +47,7 @@ export function CreateCompanyForm() {
         `Something went wrong while creating the company ${createCompanyFormState.errors._form?.join(',')}`,
       );
     }
-  }, [createCompanyFormState,router]);
+  }, [createCompanyFormState, router]);
 
   const [companyData, setCompanyData] = useState<{
     name: string;
@@ -69,9 +66,15 @@ export function CreateCompanyForm() {
 
   const handleSelectionChange = (selectedKey: Key | null) => {
     const selectedSuggestion = suggestions.find(
-      (suggestion) => `${suggestion.name}-${suggestion.domain}` === selectedKey,
+      (s) => `${s.name}-${s.domain}` === selectedKey,
     );
-    if (selectedSuggestion) setCompanyData(selectedSuggestion);
+    if (selectedSuggestion) {
+      setCompanyData({
+        name: selectedSuggestion.name,
+        domain: selectedSuggestion.domain,
+        logo: `https://img.logo.dev/${selectedSuggestion.domain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN}`,
+      });
+    }
   };
 
   const fetchSuggestions = async (term: string) => {
@@ -169,7 +172,11 @@ export function CreateCompanyForm() {
               <div className="flex gap-2 items-center">
                 <Avatar
                   alt={companyData?.name}
-                  src={companyData?.logo}
+                  src={
+                    companyData.domain
+                      ? `https://img.logo.dev/${companyData.domain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN}`
+                      : companyData.logo
+                  }
                   name={companyData?.name}
                   size="sm"
                   isBordered

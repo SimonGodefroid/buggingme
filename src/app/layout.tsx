@@ -59,8 +59,11 @@ export default async function RootLayout({
           <NavTabs count={counts} user={user} />
           {/* overflow-auto  */}
           <main className="flex flex-col m-4 md:m-4 my-4 mb-10 pb-60">
-            <Card>
-              <CardBody className='bg-green-400 text-foreground'>New release soon: Transforming reports into a war-room for both community topics and bug reports</CardBody>
+            <Card className="mx-4 mb-4">
+              <CardBody className="bg-green-400 text-foreground 4">
+                New release soon: Transforming reports into a war-room for both
+                community topics and bug reports
+              </CardBody>
             </Card>
             {rendered()}
           </main>
@@ -86,6 +89,9 @@ export default async function RootLayout({
                 </a>
               ))}
             </div>
+            <a className="m-4" href="https://logo.dev">
+              Logos provided by Logo.dev
+            </a>
           </footer>
           {/* <footer className="border-t-1 py-2 fixed bottom-0 w-full bg-foreground text-background z-10 ">
             <div
