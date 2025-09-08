@@ -89,7 +89,9 @@ export default async function RootLayout({
                 </a>
               ))}
             </div>
-            <a className='m-4' href="https://logo.dev">Logos provided by Logo.dev</a>
+            <a className="m-4" href="https://logo.dev">
+              Logos provided by Logo.dev
+            </a>
           </footer>
           {/* <footer className="border-t-1 py-2 fixed bottom-0 w-full bg-foreground text-background z-10 ">
             <div

@@ -1,11 +1,14 @@
 /// <reference types="@testing-library/cypress" />
 /// <reference types="cypress" />
 // import type Chainable from 'cypress'
-import "./auth-provider-commands/auth0";
-import '@testing-library/cypress/add-commands'
+import './auth-provider-commands/auth0';
+import '@testing-library/cypress/add-commands';
+
 import { User, UserType } from '@prisma/client';
+
 // import cypress = require('cypress');
 import { sessions, users } from '../data';
+
 // ***********************************************
 // This example commands.ts shows you how to
 // create various custom commands and overwrite
@@ -36,37 +39,47 @@ import { sessions, users } from '../data';
 declare global {
   namespace Cypress {
     interface Chainable {
-      loginToAuth0(username: string, password: string): Chainable<void>
-      setSession(userType: UserType): Chainable<void>
+      loginToAuth0(username: string, password: string): Chainable<void>;
+      setSession(userType: UserType): Chainable<void>;
     }
   }
 }
 
-
 Cypress.on('uncaught:exception', (err) => {
-  console.log('uncaught:exception', err)
-  // we check if the error is
-  // prompt user to confirm refresh
-  if (/Loading chunk [\d]+ failed/.test(err.message)) {
-    cy.window().reload()
+  console.error('Uncaught exception in app:', err.stack || err.message || err);
+
+  // ignore recoverable chunk load errors
+  if (/Loading chunk \d+ failed/.test(err.message)) {
+    window.location.reload();
+    return false;
   }
+
+  // let Cypress fail the test for all other errors
+  return true;
 });
 
 Cypress.Commands.add('setSession', (userType: UserType) => {
   const getUserSessionByType = (userType: UserType) => {
-    const user = (users as User[]).find(user => user.userTypes.includes(userType));
+    const user = (users as User[]).find((user) =>
+      user.userTypes.includes(userType),
+    );
     cy.log(`User type ${userType} found:`, user);
     if (!user) {
       throw new Error(`User type ${userType} not found`);
     }
     return user;
-  }
-
+  };
 
   const loggedInUser = getUserSessionByType(userType);
   cy.log('loggedInUser'.repeat(10) + JSON.stringify(loggedInUser));
-  const sessionToLog = sessions.find(session => session.userId === loggedInUser.id);
+  const sessionToLog = sessions.find(
+    (session) => session.userId === loggedInUser.id,
+  );
   cy.log('sessionToLog'.repeat(10) + JSON.stringify(sessionToLog));
-  cy.setCookie('authjs.session-token', sessions?.find(session => session.userId === loggedInUser.id)?.sessionToken || '')
-  cy.visit('/')
-})
+  cy.setCookie(
+    'authjs.session-token',
+    sessions?.find((session) => session.userId === loggedInUser.id)
+      ?.sessionToken || '',
+  );
+  cy.visit('/');
+});

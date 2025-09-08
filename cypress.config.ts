@@ -1,32 +1,46 @@
+// cypress.config.ts
 import { defineConfig } from "cypress";
 import { seed } from "./prisma/seed-tests";
+import * as dotenv from "dotenv";
 
-require('dotenv').config({ path: ['.env.test',], })
+dotenv.config({ path: ".env.test" });
+
+function requireEnv(name: string): string {
+  const val = process.env[name] || 'mock-env-variable';
+  if (!val) {
+    throw new Error(`Missing required env var: ${name}`);
+  }
+  return val;
+}
 
 export default defineConfig({
   e2e: {
-    baseUrl: 'http://localhost:3000',
+    baseUrl: "http://localhost:3000",
     video: false,
-    //  https://github.com/nextauthjs/next-auth/discussions/2053
     setupNodeEvents(on, config) {
-      on('task', {
+      on("task", {
         async seedDatabase() {
-          console.log('@'.repeat(200), 'we\'re seeding')
-          await seed();
-          return null;
-        }
-      })
-      // implement node event listeners here
+          try {
+            // eslint-disable-next-line no-console
+            console.error(">>> Seeding DB with prisma/seed-tests.ts");
+            await seed();
+            return { success: true };
+          } catch (err) {
+            // dump stack trace to CI logs
+            console.error("Seeding failed:", err instanceof Error ? err.stack : err);
+            // returning an error object makes Cypress fail the test cleanly
+            return { success: false, error: err instanceof Error ? err.message : String(err) };
+          }
+        },
+      });
     },
   },
   env: {
-    auth0_username: process.env.AUTH0_USERNAME,
-    auth0_password: process.env.AUTH0_PASSWORD,
-    auth0_domain: process.env.AUTH0_DOMAIN,
-    nextauth_secret: process.env.NEXTAUTH_SECRET,
-    // auth0_audience: process.env.REACT_APP_AUTH0_AUDIENCE,
-    // auth0_scope: process.env.REACT_APP_AUTH0_SCOPE,
-    auth0_client_id: process.env.AUTH0_CLIENT_ID,
-    auth0_client_secret: process.env.AUTH0_CLIENT_SECRET,
+    // auth0_username: requireEnv("AUTH0_USERNAME"),
+    // auth0_password: requireEnv("AUTH0_PASSWORD"),
+    auth0_domain: requireEnv("AUTH0_DOMAIN"),
+    nextauth_secret: requireEnv("NEXTAUTH_SECRET"),
+    auth0_client_id: requireEnv("AUTH0_CLIENT_ID"),
+    auth0_client_secret: requireEnv("AUTH0_CLIENT_SECRET"),
   },
 });
