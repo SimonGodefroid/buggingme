@@ -9,9 +9,11 @@ export default function CompanyBadge({ company }: { company: Company }) {
       }}
       avatarProps={{
         radius: 'lg',
-        src: `${company?.logo}`,
+        src: company.domain
+          ? `https://img.logo.dev/${company.domain}?token=${process.env.NEXT_PUBLIC_LOGO_DEV_TOKEN}`
+          : (company.logo ?? ''),
         size: 'md',
-        className:'shrink-0'
+        className: 'shrink-0',
       }}
       description={company.domain}
       name={company.name}

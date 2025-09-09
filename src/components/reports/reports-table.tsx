@@ -4,6 +4,7 @@ import React from 'react';
 
 import { useRouter } from 'next/navigation';
 
+import { getCompanyLogo } from '@/helpers/companies';
 import { pascalToSentenceCase } from '@/helpers/strings/pascalToSentenceCase';
 import { ReportWithTags, UserWithCompanies } from '@/types';
 import {
@@ -140,7 +141,7 @@ export default function ReportsTable({
               }}
               avatarProps={{
                 radius: 'lg',
-                src: `${report?.company?.logo}` || '',
+                src: getCompanyLogo(report?.company!) || '',
                 size: 'md',
                 className: 'shrink-0',
               }}

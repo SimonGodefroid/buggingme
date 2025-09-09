@@ -1,3 +1,4 @@
+import { getCompanyLogo } from '@/helpers/companies';
 import { Avatar } from '@nextui-org/react';
 import { Company } from '@prisma/client';
 
@@ -7,7 +8,7 @@ export default function SiteBadge({ company }: { company: Company }) {
       {/* <div className="flex gap-2 items-center flex-wrap justify-center"> */}
       <Avatar
         alt={company?.name}
-        src={`${company?.logo}`}
+        src={getCompanyLogo(company)}
         className="shrink-0"
         isBordered
         radius="sm"
