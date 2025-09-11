@@ -6,7 +6,16 @@ import { redirect, useRouter } from 'next/navigation';
 
 import { createReport } from '@/actions/reports/create';
 import { ReportWithTags, UserWithCompanies } from '@/types';
-import { Button, Input, Selection, Textarea, Tooltip, Spinner } from '@nextui-org/react';
+import {
+  Button,
+  Input,
+  Select,
+  Selection,
+  SelectItem,
+  Spinner,
+  Textarea,
+  Tooltip,
+} from '@nextui-org/react';
 import { Tag } from '@prisma/client';
 import { useFormState } from 'react-dom';
 // import { useFormState } from 'react-dom';
@@ -16,12 +25,12 @@ import { toast } from 'react-toastify';
 import { DragNDropFileUpload } from '@/components/common/drag-n-drop-file-upload';
 import { EditorClient } from '@/components/common/editor';
 import ImageTooltip from '@/components/common/image-tooltip';
+import SystemInfoBox from '@/components/common/system-info-box';
 
 // import CompanySelector from '../../companies/company-selector';
 import ImpactSelector from './impact-selector';
 import SeveritySelector from './severity-selector';
 import TagsSelector from './tags-selector';
-import SystemInfoBox from '@/components/common/system-info-box';
 
 export const CreateReportForm = ({
   user,
@@ -46,31 +55,30 @@ export const CreateReportForm = ({
   const [images, setImages] = React.useState<
     { url: string; filename: string }[]
   >([]);
-  
+
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isRedirecting, setIsRedirecting] = useState(false);
-  
-  useEffect(() => {
-  if (formState?.success) {
-    (async()=>{
-      setIsRedirecting(true);
-      await toast.success(
-        `The report has been created it will be reviewed by an admin before publication !`,
-      );
-      router.push(`/reports`); // Use router.push instead of redirect
-    })()
-  }
-    const hasFieldErrors =
-    Object.keys(formState?.errors || {}).length > 0;
 
-  if (formState?.errors._form?.length || hasFieldErrors) {
-    toast.error(
-      formState.errors._form?.join(', ') ||
-      'Please fix the highlighted errors.',
-    );
-    setIsSubmitting(false);
-  }
-}, [formState, router]); // Add router to dependencies
+  useEffect(() => {
+    if (formState?.success) {
+      (async () => {
+        setIsRedirecting(true);
+        await toast.success(
+          `The report has been created it will be reviewed by an admin before publication !`,
+        );
+        router.push(`/reports`); // Use router.push instead of redirect
+      })();
+    }
+    const hasFieldErrors = Object.keys(formState?.errors || {}).length > 0;
+
+    if (formState?.errors._form?.length || hasFieldErrors) {
+      toast.error(
+        formState.errors._form?.join(', ') ||
+          'Please fix the highlighted errors.',
+      );
+      setIsSubmitting(false);
+    }
+  }, [formState, router]); // Add router to dependencies
 
   const [url, setUrl] = useState<string>('');
   // const [selectedCampaign, setSelectedCampaign] = useState<any>(null);
@@ -86,8 +94,8 @@ export const CreateReportForm = ({
   // };
 
   const handleSubmit = (formData: FormData) => {
-      setIsSubmitting(true);
-      action(formData);
+    setIsSubmitting(true);
+    action(formData);
   };
 
   const handleCancel = () => {
@@ -131,17 +139,42 @@ export const CreateReportForm = ({
             <div className="col-span-12 md:col-span-6">
               <div className="flex flex-col gap-4 m-4">
                 <div className="flex gap-4 items-center">
-                  <Input
-                    isInvalid={!!formState?.errors.title}
-                    errorMessage={formState?.errors.title?.join(', ')}
-                    defaultValue={report?.title}
-                    name="title"
+                  <Select
+                    defaultSelectedKeys={['Bug']}
+                    disallowEmptySelection
+                    // isInvalid={!!formState?.errors.title}
+                    // errorMessage={formState?.errors.title?.join(', ')}
+                    // defaultValue={report?.title}
+                    name="type"
                     isRequired
-                    label="Title"
-                    placeholder="Wrong user information in profile"
-                    isDisabled={isSubmitting}
-                  />
+                    label="Report type"
+                    placeholder="Select the type of report you want to create"
+                    // isDisabled={isSubmitting}
+                    items={[{ label: 'a', value: 'a' }]}
+                  >
+                    {Object.values([
+                      { label: 'Bug', value: 'Bug' },
+                      { label: 'Feature', value: 'Feature' },
+                      { label: 'Discussion', value: 'Discussion' },
+                      { label: 'Question', value: 'Question' },
+                      { label: 'Announcement', value: 'Announcement' },
+                    ]).map((type) => (
+                      <SelectItem key={type.label} textValue={type.label}>
+                        {type.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
                 </div>
+                <Input
+                  isInvalid={!!formState?.errors.title}
+                  errorMessage={formState?.errors.title?.join(', ')}
+                  defaultValue={report?.title}
+                  name="title"
+                  isRequired
+                  label="Title"
+                  placeholder="Wrong user information in profile"
+                  isDisabled={isSubmitting}
+                />
                 {/* <div className="col-span-12">
                   <CampaignSelector
                     user={user!}
@@ -187,8 +220,12 @@ export const CreateReportForm = ({
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
-                  <ImpactSelector viewModeProps={{isDisabled:isSubmitting}} />
-                  <SeveritySelector viewModeProps={{isDisabled:isSubmitting}} />
+                  <ImpactSelector
+                    viewModeProps={{ isDisabled: isSubmitting }}
+                  />
+                  <SeveritySelector
+                    viewModeProps={{ isDisabled: isSubmitting }}
+                  />
                 </div>
                 <TagsSelector mode={'creation'} tags={tags} />
               </div>
@@ -270,7 +307,6 @@ export const CreateReportForm = ({
             {/* Right */}
             <div className="col-span-12 md:col-span-6">
               <div className="flex flex-col gap-4 m-4 md:mx-4 md:my-0">
-                
                 <EditorClient readOnly={isSubmitting} />
                 {/* {!user && (
                   <Input
@@ -296,9 +332,9 @@ export const CreateReportForm = ({
       </form>
 
       <div className="flex justify-between m-4">
-        <Button 
-          color="danger" 
-          variant="flat" 
+        <Button
+          color="danger"
+          variant="flat"
           onClick={handleCancel}
           isDisabled={isSubmitting}
         >
@@ -311,9 +347,9 @@ export const CreateReportForm = ({
             </Button>
           </Tooltip>
         ) : (
-          <Button 
-            color="primary" 
-            type="submit" 
+          <Button
+            color="primary"
+            type="submit"
             form={FORM_ID}
             isLoading={isSubmitting}
             isDisabled={isSubmitting}
